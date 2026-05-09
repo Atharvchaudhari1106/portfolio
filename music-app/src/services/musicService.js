@@ -3,7 +3,7 @@
 // uses DRM encryption that browsers cannot decrypt, resulting in only
 // background/instrumental audio playing.
 
-const SAAVN_API = 'https://jiosaavn-api-privatecvc2.vercel.app';
+const SAAVN_API = 'https://jiosaavn-api-v4.vercel.app/api';
 const PREFERRED_QUALITY = '96kbps'; // DO NOT change - higher qualities are DRM encrypted
 
 const mapSongItem = (item) => {
@@ -64,8 +64,9 @@ export const searchMusic = async (query) => {
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     const data = await response.json();
 
-    if (data.status === 'SUCCESS' && data.data?.results) {
-      const mapped = data.data.results.map(mapSongItem);
+    const results = data.data?.results || data.results;
+    if ((data.status === 'SUCCESS' || data.success === true || data.status === 'success') && results) {
+      const mapped = results.map(mapSongItem);
       
       // Deduplicate songs by title and artist to fix duplicate UI issues
       const seen = new Set();
