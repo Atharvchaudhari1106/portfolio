@@ -6,7 +6,7 @@ import shutil
 # Configure Flask to work with Flask-Frozen
 app.config['FREEZER_DESTINATION'] = 'build'
 app.config['FREEZER_RELATIVE_URLS'] = False
-app.config['FREEZER_BASE_URL'] = 'https://atharvchaudhari76-blip.github.io/portfolio/'
+app.config['FREEZER_BASE_URL'] = 'https://Atharvchaudhari1106.github.io/portfolio/'
 
 freezer = Freezer(app)
 
