@@ -17,21 +17,22 @@ const mapSongItem = (item) => {
   
   for (const q of qualities) {
     const found = downloadUrls.find(u => u.quality === q);
-    if (found?.link) {
-      streamUrl = found.link;
-      break;
+    if (found) {
+      streamUrl = found.url || found.link;
+      if (streamUrl) break;
     }
   }
 
   // If none of those, take the first available one as last resort
   if (!streamUrl && downloadUrls.length > 0) {
-    streamUrl = downloadUrls[0].link;
+    streamUrl = downloadUrls[0].url || downloadUrls[0].link;
   }
 
   // Handle image structure variations
   let thumbnail = 'https://via.placeholder.com/300';
   if (Array.isArray(item.image) && item.image.length > 0) {
-    thumbnail = item.image[item.image.length - 1].link;
+    const img = item.image[item.image.length - 1];
+    thumbnail = img.url || img.link;
   } else if (typeof item.image === 'string') {
     thumbnail = item.image;
   } else if (item.thumbnail) {
