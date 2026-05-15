@@ -24,7 +24,7 @@ const YoutubeView = () => {
       setUrl('');
     } catch (e) {
       console.error('Failed to import YouTube playlist', e);
-      setError('Failed to import. Make sure the playlist is public and the backend server is running.');
+      setError('Failed to import. Make sure the playlist URL is correct and the playlist is set to public.');
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ const YoutubeView = () => {
       {error && <div className="yt-error-msg">{error}</div>}
 
       <div className="yt-info-note glass-card">
-        <p><strong>Note:</strong> Requires the backend server running on port 5000 with a valid YouTube Data API v3 key in <code>.env</code></p>
+        <p><strong>Tip:</strong> Paste any public YouTube playlist URL. Supports <code>youtube.com</code> and <code>music.youtube.com</code> links.</p>
       </div>
 
       {/* Playlists */}
