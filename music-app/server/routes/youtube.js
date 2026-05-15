@@ -1,66 +1,57 @@
 import express from 'express';
-import { google } from 'googleapis';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import ytpl from '@distube/ytpl';
+import ytsr from '@distube/ytsr';
 
 const router = express.Router();
-const youtube = google.youtube({
-  version: 'v3',
-  auth: process.env.YOUTUBE_API_KEY
-});
+
+// Extract playlist ID from various YouTube URL formats
+const extractPlaylistId = (url) => {
+  try {
+    const urlObj = new URL(url);
+    // Handle youtube.com, music.youtube.com, youtu.be
+    const listParam = urlObj.searchParams.get('list');
+    if (listParam) return listParam;
+  } catch (e) {
+    // Not a valid URL — treat as raw playlist ID
+  }
+  return url;
+};
 
 // Import Playlist by URL
 router.get('/playlist', async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Playlist URL is required' });
 
-  // Extract ID from URL
-  let playlistId = url;
-  try {
-    const urlObj = new URL(url);
-    playlistId = urlObj.searchParams.get('list') || url;
-  } catch (e) {
-    // Not a valid URL, treat as ID
-  }
+  const playlistId = extractPlaylistId(url);
+  console.log(`[YouTube] Fetching playlist: ${playlistId}`);
 
   try {
-    const response = await youtube.playlists.list({
-      part: ['snippet', 'contentDetails'],
-      id: [playlistId]
-    });
+    const playlist = await ytpl(playlistId, { limit: 100 });
 
-    if (!response.data.items || response.data.items.length === 0) {
-      return res.status(404).json({ error: 'Playlist not found' });
+    if (!playlist || !playlist.items || playlist.items.length === 0) {
+      return res.status(404).json({ error: 'Playlist not found or is empty' });
     }
 
-    const playlistInfo = response.data.items[0];
-    
-    // Fetch items in the playlist
-    const itemsResponse = await youtube.playlistItems.list({
-      part: ['snippet', 'contentDetails'],
-      playlistId: playlistId,
-      maxResults: 50
-    });
-
-    const tracks = itemsResponse.data.items.map(item => ({
-      id: item.contentDetails.videoId,
-      title: item.snippet.title,
-      artist: item.snippet.videoOwnerChannelTitle || item.snippet.channelTitle,
-      thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
+    const tracks = playlist.items.map(item => ({
+      id: item.id,
+      title: cleanTitle(item.title || 'Unknown'),
+      artist: (item.author?.name || 'Unknown Artist').replace(' - Topic', ''),
+      thumbnail: item.bestThumbnail?.url || item.thumbnails?.[0]?.url || '',
       source: 'youtube',
-      duration: 0 // YouTube API items list doesn't provide duration directly, needs another call or client-side handle
+      duration: item.durationSec || 0
     }));
 
+    console.log(`[YouTube] Found ${tracks.length} tracks in "${playlist.title}"`);
+
     res.json({
-      title: playlistInfo.snippet.title,
-      description: playlistInfo.snippet.description,
-      thumbnail: playlistInfo.snippet.thumbnails.high?.url,
+      title: playlist.title || 'YouTube Playlist',
+      description: playlist.description || '',
+      thumbnail: playlist.bestThumbnail?.url || (tracks[0]?.thumbnail || ''),
       tracks
     });
   } catch (error) {
-    console.error('Error fetching YouTube playlist:', error);
-    res.status(500).json({ error: 'Failed to fetch YouTube playlist' });
+    console.error('[YouTube] Error fetching playlist:', error.message);
+    res.status(500).json({ error: 'Failed to fetch playlist: ' + error.message });
   }
 });
 
@@ -70,27 +61,43 @@ router.get('/search', async (req, res) => {
   if (!q) return res.status(400).json({ error: 'Search query is required' });
 
   try {
-    const response = await youtube.search.list({
-      part: ['snippet'],
-      q: q,
-      type: ['video'],
-      maxResults: 10,
-      videoCategoryId: '10' // Music category
-    });
+    const searchResults = await ytsr(q + ' music', { limit: 15 });
 
-    const results = response.data.items.map(item => ({
-      id: item.id.videoId,
-      title: item.snippet.title,
-      artist: item.snippet.channelTitle,
-      thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
-      source: 'youtube'
-    }));
+    const results = searchResults.items
+      .filter(item => item.type === 'video')
+      .map(item => ({
+        id: item.id,
+        title: cleanTitle(item.name || 'Unknown'),
+        artist: (item.author?.name || 'Unknown Artist').replace(' - Topic', ''),
+        thumbnail: item.bestThumbnail?.url || item.thumbnails?.[0]?.url || '',
+        source: 'youtube',
+        duration: parseDuration(item.duration)
+      }));
 
     res.json(results);
   } catch (error) {
-    console.error('Error searching YouTube:', error);
+    console.error('[YouTube] Error searching:', error.message);
     res.status(500).json({ error: 'Failed to search YouTube' });
   }
 });
+
+// Parse "3:45" duration string to seconds
+function parseDuration(str) {
+  if (!str) return 0;
+  const parts = str.split(':').map(Number);
+  if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  if (parts.length === 2) return parts[0] * 60 + parts[1];
+  return parts[0] || 0;
+}
+
+// Clean HTML entities
+function cleanTitle(title) {
+  return title
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
 
 export default router;
