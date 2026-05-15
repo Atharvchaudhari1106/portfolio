@@ -3,9 +3,9 @@ import {
   SkipBack, Play, Pause, SkipForward, Volume2, 
   VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus
 } from 'lucide-react';
-import ReactPlayer from 'react-player';
 import { useAudio } from '../context/AudioContext';
 import { downloadSong } from '../services/musicService';
+import { getYoutubeAudioStream } from '../services/youtubeService';
 
 const PlayerBar = ({ onOpenNowPlaying }) => {
   const { 
@@ -42,11 +42,41 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef(null);       // For standard <audio> element
-  const reactPlayerRef = useRef(null); // For ReactPlayer (YouTube)
+  const [ytStreamUrl, setYtStreamUrl] = useState(null);
+  const [ytLoading, setYtLoading] = useState(false);
+  const audioRef = useRef(null);
 
   // Determine if current track is a YouTube source
-  const isYoutubeTrack = currentTrack?.source === 'youtube' || (!currentTrack?.streamUrl && (typeof currentTrack?.id === 'object' || currentTrack?.id?.length === 11));
+  const isYoutubeTrack = currentTrack?.source === 'youtube';
+
+  // Resolve YouTube audio stream when a YouTube track becomes active
+  useEffect(() => {
+    if (!isYoutubeTrack || !currentTrack?.id) {
+      setYtStreamUrl(null);
+      return;
+    }
+
+    let cancelled = false;
+    setYtStreamUrl(null);
+    setYtLoading(true);
+
+    getYoutubeAudioStream(currentTrack.id)
+      .then(url => {
+        if (!cancelled) {
+          setYtStreamUrl(url);
+          setYtLoading(false);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to get YouTube audio stream:', err);
+        if (!cancelled) {
+          setYtStreamUrl(null);
+          setYtLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [currentTrack?.id, isYoutubeTrack]);
 
   // Configure Media Session API for mobile OS controls
   useEffect(() => {
@@ -69,20 +99,23 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   }, [currentTrack]);
 
+  // The effective stream URL for the <audio> element
+  const effectiveStreamUrl = isYoutubeTrack ? ytStreamUrl : currentTrack?.streamUrl;
+
   // === Standard <audio> element playback control ===
   useEffect(() => {
-    if (!audioRef.current || isYoutubeTrack) return;
+    if (!audioRef.current || !effectiveStreamUrl) return;
     if (isPlaying) {
       audioRef.current.play().catch(err => console.warn('Audio play error:', err));
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, isYoutubeTrack]);
+  }, [isPlaying, effectiveStreamUrl]);
 
   useEffect(() => {
-    if (!audioRef.current || isYoutubeTrack) return;
+    if (!audioRef.current) return;
     audioRef.current.volume = volume;
-  }, [volume, isYoutubeTrack]);
+  }, [volume]);
 
   // When track changes, reset progress
   useEffect(() => {
@@ -91,13 +124,13 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   }, [currentTrack?.id]);
 
   const handleTimeUpdate = () => {
-    if (audioRef.current && !isYoutubeTrack) {
+    if (audioRef.current) {
       setPlayedSeconds(audioRef.current.currentTime);
     }
   };
 
   const handleLoadedMetadata = () => {
-    if (audioRef.current && !isYoutubeTrack) {
+    if (audioRef.current) {
       setDuration(audioRef.current.duration);
       if (isPlaying) {
         audioRef.current.play().catch(err => console.warn('Auto-play error:', err));
@@ -119,14 +152,8 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const handleSeek = (e) => {
     const time = parseFloat(e.target.value);
     setPlayedSeconds(time);
-    if (isYoutubeTrack) {
-      if (reactPlayerRef.current) {
-        reactPlayerRef.current.seekTo(time);
-      }
-    } else {
-      if (audioRef.current) {
-        audioRef.current.currentTime = time;
-      }
+    if (audioRef.current) {
+      audioRef.current.currentTime = time;
     }
   };
 
@@ -153,7 +180,9 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         </div>
         <div className="track-info">
           <h4 className="player-track-title">{currentTrack.title}</h4>
-          <p className="player-track-artist">{currentTrack.artist}</p>
+          <p className="player-track-artist">
+            {ytLoading ? 'Loading stream...' : currentTrack.artist}
+          </p>
         </div>
         <button 
           className="icon-btn heart-btn"
@@ -329,46 +358,19 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         </div>
       </div>
 
-      {/* Standard <audio> for JioSaavn / Spotify streams */}
-      {!isYoutubeTrack && currentTrack.streamUrl && (
+      {/* Unified <audio> for all sources (JioSaavn + YouTube via Invidious) */}
+      {effectiveStreamUrl && (
         <audio
           ref={audioRef}
-          src={currentTrack.streamUrl}
+          src={effectiveStreamUrl}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={playNext}
+          onError={(e) => console.error('Audio element error:', e)}
           preload="auto"
+          crossOrigin="anonymous"
           hidden
         />
-      )}
-
-      {/* ReactPlayer for YouTube sources */}
-      {isYoutubeTrack && (
-        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: '300px', height: '200px', opacity: 0, pointerEvents: 'none' }}>
-          <ReactPlayer
-            ref={reactPlayerRef}
-            url={`https://www.youtube.com/watch?v=${typeof currentTrack.id === 'object' ? currentTrack.id.videoId : currentTrack.id}`}
-            playing={isPlaying}
-            volume={volume}
-            onProgress={(state) => setPlayedSeconds(state.playedSeconds)}
-            onDuration={(d) => setDuration(d)}
-            onEnded={playNext}
-            onError={(e) => console.error('ReactPlayer Error:', e)}
-            width="100%"
-            height="100%"
-            config={{
-              youtube: {
-                playerVars: { 
-                  autoplay: 1,
-                  controls: 0,
-                  showinfo: 0,
-                  rel: 0,
-                  modestbranding: 1
-                }
-              }
-            }}
-          />
-        </div>
       )}
     </div>
   );
