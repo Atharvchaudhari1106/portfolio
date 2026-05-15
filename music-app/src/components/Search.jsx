@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Search as SearchIcon, Clock, X, Play } from 'lucide-react';
 import { searchMusic } from '../services/musicService';
+import { searchSpotify } from '../services/spotifyService';
+import { searchYoutube } from '../services/youtubeService';
 import { useAudio } from '../context/AudioContext';
+import { useMusic } from '../context/MusicContext';
 import { addToSearchHistory, getSearchHistory, removeFromSearchHistory, clearSearchHistory } from '../services/searchHistory';
 import TrackRow from './TrackRow';
+import { Music2, TvMinimalPlay, Search as SearchIcon, Clock, X, Play } from 'lucide-react';
 
 const Search = () => {
   const [query, setQuery] = useState('');
@@ -11,6 +14,8 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const { playTrack, currentTrack, isPlaying } = useAudio();
+  const { spotifyToken } = useMusic();
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'spotify', 'youtube'
 
   const browseCategories = [
     { title: 'Electronic', color: 'linear-gradient(135deg, #8B5CF6, #6D28D9)', icon: '⚡' },
@@ -32,9 +37,25 @@ const Search = () => {
       if (query.trim()) {
         setIsLoading(true);
         try {
-          const songs = await searchMusic(query);
-          setResults(songs);
-          if (songs.length > 0) {
+          let combinedResults = [];
+          
+          if (activeTab === 'all' || activeTab === 'saavn') {
+            const saavn = await searchMusic(query);
+            combinedResults = [...combinedResults, ...saavn];
+          }
+          
+          if (spotifyToken && (activeTab === 'all' || activeTab === 'spotify')) {
+            const spotify = await searchSpotify(query, spotifyToken);
+            combinedResults = [...combinedResults, ...spotify];
+          }
+          
+          if (activeTab === 'all' || activeTab === 'youtube') {
+            const yt = await searchYoutube(query);
+            combinedResults = [...combinedResults, ...yt];
+          }
+
+          setResults(combinedResults);
+          if (combinedResults.length > 0) {
             addToSearchHistory(query);
             setHistory(getSearchHistory());
           }

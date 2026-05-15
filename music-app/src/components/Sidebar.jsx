@@ -1,15 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc } from 'lucide-react';
+import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc, Music2, TvMinimalPlay } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAudio } from '../context/AudioContext';
+import { useMusic } from '../context/MusicContext';
+import { getSpotifyLoginUrl } from '../services/spotifyService';
 import logo from '../assets/logo.png';
 
 const Sidebar = ({ setView, activeView }) => {
   const { logout, user } = useAuth();
   const { createPlaylist } = useAudio();
+  const { spotifyToken } = useMusic();
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  const handleSpotifyLogin = async () => {
+    try {
+      const url = await getSpotifyLoginUrl();
+      window.location.href = url;
+    } catch (e) {
+      console.error('Failed to get Spotify login URL', e);
+      alert('Failed to connect to Spotify. Is the server running?');
+    }
+  };
 
   const handleCreatePlaylist = () => {
     const name = window.prompt("Playlist name:");
@@ -24,11 +37,9 @@ const Sidebar = ({ setView, activeView }) => {
       setDeferredPrompt(e);
     };
 
-    // Detect iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     setIsIOS(isIOSDevice);
     
-    // Check if already installed
     const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
     setIsStandalone(isStandaloneMode);
 
@@ -79,6 +90,20 @@ const Sidebar = ({ setView, activeView }) => {
           <Search size={24} />
           <span>Search</span>
         </button>
+        <button
+          className={`nav-item ${activeView === 'spotify' ? 'active' : ''}`}
+          onClick={() => setView('spotify')}
+        >
+          <Music2 size={24} color="#1DB954" />
+          <span>Spotify</span>
+        </button>
+        <button
+          className={`nav-item ${activeView === 'youtube' ? 'active' : ''}`}
+          onClick={() => setView('youtube')}
+        >
+          <TvMinimalPlay size={24} color="#FF0000" />
+          <span>YouTube</span>
+        </button>
 
         {showInstallButton && (
           <div className="install-banner" style={{ padding: '8px 16px', marginTop: '8px' }}>
@@ -119,15 +144,20 @@ const Sidebar = ({ setView, activeView }) => {
         </div>
         
         <div className="library-content">
-          <div className="sidebar-card">
-            <h4>Create your first playlist</h4>
-            <p>It's easy, we'll help you</p>
-            <button className="pill-btn" onClick={handleCreatePlaylist}>Create playlist</button>
-          </div>
-          <div className="sidebar-card">
-            <h4>Let's find some podcasts to follow</h4>
-            <p>We'll keep you updated on new episodes</p>
-            <button className="pill-btn" onClick={() => setView('search')}>Browse podcasts</button>
+          {!spotifyToken && (
+            <div className="sidebar-card spotify-card">
+              <Music2 size={24} color="#1DB954" />
+              <h4>Connect Spotify</h4>
+              <p>Listen to your Spotify playlists here</p>
+              <button className="pill-btn spotify-btn" onClick={handleSpotifyLogin}>Connect</button>
+            </div>
+          )}
+          
+          <div className="sidebar-card youtube-card">
+            <TvMinimalPlay size={24} color="#FF0000" />
+            <h4>Import YouTube</h4>
+            <p>Paste a playlist URL to stream</p>
+            <button className="pill-btn youtube-btn" onClick={() => setView('youtube')}>Import</button>
           </div>
 
           <div className="sidebar-footer">
@@ -159,4 +189,3 @@ const Sidebar = ({ setView, activeView }) => {
 };
 
 export default Sidebar;
-

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { getTrending, getHomeSuggestions } from '../services/musicService';
 import { getRecentSearchTerms } from '../services/searchHistory';
 import { useAudio } from '../context/AudioContext';
+import { useMusic } from '../context/MusicContext';
+import { getSpotifyLikedSongs } from '../services/spotifyService';
 import SongCard from './SongCard';
 import TrackRow from './TrackRow';
-import { Play, Heart, MoreVertical } from 'lucide-react';
+import { Play, Heart, MoreVertical, Music2, TvMinimalPlay } from 'lucide-react';
 
 const Home = () => {
   const [categories, setCategories] = useState([]);
@@ -52,34 +54,45 @@ const Home = () => {
   useEffect(() => {
     const fetchMusic = async () => {
       setIsLoading(true);
-      
-      const searchTerms = getRecentSearchTerms(4);
-      const allTrending = await getTrending();
-      
-      const newCategories = [];
-      
-      if (searchTerms && searchTerms.length > 0) {
-        const dynamicCats = await getHomeSuggestions(searchTerms);
-        if (dynamicCats) {
-          newCategories.push(...dynamicCats);
-        }
-      }
-      
-      if (allTrending && allTrending.length > 0) {
-        setFeaturedSong(allTrending[0]);
-        newCategories.push({ id: 'trending-1', title: 'Personalized Mixes', tracks: allTrending.slice(1, 5) });
+      try {
+        const searchTerms = getRecentSearchTerms(4);
+        const allTrending = await getTrending();
         
-        if (newCategories.length < 3) {
-          newCategories.push({ id: 'trending-2', title: 'New Releases', tracks: allTrending.slice(5, 11) });
+        const newCategories = [];
+        
+        // Add Spotify Content if logged in
+        const spotifyToken = localStorage.getItem('spotify_access_token');
+        if (spotifyToken) {
+          try {
+            const liked = await getSpotifyLikedSongs(spotifyToken);
+            if (liked && liked.length > 0) {
+              newCategories.push({ id: 'spotify-liked', title: 'From your Spotify', tracks: liked.slice(0, 6) });
+            }
+          } catch (e) { console.error(e); }
         }
-        if (newCategories.length < 4) {
-          newCategories.push({ id: 'trending-3', title: 'Trending Tracks', tracks: allTrending.slice(11, 16) });
+
+        // Add YouTube Playlists
+        const youtubeData = JSON.parse(localStorage.getItem('youtube_playlists') || '[]');
+        if (youtubeData.length > 0) {
+          newCategories.push({ id: 'yt-playlist', title: 'YouTube Playlists', tracks: youtubeData[0].tracks.slice(0, 6) });
         }
+        
+        if (searchTerms && searchTerms.length > 0) {
+          const dynamicCats = await getHomeSuggestions(searchTerms);
+          if (dynamicCats) newCategories.push(...dynamicCats);
+        }
+        
+        if (allTrending && allTrending.length > 0) {
+          setFeaturedSong(allTrending[0]);
+          newCategories.push({ id: 'trending-1', title: 'Personalized Mixes', tracks: allTrending.slice(1, 5) });
+        }
+        
+        setCategories(newCategories.filter(c => c && c.tracks && c.tracks.length > 0));
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
-      
-      const validCategories = newCategories.filter(c => c && c.tracks && c.tracks.length > 0);
-      setCategories(validCategories);
-      setIsLoading(false);
     };
 
     fetchMusic();

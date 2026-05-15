@@ -7,6 +7,9 @@ import NowPlaying from './components/NowPlaying';
 import PlayerBar from './components/PlayerBar';
 import AuthModal from './components/AuthModal';
 import BottomNav from './components/BottomNav';
+import SpotifyView from './components/SpotifyView';
+import YoutubeView from './components/YoutubeView';
+import SpotifyCallback from './components/SpotifyCallback';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -31,6 +34,9 @@ function App() {
       case 'home': return <Home />;
       case 'search': return <Search />;
       case 'library': return <Library setView={handleSetView} />;
+      case 'spotify': return <SpotifyView />;
+      case 'youtube': return <YoutubeView />;
+      case 'spotify-callback': return <SpotifyCallback />;
       case 'nowplaying': return <NowPlaying goBack={() => handleSetView(prevView)} />;
       default: return <Home />;
     }

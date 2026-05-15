@@ -3,6 +3,7 @@ import {
   SkipBack, Play, Pause, SkipForward, Volume2, 
   VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus
 } from 'lucide-react';
+import ReactPlayer from 'react-player';
 import { useAudio } from '../context/AudioContext';
 import { downloadSong } from '../services/musicService';
 
@@ -41,21 +42,11 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [duration, setDuration] = useState(0);
-  const audioRef = useRef(null);
+  const audioRef = useRef(null);       // For standard <audio> element
+  const reactPlayerRef = useRef(null); // For ReactPlayer (YouTube)
 
-  // Sync isPlaying state with native audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(err => {
-          console.error('Playback failed:', err);
-          setIsPlaying(false);
-        });
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, currentTrack, setIsPlaying]);
+  // Determine if current track is a YouTube source
+  const isYoutubeTrack = currentTrack?.source === 'youtube';
 
   // Configure Media Session API for mobile OS controls
   useEffect(() => {
@@ -78,12 +69,41 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   }, [currentTrack]);
 
-  // Sync volume
+  // === Standard <audio> element playback control ===
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
+    if (!audioRef.current || isYoutubeTrack) return;
+    if (isPlaying) {
+      audioRef.current.play().catch(err => console.warn('Audio play error:', err));
+    } else {
+      audioRef.current.pause();
     }
-  }, [volume]);
+  }, [isPlaying, isYoutubeTrack]);
+
+  useEffect(() => {
+    if (!audioRef.current || isYoutubeTrack) return;
+    audioRef.current.volume = volume;
+  }, [volume, isYoutubeTrack]);
+
+  // When track changes, reset progress
+  useEffect(() => {
+    setPlayedSeconds(0);
+    setDuration(0);
+  }, [currentTrack?.id]);
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current && !isYoutubeTrack) {
+      setPlayedSeconds(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current && !isYoutubeTrack) {
+      setDuration(audioRef.current.duration);
+      if (isPlaying) {
+        audioRef.current.play().catch(err => console.warn('Auto-play error:', err));
+      }
+    }
+  };
 
   const handleVolumeChange = (e) => {
     setVolume(parseFloat(e.target.value));
@@ -96,23 +116,17 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setPlayedSeconds(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
   const handleSeek = (e) => {
     const time = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-      setPlayedSeconds(time);
+    setPlayedSeconds(time);
+    if (isYoutubeTrack) {
+      if (reactPlayerRef.current) {
+        reactPlayerRef.current.seekTo(time);
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.currentTime = time;
+      }
     }
   };
 
@@ -144,7 +158,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         <button 
           className="icon-btn heart-btn"
           onClick={(e) => {
-            e.stopPropagation(); // Prevent opening Now Playing
+            e.stopPropagation();
             if (library.find(t => t.id === currentTrack.id)) {
               removeFromLibrary(currentTrack.id);
             } else {
@@ -172,10 +186,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           </button>
           <button 
             className="control-btn" 
-            onClick={() => {
-              console.log('PlayerBar: Previous button clicked');
-              playPrevious();
-            }} 
+            onClick={() => playPrevious()} 
             title="Previous"
           >
             <SkipBack size={20} fill="currentColor" />
@@ -185,10 +196,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           </button>
           <button 
             className="control-btn" 
-            onClick={() => {
-              console.log('PlayerBar: Next button clicked');
-              playNext();
-            }} 
+            onClick={() => playNext()} 
             title="Next"
           >
             <SkipForward size={20} fill="currentColor" />
@@ -321,15 +329,38 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         </div>
       </div>
 
-      {/* Standard Audio Element */}
-      <audio
-        ref={audioRef}
-        src={currentTrack.streamUrl}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={playNext}
-        hidden
-      />
+      {/* Standard <audio> for JioSaavn / Spotify streams */}
+      {!isYoutubeTrack && currentTrack.streamUrl && (
+        <audio
+          ref={audioRef}
+          src={currentTrack.streamUrl}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={playNext}
+          preload="auto"
+          hidden
+        />
+      )}
+
+      {/* ReactPlayer for YouTube sources */}
+      {isYoutubeTrack && (
+        <ReactPlayer
+          ref={reactPlayerRef}
+          url={`https://www.youtube.com/watch?v=${currentTrack.id}`}
+          playing={isPlaying}
+          volume={volume}
+          onProgress={(state) => setPlayedSeconds(state.playedSeconds)}
+          onDuration={(d) => setDuration(d)}
+          onEnded={playNext}
+          width="0"
+          height="0"
+          config={{
+            youtube: {
+              playerVars: { autoplay: 1 }
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
