@@ -46,7 +46,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const reactPlayerRef = useRef(null); // For ReactPlayer (YouTube)
 
   // Determine if current track is a YouTube source
-  const isYoutubeTrack = currentTrack?.source === 'youtube';
+  const isYoutubeTrack = currentTrack?.source === 'youtube' || (!currentTrack?.streamUrl && (typeof currentTrack?.id === 'object' || currentTrack?.id?.length === 11));
 
   // Configure Media Session API for mobile OS controls
   useEffect(() => {
@@ -130,7 +130,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   };
 
-  if (!currentTrack) return null;
+  if (!currentTrack) return <div className="player-bar empty-debug" style={{ color: 'red' }}>NO CURRENT TRACK</div>;
 
   return (
     <div className="player-bar">
@@ -344,22 +344,31 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
       {/* ReactPlayer for YouTube sources */}
       {isYoutubeTrack && (
-        <ReactPlayer
-          ref={reactPlayerRef}
-          url={`https://www.youtube.com/watch?v=${currentTrack.id}`}
-          playing={isPlaying}
-          volume={volume}
-          onProgress={(state) => setPlayedSeconds(state.playedSeconds)}
-          onDuration={(d) => setDuration(d)}
-          onEnded={playNext}
-          width="0"
-          height="0"
-          config={{
-            youtube: {
-              playerVars: { autoplay: 1 }
-            }
-          }}
-        />
+        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: '300px', height: '200px', opacity: 0, pointerEvents: 'none' }}>
+          <ReactPlayer
+            ref={reactPlayerRef}
+            url={`https://www.youtube.com/watch?v=${typeof currentTrack.id === 'object' ? currentTrack.id.videoId : currentTrack.id}`}
+            playing={isPlaying}
+            volume={volume}
+            onProgress={(state) => setPlayedSeconds(state.playedSeconds)}
+            onDuration={(d) => setDuration(d)}
+            onEnded={playNext}
+            onError={(e) => console.error('ReactPlayer Error:', e)}
+            width="100%"
+            height="100%"
+            config={{
+              youtube: {
+                playerVars: { 
+                  autoplay: 1,
+                  controls: 0,
+                  showinfo: 0,
+                  rel: 0,
+                  modestbranding: 1
+                }
+              }
+            }}
+          />
+        </div>
       )}
     </div>
   );

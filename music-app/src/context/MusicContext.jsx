@@ -21,9 +21,17 @@ export const MusicProvider = ({ children }) => {
   const [spotifyRefreshToken, setSpotifyRefreshToken] = useState(localStorage.getItem('spotify_refresh_token'));
   
   // YouTube State
-  const [youtubePlaylists, setYoutubePlaylists] = useState(
-    JSON.parse(localStorage.getItem('youtube_playlists') || '[]')
-  );
+  const [youtubePlaylists, setYoutubePlaylists] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('youtube_playlists') || '[]');
+      return stored.map(p => ({
+        ...p,
+        tracks: p.tracks?.map(t => ({ ...t, source: 'youtube' })) || []
+      }));
+    } catch {
+      return [];
+    }
+  });
 
   // Playback Control
   const playTrack = (track) => {
