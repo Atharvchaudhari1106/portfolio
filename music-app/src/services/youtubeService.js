@@ -9,12 +9,12 @@
 
 // Ordered list of public Invidious instances (most reliable first).
 const INVIDIOUS_INSTANCES = [
+  'https://invidious.flokinet.to',
   'https://inv.nadeko.net',
   'https://invidious.nerdvpn.de',
   'https://iv.datura.network',
   'https://invidious.jing.rocks',
   'https://vid.puffyan.us',
-  'https://invidious.snopyta.org',
 ];
 
 // ──────────────────────────────────────────────
@@ -53,14 +53,11 @@ function extractPlaylistId(url) {
 
 /** Build the best thumbnail URL for a video. */
 function bestThumbnail(video) {
-  if (video.videoThumbnails && video.videoThumbnails.length > 0) {
-    // Prefer medium quality (good size vs. speed trade-off)
-    const medium = video.videoThumbnails.find(t => t.quality === 'medium');
-    if (medium) return medium.url;
-    return video.videoThumbnails[0].url;
-  }
-  // Fallback to standard YouTube thumbnail CDN
-  return `https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`;
+  const videoId = video.videoId || video.id;
+  if (!videoId) return 'https://via.placeholder.com/300?text=No+Thumbnail';
+  
+  // Official YouTube thumbnail CDN is the most reliable and CORS-friendly for images
+  return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
 }
 
 /**

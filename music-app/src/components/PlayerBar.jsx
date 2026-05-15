@@ -366,9 +366,14 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={playNext}
-          onError={(e) => console.error('Audio element error:', e)}
+          onError={(e) => {
+            console.error('Audio element error:', e);
+            if (isYoutubeTrack) {
+              console.warn('YouTube stream failed, trying next track...');
+              // Optional: playNext(); 
+            }
+          }}
           preload="auto"
-          crossOrigin="anonymous"
           hidden
         />
       )}

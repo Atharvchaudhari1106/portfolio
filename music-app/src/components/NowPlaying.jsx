@@ -114,6 +114,10 @@ const NowPlaying = ({ goBack }) => {
             src={currentTrack.thumbnail || 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop'} 
             alt={currentTrack.title}
             className="np-art"
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = 'https://via.placeholder.com/400?text=No+Thumbnail';
+            }}
           />
           <div className="np-art-glow"></div>
         </div>
