@@ -69,3 +69,49 @@ export const searchSpotify = async (query, access_token) => {
     return [];
   }
 };
+
+export const extractSpotifyPlaylistId = (url) => {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'open.spotify.com' && u.pathname.startsWith('/playlist/')) {
+      return u.pathname.split('/playlist/')[1].split('?')[0];
+    }
+  } catch {
+    // maybe it's already an ID
+  }
+  return url;
+};
+
+export const importSpotifyPlaylist = async (url, access_token) => {
+  try {
+    const playlistId = extractSpotifyPlaylistId(url);
+    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      headers: { Authorization: `Bearer ${access_token}` },
+      timeout: 10000
+    });
+    
+    const data = response.data;
+    const tracks = data.tracks.items
+      .filter(item => item.track)
+      .map(item => ({
+        id: item.track.id,
+        title: item.track.name,
+        artist: item.track.artists.map(a => a.name).join(', '),
+        thumbnail: item.track.album.images[0]?.url,
+        duration: Math.floor(item.track.duration_ms / 1000),
+        source: 'spotify',
+        uri: item.track.uri
+      }));
+
+    return {
+      id: data.id,
+      title: data.name,
+      description: data.description || '',
+      thumbnail: data.images[0]?.url || '',
+      tracks
+    };
+  } catch (err) {
+    console.warn('Spotify playlist import failed:', err.message);
+    throw new Error('Failed to import Spotify playlist');
+  }
+};

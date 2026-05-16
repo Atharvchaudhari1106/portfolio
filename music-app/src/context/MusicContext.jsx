@@ -33,6 +33,15 @@ export const MusicProvider = ({ children }) => {
     }
   });
 
+  const [importedSpotifyPlaylists, setImportedSpotifyPlaylists] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('spotify_playlists') || '[]');
+      return stored;
+    } catch {
+      return [];
+    }
+  });
+
   // Playback Control
   const playTrack = (track) => {
     setCurrentTrack(track);
@@ -113,7 +122,9 @@ export const MusicProvider = ({ children }) => {
     toggleFavorite,
     spotifyToken,
     youtubePlaylists,
-    setYoutubePlaylists
+    setYoutubePlaylists,
+    importedSpotifyPlaylists,
+    setImportedSpotifyPlaylists
   };
 
   return (
