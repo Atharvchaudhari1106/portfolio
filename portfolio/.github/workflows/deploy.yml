@@ -28,11 +28,13 @@ jobs:
           python-version: '3.10'
 
       - name: Install Python dependencies
+        working-directory: portfolio
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Build portfolio with Flask-Frozen
+        working-directory: portfolio
         run: python freeze.py
 
       # ── Music App (Vite/React) ────────────────────────
@@ -50,13 +52,13 @@ jobs:
         working-directory: music-app
 
       - name: Copy music app into portfolio build
-        run: cp -r music-app/dist build/music
+        run: cp -r music-app/dist portfolio/build/music
 
       # ── Upload artifact ──────────────────────────────
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./build
+          path: ./portfolio/build
 
   deploy:
     runs-on: ubuntu-latest
