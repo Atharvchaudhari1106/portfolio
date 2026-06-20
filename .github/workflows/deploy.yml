@@ -70,6 +70,29 @@ jobs:
           mkdir -p portfolio/build/bigdata
           cp -r "my works/bigdata-search/frontend/dist"/* portfolio/build/bigdata/
 
+      # ── CrimeGPT App (Vite/React) ──────────────────
+      - name: Checkout CrimeGPT
+        uses: actions/checkout@v4
+        with:
+          repository: atharv9727-debug/crimegpt
+          path: crimegpt
+
+      - name: Update CrimeGPT base path to relative
+        run: sed -i "s|base: '/crimegpt/'|base: './'|g" crimegpt/crimegpt-frontend/vite.config.js
+
+      - name: Install CrimeGPT dependencies
+        run: npm install
+        working-directory: crimegpt/crimegpt-frontend
+
+      - name: Build CrimeGPT app
+        run: npm run build
+        working-directory: crimegpt/crimegpt-frontend
+
+      - name: Copy CrimeGPT into portfolio build
+        run: |
+          mkdir -p portfolio/build/crimegpt
+          cp -r crimegpt/crimegpt-frontend/dist/* portfolio/build/crimegpt/
+
       # ── Upload artifact ──────────────────────────────
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
