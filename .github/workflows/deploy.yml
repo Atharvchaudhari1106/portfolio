@@ -78,7 +78,8 @@ jobs:
           path: crimegpt
 
       - name: Update CrimeGPT base path to relative
-        run: sed -i "s|base: '/crimegpt/'|base: './'|g" crimegpt/crimegpt-frontend/vite.config.js
+        run: |
+          sed -i "s|base: '/crimegpt/'|base: './'|g" crimegpt/crimegpt-frontend/vite.config.js
 
       - name: Install CrimeGPT dependencies
         run: npm install
