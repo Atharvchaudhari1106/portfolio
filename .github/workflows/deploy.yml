@@ -52,7 +52,9 @@ jobs:
         working-directory: music-app
 
       - name: Copy music app into portfolio build
-        run: cp -r music-app/dist portfolio/build/music
+        run: |
+          mkdir -p portfolio/build/music
+          cp -r music-app/dist/* portfolio/build/music/
 
       # ── Upload artifact ──────────────────────────────
       - name: Upload artifact
