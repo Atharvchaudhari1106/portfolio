@@ -56,6 +56,20 @@ jobs:
           mkdir -p portfolio/build/music
           cp -r music-app/dist/* portfolio/build/music/
 
+      # ── Big Data Search App (Vite/React) ──────────────────
+      - name: Install big data search dependencies
+        run: npm install
+        working-directory: "my works/bigdata-search/frontend"
+
+      - name: Build big data search app
+        run: npm run build
+        working-directory: "my works/bigdata-search/frontend"
+
+      - name: Copy big data search app into portfolio build
+        run: |
+          mkdir -p portfolio/build/bigdata
+          cp -r "my works/bigdata-search/frontend/dist"/* portfolio/build/bigdata/
+
       # ── Upload artifact ──────────────────────────────
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
