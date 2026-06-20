@@ -1,2 +1,12 @@
 music-app/server/.env
 crimegpt/
+
+# Big Data Search Tool — ignore runtime/generated files
+my works/bigdata-search/backend/__pycache__/
+my works/bigdata-search/backend/database.db
+my works/bigdata-search/backend/index_store.json
+my works/bigdata-search/backend/audit_log.jsonl
+my works/bigdata-search/backend/uploads/
+my works/bigdata-search/frontend/node_modules/
+my works/bigdata-search/frontend/dist/
+my works/bigdata-search/frontend/.env
