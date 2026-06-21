@@ -84,15 +84,27 @@ export const MusicProvider = ({ children }) => {
   // Token Refresh Logic
   useEffect(() => {
     if (spotifyRefreshToken) {
-      const interval = setInterval(async () => {
+      const doRefresh = async () => {
         try {
           const data = await refreshSpotifyToken(spotifyRefreshToken);
           setSpotifyToken(data.access_token);
           localStorage.setItem('spotify_access_token', data.access_token);
+          const newExpiresIn = data.expires_in || 3600;
+          localStorage.setItem('spotify_token_expires', String(Date.now() + (newExpiresIn * 1000)));
+          console.log('Spotify token refreshed successfully');
         } catch (e) {
           console.error('Failed to refresh Spotify token', e);
         }
-      }, 50 * 60 * 1000); // Refresh every 50 mins
+      };
+
+      // Check if expired or near expiration (less than 5 minutes remaining)
+      const expiresAt = localStorage.getItem('spotify_token_expires');
+      if (!expiresAt || Date.now() > (Number(expiresAt) - 5 * 60 * 1000)) {
+        console.log('Spotify token expired or expiring soon, refreshing immediately');
+        doRefresh();
+      }
+
+      const interval = setInterval(doRefresh, 50 * 60 * 1000); // Refresh every 50 mins
       return () => clearInterval(interval);
     }
   }, [spotifyRefreshToken]);

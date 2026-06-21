@@ -1,6 +1,7 @@
 import express from 'express';
 import ytpl from '@distube/ytpl';
 import ytsr from '@distube/ytsr';
+import ytdl from '@distube/ytdl-core';
 
 const router = express.Router();
 
@@ -78,6 +79,29 @@ router.get('/search', async (req, res) => {
   } catch (error) {
     console.error('[YouTube] Error searching:', error.message);
     res.status(500).json({ error: 'Failed to search YouTube' });
+  }
+});
+
+// Stream YouTube Video Audio
+router.get('/stream', async (req, res) => {
+  const { videoId } = req.query;
+  if (!videoId) return res.status(400).json({ error: 'Video ID is required' });
+
+  console.log(`[YouTube] Resolving stream for video: ${videoId}`);
+
+  try {
+    const info = await ytdl.getInfo(videoId);
+    const format = ytdl.chooseFormat(info.formats, { filter: 'audioonly', quality: 'highestaudio' });
+    
+    if (!format || !format.url) {
+      return res.status(404).json({ error: 'No audio format found' });
+    }
+
+    // Redirect to the direct stream URL on YouTube CDN
+    res.redirect(format.url);
+  } catch (error) {
+    console.error('[YouTube] Stream resolution failed:', error.message);
+    res.status(500).json({ error: 'Failed to resolve stream URL' });
   }
 });
 

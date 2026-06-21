@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc, Music2, TvMinimalPlay } from 'lucide-react';
+import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc, Music2, TvMinimalPlay, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAudio } from '../context/AudioContext';
 import { useMusic } from '../context/MusicContext';
 import { getSpotifyLoginUrl } from '../services/spotifyService';
+import SettingsModal from './SettingsModal';
 import logo from '../assets/logo.png';
 
 const Sidebar = ({ setView, activeView }) => {
@@ -13,6 +14,7 @@ const Sidebar = ({ setView, activeView }) => {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleSpotifyLogin = async () => {
     try {
@@ -165,9 +167,11 @@ const Sidebar = ({ setView, activeView }) => {
               <div className="user-info">
                 <span className="user-name">{user?.name || 'User'}</span>
               </div>
+              <button className="logout-btn" onClick={() => setIsSettingsOpen(true)} title="API Settings" style={{ marginRight: '8px' }}>
+                <Settings size={20} />
+              </button>
               <button className="logout-btn" onClick={logout} title="Logout">
                 <LogOut size={20} />
-                <span>Logout</span>
               </button>
             </div>
             <div className="footer-links">
@@ -184,6 +188,7 @@ const Sidebar = ({ setView, activeView }) => {
           </div>
         </div>
       </div>
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

@@ -4,8 +4,8 @@ import {
   VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus
 } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
-import { downloadSong } from '../services/musicService';
-import { getYoutubeAudioStream } from '../services/youtubeService';
+import { downloadSong, searchMusic } from '../services/musicService';
+import { getYoutubeAudioStream, searchYoutube } from '../services/youtubeService';
 
 const PlayerBar = ({ onOpenNowPlaying }) => {
   const { 
@@ -46,12 +46,13 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const [ytLoading, setYtLoading] = useState(false);
   const audioRef = useRef(null);
 
-  // Determine if current track is a YouTube source
+  // Determine if current track is a YouTube or Spotify source
   const isYoutubeTrack = currentTrack?.source === 'youtube';
+  const isSpotifyTrack = currentTrack?.source === 'spotify';
 
-  // Resolve YouTube audio stream when a YouTube track becomes active
+  // Resolve audio stream when a YouTube or Spotify track becomes active
   useEffect(() => {
-    if (!isYoutubeTrack || !currentTrack?.id) {
+    if (!currentTrack) {
       setYtStreamUrl(null);
       return;
     }
@@ -60,23 +61,65 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     setYtStreamUrl(null);
     setYtLoading(true);
 
-    getYoutubeAudioStream(currentTrack.id)
-      .then(url => {
-        if (!cancelled) {
-          setYtStreamUrl(url);
+    const resolveStream = async () => {
+      try {
+        if (isYoutubeTrack) {
+          const url = await getYoutubeAudioStream(currentTrack.id);
+          if (!cancelled) {
+            setYtStreamUrl(url);
+            setYtLoading(false);
+          }
+        } else if (isSpotifyTrack) {
+          console.log(`[Spotify Match] Resolving stream for: ${currentTrack.title} - ${currentTrack.artist}`);
+          
+          // 1. Try JioSaavn first (high quality, fast loading, no proxy/scraping needed)
+          try {
+            const query = `${currentTrack.artist.split(',')[0]} ${currentTrack.title}`;
+            const saavnResults = await searchMusic(query);
+            const match = saavnResults.find(song => song.streamUrl);
+            if (match && !cancelled) {
+              console.log(`[Spotify Match] Found JioSaavn stream: ${match.title}`);
+              setYtStreamUrl(match.streamUrl);
+              setYtLoading(false);
+              return;
+            }
+          } catch (e) {
+            console.warn('[Spotify Match] JioSaavn fallback failed, trying YouTube...', e);
+          }
+
+          // 2. Try YouTube search
+          if (!cancelled) {
+            const query = `${currentTrack.artist} ${currentTrack.title}`;
+            const ytResults = await searchYoutube(query);
+            if (ytResults && ytResults.length > 0 && !cancelled) {
+              const url = await getYoutubeAudioStream(ytResults[0].id);
+              console.log(`[Spotify Match] Found YouTube stream: ${ytResults[0].title}`);
+              setYtStreamUrl(url);
+              setYtLoading(false);
+              return;
+            }
+          }
+
+          if (!cancelled) {
+            throw new Error('No stream found in any service');
+          }
+        } else {
+          // Standard track
           setYtLoading(false);
         }
-      })
-      .catch(err => {
-        console.error('Failed to get YouTube audio stream:', err);
+      } catch (err) {
+        console.error('[Spotify/YouTube Match] Failed to resolve audio stream:', err);
         if (!cancelled) {
           setYtStreamUrl(null);
           setYtLoading(false);
         }
-      });
+      }
+    };
+
+    resolveStream();
 
     return () => { cancelled = true; };
-  }, [currentTrack?.id, isYoutubeTrack]);
+  }, [currentTrack?.id, isYoutubeTrack, isSpotifyTrack]);
 
   // Configure Media Session API for mobile OS controls
   useEffect(() => {
@@ -100,7 +143,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   }, [currentTrack]);
 
   // The effective stream URL for the <audio> element
-  const effectiveStreamUrl = isYoutubeTrack ? ytStreamUrl : currentTrack?.streamUrl;
+  const effectiveStreamUrl = (isYoutubeTrack || isSpotifyTrack) ? ytStreamUrl : currentTrack?.streamUrl;
 
   // === Standard <audio> element playback control ===
   useEffect(() => {

@@ -7,6 +7,7 @@ import authRoutes from './routes/auth.js';
 import spotifyRoutes from './routes/spotify.js';
 import youtubeRoutes from './routes/youtube.js';
 import musicRoutes from './routes/music.js';
+import configRoutes from './routes/config.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/spotify', spotifyRoutes);
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/music', musicRoutes);
+app.use('/api/config', configRoutes);
 
 // Health check
 app.get('/', (req, res) => {

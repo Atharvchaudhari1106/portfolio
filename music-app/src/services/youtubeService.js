@@ -1,43 +1,6 @@
-/**
- * YouTube Service — fully client-side, no backend required.
- *
- * Uses the public Invidious API to fetch playlist data, search results,
- * and direct audio stream URLs. Multiple Invidious instances are tried
- * in order so the feature stays reliable even when individual instances
- * go down.
- */
+import axios from 'axios';
 
-// Ordered list of public Invidious instances (most reliable first).
-const INVIDIOUS_INSTANCES = [
-  'https://invidious.flokinet.to',
-  'https://inv.nadeko.net',
-  'https://invidious.nerdvpn.de',
-  'https://iv.datura.network',
-  'https://invidious.jing.rocks',
-  'https://vid.puffyan.us',
-];
-
-// ──────────────────────────────────────────────
-// Helpers
-// ──────────────────────────────────────────────
-
-/** Try each Invidious instance until one succeeds. */
-async function invidiousFetch(path, params = {}) {
-  const qs = new URLSearchParams(params).toString();
-  const suffix = qs ? `?${qs}` : '';
-
-  for (const base of INVIDIOUS_INSTANCES) {
-    try {
-      const url = `${base}/api/v1${path}${suffix}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-      if (!res.ok) continue;
-      return await res.json();
-    } catch {
-      // instance unreachable — try the next one
-    }
-  }
-  throw new Error('All Invidious instances are currently unreachable. Please try again later.');
-}
+const API_URL = 'http://localhost:5000/api/youtube';
 
 /** Extract the playlist ID from various YouTube / YT Music URL formats. */
 function extractPlaylistId(url) {
@@ -52,91 +15,53 @@ function extractPlaylistId(url) {
 }
 
 /** Build the best thumbnail URL for a video. */
-function bestThumbnail(video) {
-  const videoId = video.videoId || video.id;
+function bestThumbnail(videoId) {
   if (!videoId) return 'https://via.placeholder.com/300?text=No+Thumbnail';
-  
-  // Official YouTube thumbnail CDN is the most reliable and CORS-friendly for images
   return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
 }
 
 /**
- * Fetch a direct audio stream URL for a YouTube video via Invidious.
- * Returns a streamUrl that can be played with a standard <audio> element.
+ * Fetch a direct audio stream URL for a YouTube video.
+ * Returns a streamUrl (our backend proxy/redirect URL) that can be played with a standard <audio> element.
  */
 export async function getYoutubeAudioStream(videoId) {
-  for (const base of INVIDIOUS_INSTANCES) {
-    try {
-      const url = `${base}/api/v1/videos/${videoId}`;
-      const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
-      if (!res.ok) continue;
-      const data = await res.json();
-
-      // Prefer adaptive audio formats (audio-only, best quality)
-      if (data.adaptiveFormats && data.adaptiveFormats.length > 0) {
-        // Sort audio streams: prefer m4a/mp4a (wider browser support), then by bitrate
-        const audioStreams = data.adaptiveFormats
-          .filter(f => f.type && f.type.startsWith('audio/'))
-          .sort((a, b) => {
-            // Prefer audio/mp4 (m4a) over webm for compatibility
-            const aIsMp4 = a.type.includes('mp4') ? 1 : 0;
-            const bIsMp4 = b.type.includes('mp4') ? 1 : 0;
-            if (bIsMp4 !== aIsMp4) return bIsMp4 - aIsMp4;
-            // Then by bitrate descending
-            return (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0);
-          });
-
-        if (audioStreams.length > 0) {
-          return audioStreams[0].url;
-        }
-      }
-
-      // Fallback to legacy combined formats (video+audio)
-      if (data.formatStreams && data.formatStreams.length > 0) {
-        return data.formatStreams[0].url;
-      }
-    } catch {
-      // try next instance
-    }
-  }
-  return null;
+  if (!videoId) return null;
+  // We return the backend stream endpoint which will redirect to the direct audio stream CDN URL
+  return `${API_URL}/stream?videoId=${videoId}`;
 }
-
-// ──────────────────────────────────────────────
-// Public API
-// ──────────────────────────────────────────────
 
 /**
  * Import a YouTube playlist by URL (or raw playlist ID).
  * Returns { title, description, thumbnail, tracks[] }.
- *
- * Each track includes a `source: 'youtube'` field.
- * The `streamUrl` is resolved lazily when the track is played (see PlayerBar).
  */
 export const importYoutubePlaylist = async (playlistUrl) => {
   const playlistId = extractPlaylistId(playlistUrl);
+  
+  try {
+    const response = await axios.get(`${API_URL}/playlist`, {
+      params: { url: playlistId },
+      timeout: 15000
+    });
+    
+    const data = response.data;
+    if (!data || !data.tracks || data.tracks.length === 0) {
+      throw new Error('Playlist not found or is empty.');
+    }
 
-  const data = await invidiousFetch(`/playlists/${playlistId}`);
-
-  if (!data || !data.videos || data.videos.length === 0) {
-    throw new Error('Playlist not found or is empty.');
+    return {
+      title: data.title || 'YouTube Playlist',
+      description: data.description || '',
+      thumbnail: data.thumbnail || bestThumbnail(data.tracks[0]?.id),
+      tracks: data.tracks.map(t => ({
+        ...t,
+        thumbnail: t.thumbnail || bestThumbnail(t.id),
+        source: 'youtube'
+      }))
+    };
+  } catch (err) {
+    console.error('YouTube playlist import failed:', err.message);
+    throw new Error(err.response?.data?.error || 'Failed to import YouTube playlist');
   }
-
-  const tracks = data.videos.map(v => ({
-    id: v.videoId,
-    title: v.title || 'Unknown',
-    artist: (v.author || 'Unknown Artist').replace(' - Topic', ''),
-    thumbnail: bestThumbnail(v),
-    source: 'youtube',
-    duration: v.lengthSeconds || 0,
-  }));
-
-  return {
-    title: data.title || 'YouTube Playlist',
-    description: data.description || '',
-    thumbnail: tracks[0]?.thumbnail || '',
-    tracks,
-  };
 };
 
 /**
@@ -144,26 +69,21 @@ export const importYoutubePlaylist = async (playlistUrl) => {
  * Returns an array of track objects.
  */
 export const searchYoutube = async (query) => {
+  if (!query.trim()) return [];
   try {
-    const results = await invidiousFetch('/search', {
-      q: query + ' music',
-      type: 'video',
-      sort_by: 'relevance',
+    const response = await axios.get(`${API_URL}/search`, {
+      params: { q: query },
+      timeout: 10000
     });
 
+    const results = response.data;
     if (!Array.isArray(results)) return [];
 
-    return results
-      .filter(item => item.type === 'video')
-      .slice(0, 15)
-      .map(item => ({
-        id: item.videoId,
-        title: item.title || 'Unknown',
-        artist: (item.author || 'Unknown Artist').replace(' - Topic', ''),
-        thumbnail: bestThumbnail(item),
-        source: 'youtube',
-        duration: item.lengthSeconds || 0,
-      }));
+    return results.map(item => ({
+      ...item,
+      thumbnail: item.thumbnail || bestThumbnail(item.id),
+      source: 'youtube'
+    }));
   } catch (err) {
     console.warn('YouTube search unavailable:', err.message);
     return [];
