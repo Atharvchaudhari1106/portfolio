@@ -1,5 +1,5 @@
 import express from 'express';
-import ytpl from '@distube/ytpl';
+import axios from 'axios';
 import ytsr from '@distube/ytsr';
 import ytdl from '@distube/ytdl-core';
 
@@ -27,27 +27,112 @@ router.get('/playlist', async (req, res) => {
   console.log(`[YouTube] Fetching playlist: ${playlistId}`);
 
   try {
-    const playlist = await ytpl(playlistId, { limit: 100 });
+    const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
+    const response = await axios.get(playlistUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9'
+      },
+      timeout: 15000
+    });
 
-    if (!playlist || !playlist.items || playlist.items.length === 0) {
-      return res.status(404).json({ error: 'Playlist not found or is empty' });
+    const html = response.data;
+    const match = html.match(/ytInitialData\s*=\s*({.+?});/);
+    if (!match) {
+      return res.status(404).json({ error: 'Could not find playlist data on YouTube' });
     }
 
-    const tracks = playlist.items.map(item => ({
-      id: item.id,
-      title: cleanTitle(item.title || 'Unknown'),
-      artist: (item.author?.name || 'Unknown Artist').replace(' - Topic', ''),
-      thumbnail: item.bestThumbnail?.url || item.thumbnails?.[0]?.url || '',
-      source: 'youtube',
-      duration: item.durationSec || 0
-    }));
+    const data = JSON.parse(match[1]);
+    const seenIds = new Set();
+    const tracks = [];
 
-    console.log(`[YouTube] Found ${tracks.length} tracks in "${playlist.title}"`);
+    // Helper function to recursively search for video metadata structures
+    function searchLockups(obj) {
+      if (!obj || typeof obj !== 'object') return;
+
+      if (obj.lockupViewModel) {
+        const lv = obj.lockupViewModel;
+        const id = lv.contentId;
+        if (id && !seenIds.has(id)) {
+          seenIds.add(id);
+          const title = lv.metadata?.lockupMetadataViewModel?.title?.content || 'Unknown';
+          let artist = 'Unknown Artist';
+          const metadataRows = lv.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+          if (metadataRows && metadataRows.length > 0) {
+            const part = metadataRows[0].metadataParts?.[0];
+            if (part?.text?.content) {
+              artist = part.text.content.replace(' - Topic', '');
+            }
+          }
+          const sources = lv.contentImage?.thumbnailViewModel?.image?.sources;
+          const thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+
+          let durationText = '';
+          const overlays = lv.contentImage?.thumbnailViewModel?.overlays || [];
+          for (const overlay of overlays) {
+            const badge = overlay.thumbnailBottomOverlayViewModel?.badges?.[0]?.thumbnailBadgeViewModel;
+            if (badge && badge.text) {
+              durationText = badge.text;
+              break;
+            }
+          }
+          const duration = parseDuration(durationText);
+
+          tracks.push({
+            id,
+            title: cleanTitle(title),
+            artist,
+            thumbnail,
+            source: 'youtube',
+            duration
+          });
+        }
+      } else if (obj.playlistVideoRenderer) {
+        const pvr = obj.playlistVideoRenderer;
+        const id = pvr.videoId;
+        if (id && !seenIds.has(id)) {
+          seenIds.add(id);
+          const title = pvr.title?.runs?.[0]?.text || pvr.title?.simpleText || 'Unknown';
+          const artist = (pvr.shortBylineText?.runs?.[0]?.text || pvr.author?.name || 'Unknown Artist').replace(' - Topic', '');
+          const sources = pvr.thumbnail?.thumbnails;
+          const thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+          const duration = parseInt(pvr.lengthSeconds) || 0;
+
+          tracks.push({
+            id,
+            title: cleanTitle(title),
+            artist,
+            thumbnail,
+            source: 'youtube',
+            duration
+          });
+        }
+      } else {
+        for (const key in obj) {
+          searchLockups(obj[key]);
+        }
+      }
+    }
+
+    searchLockups(data);
+
+    if (tracks.length === 0) {
+      return res.status(404).json({ error: 'Playlist is empty or could not be parsed' });
+    }
+
+    const metadata = data.metadata?.playlistMetadataRenderer || {};
+    const microformat = data.microformat?.microformatDataRenderer || {};
+
+    const playlistTitle = microformat.title || metadata.title || 'YouTube Playlist';
+    const playlistDescription = microformat.description || '';
+    const playlistThumbnail = microformat.thumbnail?.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || '');
+
+    console.log(`[YouTube] Found ${tracks.length} tracks in "${playlistTitle}"`);
 
     res.json({
-      title: playlist.title || 'YouTube Playlist',
-      description: playlist.description || '',
-      thumbnail: playlist.bestThumbnail?.url || (tracks[0]?.thumbnail || ''),
+      title: playlistTitle,
+      description: playlistDescription,
+      thumbnail: playlistThumbnail,
       tracks
     });
   } catch (error) {
