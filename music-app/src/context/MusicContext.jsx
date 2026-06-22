@@ -24,10 +24,40 @@ export const MusicProvider = ({ children }) => {
   const [youtubePlaylists, setYoutubePlaylists] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('youtube_playlists') || '[]');
-      return stored.map(p => ({
-        ...p,
-        tracks: p.tracks?.map(t => ({ ...t, source: 'youtube' })) || []
-      }));
+      let needsSave = false;
+      const cleaned = stored.map(p => {
+        const firstTrackId = p.tracks?.[0]?.id;
+        const fallbackPlaylistThumb = firstTrackId ? `https://i.ytimg.com/vi/${firstTrackId}/hqdefault.jpg` : '';
+        const origThumb = p.thumbnail || '';
+        let cleanThumb = origThumb.includes('?') ? origThumb.split('?')[0] : origThumb;
+        if (!cleanThumb && fallbackPlaylistThumb) {
+          cleanThumb = fallbackPlaylistThumb;
+          needsSave = true;
+        }
+
+        const tracks = p.tracks?.map(t => {
+          const expectedThumb = `https://i.ytimg.com/vi/${t.id}/hqdefault.jpg`;
+          if (t.thumbnail !== expectedThumb) {
+            needsSave = true;
+          }
+          return {
+            ...t,
+            thumbnail: expectedThumb,
+            source: 'youtube'
+          };
+        }) || [];
+
+        return {
+          ...p,
+          thumbnail: cleanThumb,
+          tracks
+        };
+      });
+
+      if (needsSave && cleaned.length > 0) {
+        localStorage.setItem('youtube_playlists', JSON.stringify(cleaned));
+      }
+      return cleaned;
     } catch {
       return [];
     }

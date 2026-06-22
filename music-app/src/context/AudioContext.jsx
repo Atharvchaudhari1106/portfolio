@@ -16,12 +16,63 @@ export const AudioProvider = ({ children }) => {
   
   const [library, setLibrary] = useState(() => {
     const saved = localStorage.getItem('music-library');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const parsed = saved ? JSON.parse(saved) : [];
+      let needsSave = false;
+      const cleaned = parsed.map(t => {
+        if (t.source === 'youtube') {
+          const expectedThumb = `https://i.ytimg.com/vi/${t.id}/hqdefault.jpg`;
+          if (t.thumbnail !== expectedThumb) {
+            needsSave = true;
+            return { ...t, thumbnail: expectedThumb };
+          }
+        }
+        return t;
+      });
+      if (needsSave && cleaned.length > 0) {
+        localStorage.setItem('music-library', JSON.stringify(cleaned));
+      }
+      return cleaned;
+    } catch {
+      return [];
+    }
   });
 
   const [playlists, setPlaylists] = useState(() => {
     const saved = localStorage.getItem('music-playlists');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const parsed = saved ? JSON.parse(saved) : [];
+      let needsSave = false;
+      const cleaned = parsed.map(p => {
+        const firstTrackId = p.tracks?.[0]?.id;
+        const fallbackPlaylistThumb = (p.tracks?.[0]?.source === 'youtube' && firstTrackId) ? `https://i.ytimg.com/vi/${firstTrackId}/hqdefault.jpg` : '';
+        const origThumb = p.thumbnail || '';
+        let cleanThumb = origThumb.includes('?') ? origThumb.split('?')[0] : origThumb;
+        if (!cleanThumb && fallbackPlaylistThumb) {
+          cleanThumb = fallbackPlaylistThumb;
+          needsSave = true;
+        }
+
+        const tracks = p.tracks?.map(t => {
+          if (t.source === 'youtube') {
+            const expectedThumb = `https://i.ytimg.com/vi/${t.id}/hqdefault.jpg`;
+            if (t.thumbnail !== expectedThumb) {
+              needsSave = true;
+              return { ...t, thumbnail: expectedThumb };
+            }
+          }
+          return t;
+        }) || [];
+
+        return { ...p, thumbnail: cleanThumb, tracks };
+      });
+      if (needsSave && cleaned.length > 0) {
+        localStorage.setItem('music-playlists', JSON.stringify(cleaned));
+      }
+      return cleaned;
+    } catch {
+      return [];
+    }
   });
 
   useEffect(() => {

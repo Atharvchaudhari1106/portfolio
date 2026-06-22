@@ -71,11 +71,7 @@ router.get('/playlist', async (req, res) => {
               artist = part.text.content.replace(' - Topic', '');
             }
           }
-          const sources = lv.contentImage?.thumbnailViewModel?.image?.sources;
-          let thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
-          if (thumbnail) {
-            thumbnail = thumbnail.split('?')[0];
-          }
+          const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 
           let durationText = '';
           const overlays = lv.contentImage?.thumbnailViewModel?.overlays || [];
@@ -104,11 +100,7 @@ router.get('/playlist', async (req, res) => {
           seenIds.add(id);
           const title = pvr.title?.runs?.[0]?.text || pvr.title?.simpleText || 'Unknown';
           const artist = (pvr.shortBylineText?.runs?.[0]?.text || pvr.author?.name || 'Unknown Artist').replace(' - Topic', '');
-          const sources = pvr.thumbnail?.thumbnails;
-          let thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
-          if (thumbnail) {
-            thumbnail = thumbnail.split('?')[0];
-          }
+          const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
           const duration = parseInt(pvr.lengthSeconds) || 0;
 
           tracks.push({
