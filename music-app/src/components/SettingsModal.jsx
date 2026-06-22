@@ -5,7 +5,7 @@ import { Settings, X, Key, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 const SettingsModal = ({ isOpen, onClose }) => {
   const [spotifyClientId, setSpotifyClientId] = useState('');
   const [spotifyClientSecret, setSpotifyClientSecret] = useState('');
-  const [spotifyRedirectUri, setSpotifyRedirectUri] = useState('http://localhost:5000/api/spotify/callback');
+  const [spotifyRedirectUri, setSpotifyRedirectUri] = useState(`http://${window.location.hostname}:5000/api/spotify/callback`);
   const [youtubeApiKey, setYoutubeApiKey] = useState('');
   
   const [showSecret, setShowSecret] = useState(false);
@@ -17,11 +17,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
     if (isOpen) {
       setLoading(true);
       setStatusMessage({ type: '', text: '' });
-      axios.get('http://localhost:5000/api/config')
+      axios.get(`http://${window.location.hostname}:5000/api/config`)
         .then(response => {
           const { spotifyClientId, spotifyRedirectUri, spotifyClientSecretSet } = response.data;
           setSpotifyClientId(spotifyClientId || '');
-          setSpotifyRedirectUri(spotifyRedirectUri || 'http://localhost:5000/api/spotify/callback');
+          setSpotifyRedirectUri(spotifyRedirectUri || `http://${window.location.hostname}:5000/api/spotify/callback`);
           if (spotifyClientSecretSet) {
             setSpotifyClientSecret('••••••••••••••••••••••••••••••••');
           } else {
@@ -53,7 +53,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      const res = await axios.post('http://localhost:5000/api/config', payload);
+      const res = await axios.post(`http://${window.location.hostname}:5000/api/config`, payload);
       if (res.data.success) {
         setStatusMessage({ type: 'success', text: 'Credentials saved! Server updated.' });
         setTimeout(() => {

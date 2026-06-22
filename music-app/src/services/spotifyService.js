@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/spotify';
+const API_URL = `http://${window.location.hostname}:5000/api/spotify`;
 
 export const getSpotifyLoginUrl = async () => {
   const response = await axios.get(`${API_URL}/login`, { timeout: 5000 });

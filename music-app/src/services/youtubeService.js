@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/youtube';
+const API_URL = `http://${window.location.hostname}:5000/api/youtube`;
 
 /** Extract the playlist ID from various YouTube / YT Music URL formats. */
 function extractPlaylistId(url) {
