@@ -16,14 +16,21 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Check localStorage for saved user session
-    const savedUser = localStorage.getItem('music_app_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error('Failed to parse saved user', e);
-        localStorage.removeItem('music_app_user');
-      }
+    let savedUser = localStorage.getItem('music_app_user');
+    if (!savedUser) {
+      const defaultUser = { 
+        id: Date.now(), 
+        name: 'Guest User', 
+        userId: 'guest' 
+      };
+      localStorage.setItem('music_app_user', JSON.stringify(defaultUser));
+      savedUser = JSON.stringify(defaultUser);
+    }
+    try {
+      setUser(JSON.parse(savedUser));
+    } catch (e) {
+      console.error('Failed to parse saved user', e);
+      localStorage.removeItem('music_app_user');
     }
     setLoading(false);
   }, []);
