@@ -72,7 +72,10 @@ router.get('/playlist', async (req, res) => {
             }
           }
           const sources = lv.contentImage?.thumbnailViewModel?.image?.sources;
-          const thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+          let thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+          if (thumbnail) {
+            thumbnail = thumbnail.split('?')[0];
+          }
 
           let durationText = '';
           const overlays = lv.contentImage?.thumbnailViewModel?.overlays || [];
@@ -102,7 +105,10 @@ router.get('/playlist', async (req, res) => {
           const title = pvr.title?.runs?.[0]?.text || pvr.title?.simpleText || 'Unknown';
           const artist = (pvr.shortBylineText?.runs?.[0]?.text || pvr.author?.name || 'Unknown Artist').replace(' - Topic', '');
           const sources = pvr.thumbnail?.thumbnails;
-          const thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+          let thumbnail = sources && sources.length > 0 ? sources[sources.length - 1].url : '';
+          if (thumbnail) {
+            thumbnail = thumbnail.split('?')[0];
+          }
           const duration = parseInt(pvr.lengthSeconds) || 0;
 
           tracks.push({
@@ -132,7 +138,10 @@ router.get('/playlist', async (req, res) => {
 
     const playlistTitle = microformat.title || metadata.title || 'YouTube Playlist';
     const playlistDescription = microformat.description || '';
-    const playlistThumbnail = microformat.thumbnail?.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || '');
+    let playlistThumbnail = microformat.thumbnail?.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || '');
+    if (playlistThumbnail) {
+      playlistThumbnail = playlistThumbnail.split('?')[0];
+    }
 
     console.log(`[YouTube] Found ${tracks.length} tracks in "${playlistTitle}"`);
 
