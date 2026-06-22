@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# YouTube downloader and player scripts
+server/yt-dlp.exe
+server/*player-script.js
+

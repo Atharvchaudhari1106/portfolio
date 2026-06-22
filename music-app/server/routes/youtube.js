@@ -2,6 +2,13 @@ import express from 'express';
 import axios from 'axios';
 import ytsr from '@distube/ytsr';
 import ytdl from '@distube/ytdl-core';
+import { execFile } from 'child_process';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ytdlpPath = path.join(__dirname, '..', 'yt-dlp.exe');
 
 const router = express.Router();
 
@@ -172,22 +179,28 @@ router.get('/stream', async (req, res) => {
   const { videoId } = req.query;
   if (!videoId) return res.status(400).json({ error: 'Video ID is required' });
 
-  console.log(`[YouTube] Resolving stream for video: ${videoId}`);
+  console.log(`[YouTube] Resolving stream for video: ${videoId} using yt-dlp`);
 
-  try {
-    const info = await ytdl.getInfo(videoId);
-    const format = ytdl.chooseFormat(info.formats, { filter: 'audioonly', quality: 'highestaudio' });
-    
-    if (!format || !format.url) {
-      return res.status(404).json({ error: 'No audio format found' });
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  
+  execFile(
+    ytdlpPath,
+    ['--js-runtime', 'node', '-f', 'ba', '-g', videoUrl],
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error('[YouTube] yt-dlp resolution failed:', error.message, stderr);
+        return res.status(500).json({ error: 'Failed to resolve stream URL' });
+      }
+
+      const streamUrl = stdout.trim();
+      if (!streamUrl) {
+        return res.status(404).json({ error: 'No stream URL returned' });
+      }
+
+      // Redirect to the direct stream URL on YouTube CDN
+      res.redirect(streamUrl);
     }
-
-    // Redirect to the direct stream URL on YouTube CDN
-    res.redirect(format.url);
-  } catch (error) {
-    console.error('[YouTube] Stream resolution failed:', error.message);
-    res.status(500).json({ error: 'Failed to resolve stream URL' });
-  }
+  );
 });
 
 // Parse "3:45" duration string to seconds
