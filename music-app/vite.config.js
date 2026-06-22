@@ -1,10 +1,66 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { spawn } from 'child_process'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+function startBackendServerPlugin() {
+  let serverProcess = null;
+  return {
+    name: 'start-backend-server',
+    configureServer(server) {
+      console.log('🚀 [Vite] Starting backend server in server directory...');
+      
+      const serverDir = path.resolve(__dirname, 'server');
+      
+      // Spawn node index.js in the server directory
+      serverProcess = spawn('node', ['index.js'], {
+        cwd: serverDir,
+        stdio: 'inherit',
+        shell: true
+      });
+
+      serverProcess.on('error', (err) => {
+        console.error('❌ [Vite] Failed to start backend server:', err);
+      });
+
+      // Kill the child process on exit
+      process.on('exit', () => {
+        if (serverProcess) {
+          serverProcess.kill();
+        }
+      });
+
+      process.on('SIGINT', () => {
+        if (serverProcess) {
+          serverProcess.kill();
+        }
+        process.exit();
+      });
+
+      process.on('SIGTERM', () => {
+        if (serverProcess) {
+          serverProcess.kill();
+        }
+        process.exit();
+      });
+    },
+    closeBundle() {
+      if (serverProcess) {
+        serverProcess.kill();
+      }
+    }
+  }
+}
 
 export default defineConfig({
   plugins: [
     react(),
+    startBackendServerPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
