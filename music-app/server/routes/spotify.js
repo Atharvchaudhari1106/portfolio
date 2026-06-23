@@ -101,9 +101,9 @@ router.get('/playlist', checkCredentials, async (req, res) => {
 
   let playlistId = url;
   try {
-    const u = new URL(url);
-    if (u.hostname === 'open.spotify.com' && u.pathname.startsWith('/playlist/')) {
-      playlistId = u.pathname.split('/playlist/')[1].split('?')[0];
+    const match = url.match(/\/playlist\/([a-zA-Z0-9]+)/);
+    if (match && match[1]) {
+      playlistId = match[1];
     }
   } catch (e) {
     // assume it's already an ID

@@ -72,9 +72,9 @@ export const searchSpotify = async (query, access_token) => {
 
 export const extractSpotifyPlaylistId = (url) => {
   try {
-    const u = new URL(url);
-    if (u.hostname === 'open.spotify.com' && u.pathname.startsWith('/playlist/')) {
-      return u.pathname.split('/playlist/')[1].split('?')[0];
+    const match = url.match(/\/playlist\/([a-zA-Z0-9]+)/);
+    if (match && match[1]) {
+      return match[1];
     }
   } catch {
     // maybe it's already an ID
