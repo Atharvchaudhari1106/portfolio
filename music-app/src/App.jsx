@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Home from './components/Home';
 import Search from './components/Search';
@@ -18,7 +18,46 @@ function App() {
   const [prevView, setPrevView] = useState('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isIOS, setIsIOS] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    setIsIOS(isIOSDevice);
+    
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+    setIsStandalone(isStandaloneMode);
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        }
+        setDeferredPrompt(null);
+      });
+    } else if (isIOS) {
+      alert("📱 To install AesthetiCore on your iPhone:\n\n1. Tap the 'Share' icon (square with up arrow) at the bottom.\n2. Scroll down and tap 'Add to Home Screen'.\n3. Tap 'Add' in the top right.");
+    } else {
+      alert("📱 To install AesthetiCore:\n\n1. Tap the menu icon (three dots) in your browser.\n2. Tap 'Install App' or 'Add to Home Screen'.\n\nThis will add a shortcut to your home screen for a full-screen experience!");
+    }
+  };
+
+  const showInstallButton = (deferredPrompt || isIOS || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) && !isStandalone;
 
   const handleSetView = (view) => {
     if (view !== activeView) {
@@ -35,7 +74,14 @@ function App() {
     switch (activeView) {
       case 'home': return <Home />;
       case 'search': return <Search />;
-      case 'library': return <Library setView={handleSetView} onOpenSettings={() => setIsSettingsOpen(true)} />;
+      case 'library': return (
+        <Library 
+          setView={handleSetView} 
+          onOpenSettings={() => setIsSettingsOpen(true)} 
+          onInstall={handleInstallClick}
+          showInstallButton={showInstallButton}
+        />
+      );
       case 'spotify': return <SpotifyView />;
       case 'youtube': return <YoutubeView />;
       case 'spotify-callback': return <SpotifyCallback />;
@@ -62,6 +108,8 @@ function App() {
           }} 
           activeView={activeView} 
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onInstall={handleInstallClick}
+          showInstallButton={showInstallButton}
         />
       </div>
       

@@ -7,13 +7,10 @@ import { getSpotifyLoginUrl } from '../services/spotifyService';
 // SettingsModal import removed, now rendered globally at App level
 import logo from '../assets/logo.png';
 
-const Sidebar = ({ setView, activeView, onOpenSettings }) => {
+const Sidebar = ({ setView, activeView, onOpenSettings, onInstall, showInstallButton }) => {
   const { logout, user } = useAuth();
   const { createPlaylist } = useAudio();
   const { spotifyToken } = useMusic();
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
 
   const handleSpotifyLogin = async () => {
     try {
@@ -31,43 +28,6 @@ const Sidebar = ({ setView, activeView, onOpenSettings }) => {
       createPlaylist(name);
     }
   };
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    setIsIOS(isIOSDevice);
-    
-    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
-    setIsStandalone(isStandaloneMode);
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstallClick = () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the install prompt');
-        }
-        setDeferredPrompt(null);
-      });
-    } else if (isIOS) {
-      alert("📱 To install AesthetiCore on your iPhone:\n\n1. Tap the 'Share' icon (square with up arrow) at the bottom.\n2. Scroll down and tap 'Add to Home Screen'.\n3. Tap 'Add' in the top right.");
-    } else {
-      alert("📱 To install AesthetiCore:\n\n1. Tap the menu icon (three dots) in your browser.\n2. Tap 'Install App' or 'Add to Home Screen'.\n\nThis will add a shortcut to your home screen for a full-screen experience!");
-    }
-  };
-
-  const showInstallButton = (deferredPrompt || isIOS || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) && !isStandalone;
 
   return (
     <div className="sidebar">
@@ -110,7 +70,7 @@ const Sidebar = ({ setView, activeView, onOpenSettings }) => {
           <div className="install-banner" style={{ padding: '8px 16px', marginTop: '8px' }}>
             <button
               className="pill-btn"
-              onClick={handleInstallClick}
+              onClick={onInstall}
               style={{ 
                 width: '100%', 
                 background: 'var(--accent-primary)', 

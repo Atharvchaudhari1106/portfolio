@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Play, Heart, Music2, MoreVertical, X, Check, Settings, TvMinimalPlay } from 'lucide-react';
+import { Plus, Play, Heart, Music2, MoreVertical, X, Check, Settings, TvMinimalPlay, Download } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
 import TrackRow from './TrackRow';
 
-const Library = ({ setView, onOpenSettings }) => {
+const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
   const { library, playlists, createPlaylist, playTrack, addToPlaylist, currentTrack } = useAudio();
   const [showNewPlaylist, setShowNewPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
@@ -37,25 +37,49 @@ const Library = ({ setView, onOpenSettings }) => {
     <div className="pulse-library animate-fade-in">
       <header className="pulse-library-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1 className="pulse-page-title" style={{ margin: 0 }}>Your Library</h1>
-        <button 
-          onClick={onOpenSettings} 
-          className="icon-btn settings-mobile-btn" 
-          title="API Settings"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            padding: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: '50%',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          <Settings size={22} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          {showInstallButton && (
+            <button 
+              onClick={onInstall} 
+              className="icon-btn install-mobile-btn" 
+              title="Install App"
+              style={{
+                background: 'var(--accent-primary)',
+                border: 'none',
+                color: 'black',
+                cursor: 'pointer',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                boxShadow: '0 0 12px var(--accent-primary)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Download size={18} />
+            </button>
+          )}
+          <button 
+            onClick={onOpenSettings} 
+            className="icon-btn settings-mobile-btn" 
+            title="API Settings"
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              padding: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Settings size={22} />
+          </button>
+        </div>
       </header>
 
       {/* Import Shortcuts for Mobile & Desktop */}
