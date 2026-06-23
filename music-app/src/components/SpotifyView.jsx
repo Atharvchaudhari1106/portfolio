@@ -24,7 +24,7 @@ const SpotifyView = () => {
       setUrl('');
     } catch (e) {
       console.error('Failed to import Spotify playlist', e);
-      setImportError('Failed to import. Make sure the playlist URL is correct, public, and Spotify credentials are configured on the backend.');
+      setImportError(e.message || 'Failed to import. Make sure the playlist URL is correct, public, and Spotify credentials are configured on the backend.');
     } finally {
       setImportLoading(false);
     }

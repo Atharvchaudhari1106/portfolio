@@ -12,11 +12,26 @@ const spotifyApi = new SpotifyWebApi({
   redirectUri: process.env.SPOTIFY_REDIRECT_URI
 });
 
-// Helper to check if credentials are set
+// Helper to check if credentials are set and configure spotifyApi dynamically
 const checkCredentials = (req, res, next) => {
-  if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
-    return res.status(500).json({ error: 'Spotify credentials not configured in .env' });
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret || 
+      clientId.includes('your_') || clientSecret.includes('your_') ||
+      clientId.includes('placeholder') || clientSecret.includes('placeholder')) {
+    return res.status(400).json({ 
+      error: 'Spotify Client ID & Client Secret are not configured. Please click the Settings gear icon in the app, enter your Spotify Developer credentials, and click Save.' 
+    });
   }
+
+  // Update spotifyApi dynamically with current environment variables
+  spotifyApi.setClientId(clientId);
+  spotifyApi.setClientSecret(clientSecret);
+  if (process.env.SPOTIFY_REDIRECT_URI) {
+    spotifyApi.setRedirectUri(process.env.SPOTIFY_REDIRECT_URI);
+  }
+
   next();
 };
 
