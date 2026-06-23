@@ -60,15 +60,10 @@ const Home = () => {
         
         const newCategories = [];
         
-        // Add Spotify Content if logged in
-        const spotifyToken = localStorage.getItem('spotify_access_token');
-        if (spotifyToken) {
-          try {
-            const liked = await getSpotifyLikedSongs(spotifyToken);
-            if (liked && liked.length > 0) {
-              newCategories.push({ id: 'spotify-liked', title: 'From your Spotify', tracks: liked.slice(0, 6) });
-            }
-          } catch (e) { console.error(e); }
+        // Add Spotify Playlists
+        const spotifyPlaylists = JSON.parse(localStorage.getItem('spotify_playlists') || '[]');
+        if (spotifyPlaylists.length > 0) {
+          newCategories.push({ id: 'spotify-playlists', title: 'Spotify Playlists', tracks: spotifyPlaylists[0].tracks.slice(0, 6) });
         }
 
         // Add YouTube Playlists

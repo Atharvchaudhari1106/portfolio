@@ -77,4 +77,59 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
+// 4. Import playlist using client credentials (no user login required)
+router.get('/playlist', checkCredentials, async (req, res) => {
+  const { url } = req.query;
+  if (!url) {
+    return res.status(400).json({ error: 'Playlist URL or ID is required' });
+  }
+
+  let playlistId = url;
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'open.spotify.com' && u.pathname.startsWith('/playlist/')) {
+      playlistId = u.pathname.split('/playlist/')[1].split('?')[0];
+    }
+  } catch (e) {
+    // assume it's already an ID
+  }
+
+  try {
+    const clientCreds = await spotifyApi.clientCredentialsGrant();
+    const token = clientCreds.body.access_token;
+
+    const tempApi = new SpotifyWebApi({
+      clientId: process.env.SPOTIFY_CLIENT_ID,
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET
+    });
+    tempApi.setAccessToken(token);
+
+    const playlistData = await tempApi.getPlaylist(playlistId);
+    const data = playlistData.body;
+
+    const tracks = data.tracks.items
+      .filter(item => item.track)
+      .map(item => ({
+        id: item.track.id,
+        title: item.track.name,
+        artist: item.track.artists.map(a => a.name).join(', '),
+        thumbnail: item.track.album.images[0]?.url || 'https://via.placeholder.com/300?text=No+Thumbnail',
+        duration: Math.floor(item.track.duration_ms / 1000),
+        source: 'spotify',
+        uri: item.track.uri
+      }));
+
+    res.json({
+      id: data.id,
+      title: data.name,
+      description: data.description || '',
+      thumbnail: data.images[0]?.url || 'https://via.placeholder.com/300?text=No+Thumbnail',
+      tracks
+    });
+  } catch (error) {
+    console.error('Error importing Spotify playlist via client credentials:', error);
+    res.status(500).json({ error: error.message || 'Failed to import Spotify playlist' });
+  }
+});
+
 export default router;

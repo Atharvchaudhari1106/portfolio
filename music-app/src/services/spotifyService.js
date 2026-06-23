@@ -82,36 +82,15 @@ export const extractSpotifyPlaylistId = (url) => {
   return url;
 };
 
-export const importSpotifyPlaylist = async (url, access_token) => {
+export const importSpotifyPlaylist = async (url) => {
   try {
-    const playlistId = extractSpotifyPlaylistId(url);
-    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}`, {
-      headers: { Authorization: `Bearer ${access_token}` },
-      timeout: 10000
+    const response = await axios.get(`${API_URL}/playlist`, {
+      params: { url },
+      timeout: 20000
     });
-    
-    const data = response.data;
-    const tracks = data.tracks.items
-      .filter(item => item.track)
-      .map(item => ({
-        id: item.track.id,
-        title: item.track.name,
-        artist: item.track.artists.map(a => a.name).join(', '),
-        thumbnail: item.track.album.images[0]?.url,
-        duration: Math.floor(item.track.duration_ms / 1000),
-        source: 'spotify',
-        uri: item.track.uri
-      }));
-
-    return {
-      id: data.id,
-      title: data.name,
-      description: data.description || '',
-      thumbnail: data.images[0]?.url || '',
-      tracks
-    };
+    return response.data;
   } catch (err) {
     console.warn('Spotify playlist import failed:', err.message);
-    throw new Error('Failed to import Spotify playlist');
+    throw new Error(err.response?.data?.error || 'Failed to import Spotify playlist');
   }
 };

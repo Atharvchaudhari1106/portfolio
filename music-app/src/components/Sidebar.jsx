@@ -146,14 +146,12 @@ const Sidebar = ({ setView, activeView }) => {
         </div>
         
         <div className="library-content">
-          {!spotifyToken && (
-            <div className="sidebar-card spotify-card">
-              <Music2 size={24} color="#1DB954" />
-              <h4>Connect Spotify</h4>
-              <p>Listen to your Spotify playlists here</p>
-              <button className="pill-btn spotify-btn" onClick={handleSpotifyLogin}>Connect</button>
-            </div>
-          )}
+          <div className="sidebar-card spotify-card">
+            <Music2 size={24} color="#1DB954" />
+            <h4>Import Spotify</h4>
+            <p>Paste a playlist URL to stream</p>
+            <button className="pill-btn spotify-btn" onClick={() => setView('spotify')}>Import</button>
+          </div>
           
           <div className="sidebar-card youtube-card">
             <TvMinimalPlay size={24} color="#FF0000" />
