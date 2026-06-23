@@ -68,7 +68,7 @@ const YoutubeView = () => {
       {error && <div className="yt-error-msg">{error}</div>}
 
       <div className="yt-info-note glass-card">
-        <p><strong>Tip:</strong> Paste any public YouTube playlist URL. Supports <code>youtube.com</code> and <code>music.youtube.com</code> links.</p>
+        <p><strong>Tip:</strong> Paste any public or <strong>unlisted</strong> playlist URL. If your playlist is private, change its visibility setting to <strong>Unlisted</strong> in YouTube/YouTube Music. This allows the app to import it while keeping it hidden from search engines and your public profile.</p>
       </div>
 
       {/* Playlists */}

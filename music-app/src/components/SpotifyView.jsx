@@ -66,6 +66,10 @@ const SpotifyView = () => {
       </form>
       {importError && <div className="yt-error-msg">{importError}</div>}
 
+      <div className="yt-info-note glass-card" style={{ marginTop: '1rem' }}>
+        <p><strong>Tip:</strong> Playlists must be set to <strong>Public</strong> (or "Add to profile") in Spotify to be imported. If your playlist is private, open it in Spotify, click the three dots, and select <strong>Make Public</strong> or <strong>Add to Profile</strong>.</p>
+      </div>
+
       {/* Imported Playlists */}
       {importedSpotifyPlaylists.length > 0 ? (
         <div className="yt-playlists" style={{marginTop: '2rem'}}>
