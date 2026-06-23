@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { Settings, X, Key, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
@@ -74,8 +75,8 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="auth-modal-overlay" style={{ zIndex: 2000 }}>
+  return createPortal(
+    <div className="auth-modal-overlay" style={{ zIndex: 99999 }}>
       <div className="auth-modal animate-fade-in" style={{ maxWidth: '500px', width: '90%', padding: '30px' }}>
         <div className="auth-header" style={{ marginBottom: '20px', position: 'relative' }}>
           <button 
@@ -191,7 +192,8 @@ const SettingsModal = ({ isOpen, onClose }) => {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
