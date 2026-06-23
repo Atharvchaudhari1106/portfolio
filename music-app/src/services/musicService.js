@@ -3,7 +3,7 @@
 // uses DRM encryption that browsers cannot decrypt, resulting in only
 // background/instrumental audio playing.
 
-const SAAVN_API = 'https://jiosaavn-api-v4.vercel.app/api';
+const SAAVN_API = `http://${window.location.hostname}:5000/api/music/saavn`;
 const PREFERRED_QUALITY = '96kbps'; // DO NOT change - higher qualities are DRM encrypted
 
 const mapSongItem = (item) => {
