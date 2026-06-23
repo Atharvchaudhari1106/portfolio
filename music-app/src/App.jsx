@@ -10,12 +10,14 @@ import BottomNav from './components/BottomNav';
 import SpotifyView from './components/SpotifyView';
 import YoutubeView from './components/YoutubeView';
 import SpotifyCallback from './components/SpotifyCallback';
+import SettingsModal from './components/SettingsModal';
 import { useAuth } from './context/AuthContext';
 
 function App() {
   const [activeView, setActiveView] = useState('home');
   const [prevView, setPrevView] = useState('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { user } = useAuth();
 
   const handleSetView = (view) => {
@@ -33,7 +35,7 @@ function App() {
     switch (activeView) {
       case 'home': return <Home />;
       case 'search': return <Search />;
-      case 'library': return <Library setView={handleSetView} />;
+      case 'library': return <Library setView={handleSetView} onOpenSettings={() => setIsSettingsOpen(true)} />;
       case 'spotify': return <SpotifyView />;
       case 'youtube': return <YoutubeView />;
       case 'spotify-callback': return <SpotifyCallback />;
@@ -59,6 +61,7 @@ function App() {
             setIsSidebarOpen(false);
           }} 
           activeView={activeView} 
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
       </div>
       
@@ -80,6 +83,8 @@ function App() {
         setView={handleSetView} 
         toggleSidebar={toggleSidebar} 
       />
+
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

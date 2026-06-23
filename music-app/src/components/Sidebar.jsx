@@ -4,17 +4,16 @@ import { useAuth } from '../context/AuthContext';
 import { useAudio } from '../context/AudioContext';
 import { useMusic } from '../context/MusicContext';
 import { getSpotifyLoginUrl } from '../services/spotifyService';
-import SettingsModal from './SettingsModal';
+// SettingsModal import removed, now rendered globally at App level
 import logo from '../assets/logo.png';
 
-const Sidebar = ({ setView, activeView }) => {
+const Sidebar = ({ setView, activeView, onOpenSettings }) => {
   const { logout, user } = useAuth();
   const { createPlaylist } = useAudio();
   const { spotifyToken } = useMusic();
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const handleSpotifyLogin = async () => {
     try {
@@ -165,7 +164,7 @@ const Sidebar = ({ setView, activeView }) => {
               <div className="user-info">
                 <span className="user-name">{user?.name || 'User'}</span>
               </div>
-              <button className="logout-btn" onClick={() => setIsSettingsOpen(true)} title="API Settings" style={{ marginRight: '8px' }}>
+              <button className="logout-btn" onClick={onOpenSettings} title="API Settings" style={{ marginRight: '8px' }}>
                 <Settings size={20} />
               </button>
               <button className="logout-btn" onClick={logout} title="Logout">
@@ -186,7 +185,6 @@ const Sidebar = ({ setView, activeView }) => {
           </div>
         </div>
       </div>
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 };

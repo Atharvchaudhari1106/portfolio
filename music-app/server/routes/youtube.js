@@ -56,122 +56,56 @@ router.get('/playlist', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'Playlist URL is required' });
 
   const playlistId = extractPlaylistId(url);
-  console.log(`[YouTube] Fetching playlist: ${playlistId}`);
+  console.log(`[YouTube] Fetching playlist: ${playlistId} using yt-dlp`);
 
-  try {
-    const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
-    const response = await axios.get(playlistUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9'
-      },
-      timeout: 15000
-    });
+  const playlistUrl = `https://www.youtube.com/playlist?list=${playlistId}`;
 
-    const html = response.data;
-    const match = html.match(/ytInitialData\s*=\s*({.+?});/);
-    if (!match) {
-      return res.status(404).json({ error: 'Could not find playlist data on YouTube' });
-    }
+  execFile(
+    ytdlpPath,
+    ['--dump-single-json', '--flat-playlist', '--playlist-end', '100', playlistUrl],
+    { maxBuffer: 15 * 1024 * 1024 }, // 15MB buffer
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error('[YouTube] yt-dlp playlist fetch failed:', error.message, stderr);
+        let errorMsg = 'Failed to fetch playlist';
+        if (stderr.includes('The playlist does not exist') || stderr.includes('does not exist') || error.message.includes('does not exist')) {
+          errorMsg = 'The playlist does not exist or is private. If it is your playlist, please change its visibility to Public or Unlisted in YouTube/YouTube Music settings.';
+        } else if (stderr.includes('404')) {
+          errorMsg = 'Playlist not found (404). Check the URL/ID.';
+        }
+        return res.status(404).json({ error: errorMsg });
+      }
 
-    const data = JSON.parse(match[1]);
-    const seenIds = new Set();
-    const tracks = [];
-
-    // Helper function to recursively search for video metadata structures
-    function searchLockups(obj) {
-      if (!obj || typeof obj !== 'object') return;
-
-      if (obj.lockupViewModel) {
-        const lv = obj.lockupViewModel;
-        const id = lv.contentId;
-        if (id && !seenIds.has(id)) {
-          seenIds.add(id);
-          const title = lv.metadata?.lockupMetadataViewModel?.title?.content || 'Unknown';
-          let artist = 'Unknown Artist';
-          const metadataRows = lv.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
-          if (metadataRows && metadataRows.length > 0) {
-            const part = metadataRows[0].metadataParts?.[0];
-            if (part?.text?.content) {
-              artist = part.text.content.replace(' - Topic', '');
-            }
-          }
-          const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-
-          let durationText = '';
-          const overlays = lv.contentImage?.thumbnailViewModel?.overlays || [];
-          for (const overlay of overlays) {
-            const badge = overlay.thumbnailBottomOverlayViewModel?.badges?.[0]?.thumbnailBadgeViewModel;
-            if (badge && badge.text) {
-              durationText = badge.text;
-              break;
-            }
-          }
-          const duration = parseDuration(durationText);
-
-          tracks.push({
-            id,
-            title: cleanTitle(title),
-            artist,
-            thumbnail,
-            source: 'youtube',
-            duration
+      try {
+        const data = JSON.parse(stdout);
+        const tracks = (data.entries || [])
+          .filter(entry => entry && entry.id)
+          .map(entry => {
+            const thumbnail = entry.thumbnails?.[0]?.url || `https://i.ytimg.com/vi/${entry.id}/hqdefault.jpg`;
+            return {
+              id: entry.id,
+              title: entry.title || 'Unknown',
+              artist: entry.uploader || entry.channel || data.uploader || data.channel || 'YouTube',
+              thumbnail: thumbnail,
+              duration: entry.duration || 0,
+              source: 'youtube'
+            };
           });
-        }
-      } else if (obj.playlistVideoRenderer) {
-        const pvr = obj.playlistVideoRenderer;
-        const id = pvr.videoId;
-        if (id && !seenIds.has(id)) {
-          seenIds.add(id);
-          const title = pvr.title?.runs?.[0]?.text || pvr.title?.simpleText || 'Unknown';
-          const artist = (pvr.shortBylineText?.runs?.[0]?.text || pvr.author?.name || 'Unknown Artist').replace(' - Topic', '');
-          const thumbnail = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-          const duration = parseInt(pvr.lengthSeconds) || 0;
 
-          tracks.push({
-            id,
-            title: cleanTitle(title),
-            artist,
-            thumbnail,
-            source: 'youtube',
-            duration
-          });
-        }
-      } else {
-        for (const key in obj) {
-          searchLockups(obj[key]);
-        }
+        const playlistThumbnail = data.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || 'https://via.placeholder.com/300?text=No+Thumbnail');
+
+        res.json({
+          title: data.title || 'YouTube Playlist',
+          description: data.description || '',
+          thumbnail: playlistThumbnail,
+          tracks
+        });
+      } catch (err) {
+        console.error('[YouTube] Failed to parse yt-dlp output:', err.message);
+        res.status(500).json({ error: 'Failed to parse playlist data: ' + err.message });
       }
     }
-
-    searchLockups(data);
-
-    if (tracks.length === 0) {
-      return res.status(404).json({ error: 'Playlist is empty or could not be parsed' });
-    }
-
-    const metadata = data.metadata?.playlistMetadataRenderer || {};
-    const microformat = data.microformat?.microformatDataRenderer || {};
-
-    const playlistTitle = microformat.title || metadata.title || 'YouTube Playlist';
-    const playlistDescription = microformat.description || '';
-    let playlistThumbnail = microformat.thumbnail?.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || '');
-    if (playlistThumbnail) {
-      playlistThumbnail = playlistThumbnail.split('?')[0];
-    }
-
-    console.log(`[YouTube] Found ${tracks.length} tracks in "${playlistTitle}"`);
-
-    res.json({
-      title: playlistTitle,
-      description: playlistDescription,
-      thumbnail: playlistThumbnail,
-      tracks
-    });
-  } catch (error) {
-    console.error('[YouTube] Error fetching playlist:', error.message);
-    res.status(500).json({ error: 'Failed to fetch playlist: ' + error.message });
-  }
+  );
 });
 
 // Search YouTube

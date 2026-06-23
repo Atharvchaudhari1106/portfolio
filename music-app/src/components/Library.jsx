@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Plus, Play, Heart, Music2, MoreVertical, X, Check } from 'lucide-react';
+import { Plus, Play, Heart, Music2, MoreVertical, X, Check, Settings, TvMinimalPlay } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
 import TrackRow from './TrackRow';
 
-const Library = ({ setView }) => {
+const Library = ({ setView, onOpenSettings }) => {
   const { library, playlists, createPlaylist, playTrack, addToPlaylist, currentTrack } = useAudio();
   const [showNewPlaylist, setShowNewPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
@@ -35,9 +35,102 @@ const Library = ({ setView }) => {
 
   return (
     <div className="pulse-library animate-fade-in">
-      <header className="pulse-library-header">
-        <h1 className="pulse-page-title">Your Library</h1>
+      <header className="pulse-library-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h1 className="pulse-page-title" style={{ margin: 0 }}>Your Library</h1>
+        <button 
+          onClick={onOpenSettings} 
+          className="icon-btn settings-mobile-btn" 
+          title="API Settings"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-secondary)',
+            cursor: 'pointer',
+            padding: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: '50%',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Settings size={22} />
+        </button>
       </header>
+
+      {/* Import Shortcuts for Mobile & Desktop */}
+      <div className="pulse-imports-grid" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+        gap: '15px',
+        marginBottom: '25px'
+      }}>
+        <div 
+          className="import-shortcut-card glass-card group" 
+          onClick={() => setView('spotify')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '16px',
+            cursor: 'pointer',
+            borderRadius: '16px',
+            textAlign: 'center',
+            transition: 'all 0.2s ease',
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div className="import-icon-wrap" style={{
+            background: 'rgba(29, 185, 84, 0.1)',
+            color: '#1DB954',
+            borderRadius: '50%',
+            padding: '10px',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Music2 size={22} />
+          </div>
+          <h4 style={{ margin: '4px 0 2px 0', fontSize: '13px', fontWeight: 'bold' }}>Spotify Import</h4>
+          <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Play public lists</span>
+        </div>
+
+        <div 
+          className="import-shortcut-card glass-card group" 
+          onClick={() => setView('youtube')}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '16px',
+            cursor: 'pointer',
+            borderRadius: '16px',
+            textAlign: 'center',
+            transition: 'all 0.2s ease',
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div className="import-icon-wrap" style={{
+            background: 'rgba(255, 0, 0, 0.1)',
+            color: '#FF0000',
+            borderRadius: '50%',
+            padding: '10px',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <TvMinimalPlay size={22} />
+          </div>
+          <h4 style={{ margin: '4px 0 2px 0', fontSize: '13px', fontWeight: 'bold' }}>YouTube Import</h4>
+          <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Play any playlist</span>
+        </div>
+      </div>
 
       {/* Liked Songs Hero */}
       <div className="pulse-liked-hero glass-card" onClick={() => library.length > 0 && playTrack(library[0], library)}>
