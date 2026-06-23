@@ -2,15 +2,41 @@ import axios from 'axios';
 
 const API_URL = `http://${window.location.hostname}:5000/api/youtube`;
 
-/** Extract the playlist ID from various YouTube / YT Music URL formats. */
+/** Extract the playlist ID from various YouTube & YouTube Music URL formats. */
 function extractPlaylistId(url) {
-  try {
-    const u = new URL(url);
-    const list = u.searchParams.get('list');
-    if (list) return list;
-  } catch {
-    // not a URL — assume it's a raw playlist ID
+  if (!url) return '';
+  url = url.trim();
+
+  let testUrl = url;
+  if (!/^https?:\/\//i.test(url)) {
+    testUrl = 'https://' + url;
   }
+
+  try {
+    const urlObj = new URL(testUrl);
+
+    // 1. Check for 'list' query parameter (common in standard YouTube / YT Music URLs)
+    const listParam = urlObj.searchParams.get('list');
+    if (listParam) return listParam;
+
+    // 2. Check for browse path: /browse/VL<ID>
+    if (urlObj.pathname.includes('/browse/VL')) {
+      const match = urlObj.pathname.match(/\/browse\/VL([^?/]+)/);
+      if (match && match[1]) return match[1];
+    }
+  } catch (e) {
+    // Fallback to regex below
+  }
+
+  // Fallback regex matching
+  const listRegex = /[&?]list=([^&]+)/;
+  const listMatch = url.match(listRegex);
+  if (listMatch && listMatch[1]) return listMatch[1];
+
+  const browseRegex = /\/browse\/VL([^?/&]+)/;
+  const browseMatch = url.match(browseRegex);
+  if (browseMatch && browseMatch[1]) return browseMatch[1];
+
   return url;
 }
 

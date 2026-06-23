@@ -24,7 +24,7 @@ const YoutubeView = () => {
       setUrl('');
     } catch (e) {
       console.error('Failed to import YouTube playlist', e);
-      setError('Failed to import. Make sure the playlist URL is correct and the playlist is set to public.');
+      setError(e.message || 'Failed to import. Make sure the playlist URL is correct and the playlist is set to public.');
     } finally {
       setLoading(false);
     }

@@ -12,16 +12,41 @@ const ytdlpPath = path.join(__dirname, '..', 'yt-dlp.exe');
 
 const router = express.Router();
 
-// Extract playlist ID from various YouTube URL formats
+// Extract playlist ID from various YouTube & YouTube Music URL formats
 const extractPlaylistId = (url) => {
+  if (!url) return '';
+  url = url.trim();
+
+  let testUrl = url;
+  if (!/^https?:\/\//i.test(url)) {
+    testUrl = 'https://' + url;
+  }
+
   try {
-    const urlObj = new URL(url);
-    // Handle youtube.com, music.youtube.com, youtu.be
+    const urlObj = new URL(testUrl);
+
+    // 1. Check for 'list' query parameter (common in standard YouTube / YT Music URLs)
     const listParam = urlObj.searchParams.get('list');
     if (listParam) return listParam;
+
+    // 2. Check for browse path: /browse/VL<ID>
+    if (urlObj.pathname.includes('/browse/VL')) {
+      const match = urlObj.pathname.match(/\/browse\/VL([^?/]+)/);
+      if (match && match[1]) return match[1];
+    }
   } catch (e) {
-    // Not a valid URL — treat as raw playlist ID
+    // Fallback to regex below
   }
+
+  // Fallback regex matching
+  const listRegex = /[&?]list=([^&]+)/;
+  const listMatch = url.match(listRegex);
+  if (listMatch && listMatch[1]) return listMatch[1];
+
+  const browseRegex = /\/browse\/VL([^?/&]+)/;
+  const browseMatch = url.match(browseRegex);
+  if (browseMatch && browseMatch[1]) return browseMatch[1];
+
   return url;
 };
 
