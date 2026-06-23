@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getBackendUrl } from '../utils/api';
 
-const API_URL = `http://${window.location.hostname}:5000/api/youtube`;
+const API_URL = `${getBackendUrl()}/api/youtube`;
 
 /** Extract the playlist ID from various YouTube & YouTube Music URL formats. */
 function extractPlaylistId(url) {

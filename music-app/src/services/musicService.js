@@ -1,9 +1,6 @@
-// Use 96kbps quality - this quality tier on Saavn's CDN is unencrypted
-// and plays with full audio including vocals. Higher quality (160/320kbps)
-// uses DRM encryption that browsers cannot decrypt, resulting in only
-// background/instrumental audio playing.
+import { getBackendUrl } from '../utils/api';
 
-const SAAVN_API = `http://${window.location.hostname}:5000/api/music/saavn`;
+const SAAVN_API = `${getBackendUrl()}/api/music/saavn`;
 const PREFERRED_QUALITY = '96kbps'; // DO NOT change - higher qualities are DRM encrypted
 
 const mapSongItem = (item) => {

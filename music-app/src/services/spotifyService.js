@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getBackendUrl } from '../utils/api';
 
-const API_URL = `http://${window.location.hostname}:5000/api/spotify`;
+const API_URL = `${getBackendUrl()}/api/spotify`;
 
 export const getSpotifyLoginUrl = async () => {
   const response = await axios.get(`${API_URL}/login`, { timeout: 5000 });
