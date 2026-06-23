@@ -86,7 +86,7 @@ export const importYoutubePlaylist = async (playlistUrl) => {
     };
   } catch (err) {
     console.error('YouTube playlist import failed:', err.message);
-    throw new Error(err.response?.data?.error || 'Failed to import YouTube playlist');
+    throw new Error(err.response?.data?.error || err.message || 'Failed to import YouTube playlist');
   }
 };
 

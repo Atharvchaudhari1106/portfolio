@@ -91,6 +91,6 @@ export const importSpotifyPlaylist = async (url) => {
     return response.data;
   } catch (err) {
     console.warn('Spotify playlist import failed:', err.message);
-    throw new Error(err.response?.data?.error || 'Failed to import Spotify playlist');
+    throw new Error(err.response?.data?.error || err.message || 'Failed to import Spotify playlist');
   }
 };
