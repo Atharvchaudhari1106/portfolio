@@ -29,7 +29,7 @@ const checkCredentials = (req, res, next) => {
   spotifyApi.setClientId(clientId);
   spotifyApi.setClientSecret(clientSecret);
   if (process.env.SPOTIFY_REDIRECT_URI) {
-    spotifyApi.setRedirectUri(process.env.SPOTIFY_REDIRECT_URI);
+    spotifyApi.setRedirectURI(process.env.SPOTIFY_REDIRECT_URI);
   }
 
   next();
