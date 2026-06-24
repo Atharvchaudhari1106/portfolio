@@ -4,6 +4,11 @@
  * so it can connect to the local server running on the user's computer.
  */
 export const getBackendUrl = () => {
+  const savedUrl = localStorage.getItem('AESTHETICORE_BACKEND_URL');
+  if (savedUrl) {
+    return savedUrl.replace(/\/$/, ''); // Trim trailing slash
+  }
+  
   const hostname = window.location.hostname;
   if (
     hostname === 'localhost' ||
