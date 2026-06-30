@@ -69,14 +69,10 @@ const Search = () => {
 
           let combinedResults = [];
           
-          // Always search JioSaavn
-          const saavn = await searchMusic(searchQuery);
-          combinedResults = [...combinedResults, ...saavn];
+          // Search JioSaavn & YouTube (now combined and parallel inside searchMusic)
+          const musicResults = await searchMusic(searchQuery);
+          combinedResults = [...combinedResults, ...musicResults];
           
-          // Search YouTube
-          const yt = await searchYoutube(searchQuery);
-          combinedResults = [...combinedResults, ...yt];
-
           // Search Spotify if connected
           if (spotifyToken) {
             const spotify = await searchSpotify(searchQuery, spotifyToken);

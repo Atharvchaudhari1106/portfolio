@@ -50,6 +50,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const [resolvePhase, setResolvePhase] = useState('');
   const audioRef = useRef(null);
   const abortRef = useRef(null);
+  const consecutiveErrorsRef = useRef(0);
 
   // ─── Stream Resolution via StreamResolver ───────────────────
   useEffect(() => {
@@ -93,6 +94,19 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         setStreamError(err.message);
         setStreamLoading(false);
         setResolvePhase('');
+        
+        // Auto-skip to next track if in active playback mode, to prevent hanging
+        if (isPlaying) {
+          consecutiveErrorsRef.current += 1;
+          if (consecutiveErrorsRef.current > 3) {
+            console.error('[PlayerBar] Too many consecutive resolution errors. Stopping.');
+            setIsPlaying(false);
+            consecutiveErrorsRef.current = 0;
+          } else {
+            console.warn('[PlayerBar] Auto-skipping to next track in 2 seconds...');
+            setTimeout(() => playNext(), 2000);
+          }
+        }
       }
     });
 
@@ -184,6 +198,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
+      consecutiveErrorsRef.current = 0;
       setDuration(audioRef.current.duration);
       if (isPlaying) {
         audioRef.current.play().catch(err => console.warn('Auto-play error:', err));
@@ -456,9 +471,16 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           onEnded={playNext}
           onError={(e) => {
             console.error('Audio element error:', e);
-            // Auto-skip to next on audio error
-            console.warn('Stream failed, trying next track...');
-            setTimeout(() => playNext(), 1000);
+            consecutiveErrorsRef.current += 1;
+            if (consecutiveErrorsRef.current > 3) {
+              console.error('[PlayerBar] Too many consecutive playback errors. Stopping.');
+              setIsPlaying(false);
+              setStreamError('Playback failed. Please check your internet connection or backend server.');
+              consecutiveErrorsRef.current = 0;
+            } else {
+              console.warn('[PlayerBar] Stream failed, auto-skipping to next track in 2 seconds...');
+              setTimeout(() => playNext(), 2000);
+            }
           }}
           preload="auto"
           hidden

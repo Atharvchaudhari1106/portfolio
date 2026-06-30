@@ -61,10 +61,12 @@ const mapSongItem = (item) => {
 };
 
 export const searchMusic = async (query) => {
-  try {
-    const ytTracks = await searchYoutube(query);
-    if (ytTracks && ytTracks.length > 0) {
-      return ytTracks.map(track => ({
+  // Search YouTube and JioSaavn in PARALLEL for speed and resilience
+  const [ytResult, saavnResult] = await Promise.allSettled([
+    // YouTube search
+    searchYoutube(query).then(tracks => {
+      if (!tracks || tracks.length === 0) return [];
+      return tracks.map(track => ({
         id: track.id,
         title: track.title,
         artist: track.artist || 'Unknown Artist',
@@ -76,38 +78,42 @@ export const searchMusic = async (query) => {
         year: track.year || '',
         playCount: track.playCount || 0
       }));
-    }
-  } catch (err) {
-    console.warn('YouTube primary search failed, falling back to JioSaavn:', err.message);
-  }
+    }).catch(err => {
+      console.warn('YouTube search failed:', err.message);
+      return [];
+    }),
 
-  // Fallback to JioSaavn proxy search
-  try {
-    const response = await fetch(
-      `${SAAVN_API}/search/songs?query=${encodeURIComponent(query)}&limit=20`
-    );
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const data = await response.json();
+    // JioSaavn search
+    fetch(`${SAAVN_API}/search/songs?query=${encodeURIComponent(query)}&limit=20`)
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+        const data = await response.json();
+        const results = data.data?.results || data.results;
+        if (results) {
+          return results.map(mapSongItem);
+        }
+        return [];
+      })
+      .catch(err => {
+        console.warn('JioSaavn search failed:', err.message);
+        return [];
+      })
+  ]);
 
-    const results = data.data?.results || data.results;
-    if (results) {
-      const mapped = results.map(mapSongItem);
-      
-      // Deduplicate songs by title and artist to fix duplicate UI issues
-      const seen = new Set();
-      return mapped.filter(song => {
-        // Create normalized key "title-artist"
-        const key = `${song.title.toLowerCase().trim()}-${song.artist.split(',')[0].toLowerCase().trim()}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-    }
-    return [];
-  } catch (error) {
-    console.error('Saavn fallback search failed:', error);
-    return [];
-  }
+  const ytTracks = ytResult.status === 'fulfilled' ? ytResult.value : [];
+  const saavnTracks = saavnResult.status === 'fulfilled' ? saavnResult.value : [];
+
+  // Merge: JioSaavn first (has direct stream URLs), then YouTube
+  const combined = [...saavnTracks, ...ytTracks];
+
+  // Deduplicate by normalized title + primary artist
+  const seen = new Set();
+  return combined.filter(song => {
+    const key = `${(song.title || '').toLowerCase().trim()}-${(song.artist || '').split(',')[0].toLowerCase().trim()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 };
 
 export const getTrending = async () => {

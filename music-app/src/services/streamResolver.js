@@ -270,6 +270,25 @@ async function tryYoutubeSearchStream(track) {
   return null;
 }
 
+// Helper to enforce timeout on async operations
+const withTimeout = (promise, ms, name) => {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Timeout of ${ms}ms exceeded for tier ${name}`));
+    }, ms);
+    promise.then(
+      (res) => {
+        clearTimeout(timer);
+        resolve(res);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      }
+    );
+  });
+};
+
 // ─── Main Resolver ──────────────────────────────────────────────
 /**
  * Resolve a playable stream URL for any track.
@@ -322,7 +341,8 @@ export async function resolveStream(track, options = {}) {
       onProgress?.(tier.name, tier.label);
 
       try {
-        const result = await tier.fn(track);
+        // Enforce 6s timeout per resolution tier to prevent hanging
+        const result = await withTimeout(tier.fn(track), 6000, tier.name);
         if (result && result.streamUrl) {
           // Cache the successful result
           cacheStream(track, result.streamUrl, result.resolvedVia);

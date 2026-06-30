@@ -11,6 +11,14 @@ const SpotifyView = () => {
   const [importLoading, setImportLoading] = useState(false);
   const [importError, setImportError] = useState('');
   const [importProgress, setImportProgress] = useState(null);
+  const [expandedPlaylists, setExpandedPlaylists] = useState({});
+
+  const toggleExpandPlaylist = (key) => {
+    setExpandedPlaylists(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   const handleImport = async (e) => {
     e.preventDefault();
@@ -151,21 +159,21 @@ const SpotifyView = () => {
                 </div>
               </div>
               <div className="mixes-grid">
-                {playlist.tracks.slice(0, 12).map(song => (
+                {playlist.tracks.slice(0, expandedPlaylists[playlist.id || playlist.title] ? undefined : 12).map(song => (
                   <div
                     key={song.id}
                     className={`mix-card glass-card group ${currentTrack?.id === song.id ? 'active-card' : ''}`}
                     onClick={() => playTrack(song, playlist.tracks)}
                   >
                     <div className="mix-image-container">
-                      <img src={song.thumbnail} alt={song.title} />
-                      <div className="mix-play-overlay">
+                       <img src={song.thumbnail} alt={song.title} />
+                       <div className="mix-play-overlay">
                         {currentTrack?.id === song.id && isPlaying
                           ? <Pause size={32} fill="white" />
                           : <Play size={32} fill="white" />
                         }
-                      </div>
-                      <span className="yt-source-badge" style={{background: '#1DB954'}}>SP</span>
+                       </div>
+                       <span className="yt-source-badge" style={{background: '#1DB954'}}>SP</span>
                     </div>
                     <div className="mix-info">
                       <p className="mix-title">{song.title}</p>
@@ -175,8 +183,14 @@ const SpotifyView = () => {
                 ))}
               </div>
               {playlist.tracks.length > 12 && (
-                <p className="show-more-text" onClick={() => handlePlayAll(playlist)}>
-                  + {playlist.tracks.length - 12} more tracks — Play All to hear them
+                <p 
+                  className="show-more-text" 
+                  onClick={() => toggleExpandPlaylist(playlist.id || playlist.title)}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                >
+                  {expandedPlaylists[playlist.id || playlist.title] 
+                    ? 'Show Less' 
+                    : `+ ${playlist.tracks.length - 12} more tracks — Show All`}
                 </p>
               )}
             </section>
