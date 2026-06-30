@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Heart, MoreVertical, Play, Plus, Music } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
 
-const TrackRow = ({ track, index, queueContext, showIndex = true }) => {
+const SOURCE_BADGES = {
+  youtube: { label: 'YT', color: '#FF0000' },
+  spotify: { label: 'SP', color: '#1DB954' },
+  jiosaavn: { label: 'JS', color: '#1ed760' }
+};
+
+const TrackRow = ({ track, index, queueContext, showIndex = true, showSource = false }) => {
   const { 
     currentTrack, 
     isPlaying,
@@ -68,13 +74,33 @@ const TrackRow = ({ track, index, queueContext, showIndex = true }) => {
         </span>
       )}
       
-      <div className="trending-image">
+      <div className="trending-image" style={{ position: 'relative' }}>
         {track.thumbnail ? (
           <img src={track.thumbnail} alt={track.title} />
         ) : (
           <div className="placeholder-art" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.1)', borderRadius: '4px' }}>
             <Music size={20} />
           </div>
+        )}
+        {showSource && (
+          <span 
+            className="row-source-badge" 
+            style={{ 
+              position: 'absolute', 
+              bottom: '-2px', 
+              right: '-2px', 
+              fontSize: '8px', 
+              fontWeight: 'bold', 
+              padding: '1px 3px', 
+              borderRadius: '3px', 
+              background: SOURCE_BADGES[track.source || 'jiosaavn']?.color || '#1ed760',
+              color: 'white',
+              transform: 'scale(0.85)',
+              zIndex: 2
+            }}
+          >
+            {SOURCE_BADGES[track.source || 'jiosaavn']?.label || 'JS'}
+          </span>
         )}
       </div>
       

@@ -11,6 +11,8 @@ import SpotifyView from './components/SpotifyView';
 import YoutubeView from './components/YoutubeView';
 import SpotifyCallback from './components/SpotifyCallback';
 import SettingsModal from './components/SettingsModal';
+import AIMixModal from './components/AIMixModal';
+import InstallModal from './components/InstallModal';
 import { useAuth } from './context/AuthContext';
 
 function App() {
@@ -18,6 +20,8 @@ function App() {
   const [prevView, setPrevView] = useState('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAIMixOpen, setIsAIMixOpen] = useState(false);
+  const [isInstallOpen, setIsInstallOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -72,7 +76,7 @@ function App() {
 
   const renderView = () => {
     switch (activeView) {
-      case 'home': return <Home />;
+      case 'home': return <Home onOpenAIMix={() => setIsAIMixOpen(true)} onOpenInstallModal={() => setIsInstallOpen(true)} />;
       case 'search': return <Search />;
       case 'library': return (
         <Library 
@@ -80,13 +84,14 @@ function App() {
           onOpenSettings={() => setIsSettingsOpen(true)} 
           onInstall={handleInstallClick}
           showInstallButton={showInstallButton}
+          onOpenAIMix={() => setIsAIMixOpen(true)}
         />
       );
       case 'spotify': return <SpotifyView />;
       case 'youtube': return <YoutubeView />;
       case 'spotify-callback': return <SpotifyCallback />;
       case 'nowplaying': return <NowPlaying goBack={() => handleSetView(prevView)} />;
-      default: return <Home />;
+      default: return <Home onOpenAIMix={() => setIsAIMixOpen(true)} onOpenInstallModal={() => setIsInstallOpen(true)} />;
     }
   };
 
@@ -110,6 +115,8 @@ function App() {
           onOpenSettings={() => setIsSettingsOpen(true)}
           onInstall={handleInstallClick}
           showInstallButton={showInstallButton}
+          onOpenAIMix={() => setIsAIMixOpen(true)}
+          onOpenInstallModal={() => setIsInstallOpen(true)}
         />
       </div>
       
@@ -133,6 +140,8 @@ function App() {
       />
 
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <AIMixModal isOpen={isAIMixOpen} onClose={() => setIsAIMixOpen(false)} />
+      <InstallModal isOpen={isInstallOpen} onClose={() => setIsInstallOpen(false)} onInstallPrompt={handleInstallClick} hasPrompt={!!deferredPrompt} />
     </div>
   );
 }

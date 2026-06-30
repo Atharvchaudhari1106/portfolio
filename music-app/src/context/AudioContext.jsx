@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getRecommendations } from '../services/musicService';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { getSmartNextTracks } from '../services/musicIntelligence';
+import { trackPlay, trackSkip, trackComplete } from '../services/analyticsService';
 
 const AudioContext = createContext();
 
@@ -13,7 +14,12 @@ export const AudioProvider = ({ children }) => {
   const [originalQueue, setOriginalQueue] = useState([]);
   const [isShuffled, setIsShuffled] = useState(false);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off' | 'all' | 'one'
+  const [isLoadingNext, setIsLoadingNext] = useState(false);
   
+  // Track play start time for analytics
+  const playStartTimeRef = useRef(null);
+  const prevTrackRef = useRef(null);
+
   const [library, setLibrary] = useState(() => {
     const saved = localStorage.getItem('music-library');
     try {
@@ -83,11 +89,30 @@ export const AudioProvider = ({ children }) => {
     localStorage.setItem('music-playlists', JSON.stringify(playlists));
   }, [playlists]);
 
+  // ─── Analytics Tracking ─────────────────────────────────────
+  useEffect(() => {
+    if (currentTrack) {
+      // Track play event
+      trackPlay(currentTrack);
+      playStartTimeRef.current = Date.now();
+
+      // Check if the previous track was skipped (played less than 30% or <15 seconds)
+      if (prevTrackRef.current && prevTrackRef.current.id !== currentTrack.id) {
+        const playedMs = Date.now() - (playStartTimeRef.current || Date.now());
+        const trackDuration = (prevTrackRef.current.duration || 180) * 1000;
+        if (playedMs < Math.min(trackDuration * 0.3, 15000)) {
+          trackSkip(prevTrackRef.current);
+        }
+      }
+
+      prevTrackRef.current = currentTrack;
+    }
+  }, [currentTrack?.id]);
+
   const toggleShuffle = () => {
     if (!isShuffled) {
       setOriginalQueue([...queue]);
       const shuffled = [...queue].sort(() => Math.random() - 0.5);
-      // Ensure current track is still at the right place or handle it
       setQueue(shuffled);
     } else {
       setQueue(originalQueue);
@@ -121,6 +146,15 @@ export const AudioProvider = ({ children }) => {
     console.log('AudioContext: playNext called', { queueLength: queue.length, currentTrackId: currentTrack?.id });
     if (!currentTrack || queue.length === 0) return;
     
+    // Track completion if the song played most of the way through
+    if (playStartTimeRef.current) {
+      const playedMs = Date.now() - playStartTimeRef.current;
+      const trackDuration = (currentTrack.duration || 180) * 1000;
+      if (playedMs > trackDuration * 0.8) {
+        trackComplete(currentTrack);
+      }
+    }
+
     if (repeatMode === 'one') {
       const track = currentTrack;
       setCurrentTrack(null);
@@ -138,21 +172,31 @@ export const AudioProvider = ({ children }) => {
       console.log('AudioContext: end of queue reached, looping to start');
       setCurrentTrack(queue[0]);
     } else {
-      console.log('AudioContext: end of queue reached, fetching recommendations...');
-      const recommendations = await getRecommendations(currentTrack);
+      // ─── AI Smart Queue ─────────────────────────────────
+      console.log('AudioContext: end of queue reached, using AI to find next tracks...');
+      setIsLoadingNext(true);
       
-      if (recommendations && recommendations.length > 0) {
-        // Add unique songs to the queue
-        const newSongs = recommendations.filter(s => !queue.find(qS => qS.id === s.id));
-        if (newSongs.length > 0) {
-          setQueue([...queue, ...newSongs]);
-          setCurrentTrack(newSongs[0]);
-          return;
+      try {
+        const smartTracks = await getSmartNextTracks(currentTrack, library, queue);
+        
+        if (smartTracks && smartTracks.length > 0) {
+          console.log(`AudioContext: AI found ${smartTracks.length} smart recommendations`);
+          // Add unique songs to the queue
+          const newSongs = smartTracks.filter(s => !queue.find(qS => qS.id === s.id));
+          if (newSongs.length > 0) {
+            setQueue(prev => [...prev, ...newSongs]);
+            setCurrentTrack(newSongs[0]);
+            setIsLoadingNext(false);
+            return;
+          }
         }
+      } catch (err) {
+        console.warn('AudioContext: AI recommendations failed:', err.message);
       }
       
       console.log('AudioContext: no recommendations found, stopping playback');
       setIsPlaying(false);
+      setIsLoadingNext(false);
     }
   };
 
@@ -208,6 +252,10 @@ export const AudioProvider = ({ children }) => {
     }));
   };
 
+  const deletePlaylist = (playlistId) => {
+    setPlaylists(playlists.filter(p => p.id !== playlistId));
+  };
+
   const value = {
     currentTrack,
     isPlaying,
@@ -217,6 +265,7 @@ export const AudioProvider = ({ children }) => {
     isShuffled,
     repeatMode,
     playlists,
+    isLoadingNext,
     playTrack,
     playNext,
     playPrevious,
@@ -228,11 +277,9 @@ export const AudioProvider = ({ children }) => {
     addToLibrary,
     removeFromLibrary,
     createPlaylist,
-    addToPlaylist
+    addToPlaylist,
+    deletePlaylist
   };
 
   return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>;
 };
-
-
-

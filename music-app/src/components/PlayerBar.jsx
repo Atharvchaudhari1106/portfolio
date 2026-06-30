@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   SkipBack, Play, Pause, SkipForward, Volume2, 
-  VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus
+  VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus, Loader2, RefreshCw
 } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
-import { downloadSong, searchMusic } from '../services/musicService';
-import { getYoutubeAudioStream, searchYoutube } from '../services/youtubeService';
+import { downloadSong } from '../services/musicService';
+import { resolveStream } from '../services/streamResolver';
 
 const PlayerBar = ({ onOpenNowPlaying }) => {
   const { 
@@ -26,7 +26,8 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     removeFromLibrary,
     playlists,
     addToPlaylist,
-    createPlaylist
+    createPlaylist,
+    isLoadingNext
   } = useAudio();
   
   const [showPlaylists, setShowPlaylists] = useState(false);
@@ -42,84 +43,96 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [ytStreamUrl, setYtStreamUrl] = useState(null);
-  const [ytLoading, setYtLoading] = useState(false);
+  const [resolvedStreamUrl, setResolvedStreamUrl] = useState(null);
+  const [streamLoading, setStreamLoading] = useState(false);
+  const [streamError, setStreamError] = useState(null);
+  const [resolvedVia, setResolvedVia] = useState('');
+  const [resolvePhase, setResolvePhase] = useState('');
   const audioRef = useRef(null);
+  const abortRef = useRef(null);
 
-  // Determine if current track is a YouTube or Spotify source
-  const isYoutubeTrack = currentTrack?.source === 'youtube';
-  const isSpotifyTrack = currentTrack?.source === 'spotify';
-
-  // Resolve audio stream when a YouTube or Spotify track becomes active
+  // ─── Stream Resolution via StreamResolver ───────────────────
   useEffect(() => {
     if (!currentTrack) {
-      setYtStreamUrl(null);
+      setResolvedStreamUrl(null);
+      setStreamError(null);
+      setResolvedVia('');
       return;
     }
 
-    let cancelled = false;
-    setYtStreamUrl(null);
-    setYtLoading(true);
+    // Abort previous resolution
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
-    const resolveStream = async () => {
-      try {
-        if (isYoutubeTrack) {
-          const url = await getYoutubeAudioStream(currentTrack.id);
-          if (!cancelled) {
-            setYtStreamUrl(url);
-            setYtLoading(false);
-          }
-        } else if (isSpotifyTrack) {
-          console.log(`[Spotify Match] Resolving stream for: ${currentTrack.title} - ${currentTrack.artist}`);
-          
-          // 1. Try JioSaavn first (high quality, fast loading, no proxy/scraping needed)
-          try {
-            const query = `${currentTrack.artist.split(',')[0]} ${currentTrack.title}`;
-            const saavnResults = await searchMusic(query);
-            const match = saavnResults.find(song => song.streamUrl);
-            if (match && !cancelled) {
-              console.log(`[Spotify Match] Found JioSaavn stream: ${match.title}`);
-              setYtStreamUrl(match.streamUrl);
-              setYtLoading(false);
-              return;
-            }
-          } catch (e) {
-            console.warn('[Spotify Match] JioSaavn fallback failed, trying YouTube...', e);
-          }
+    setResolvedStreamUrl(null);
+    setStreamLoading(true);
+    setStreamError(null);
+    setResolvedVia('');
+    setResolvePhase('');
 
-          // 2. Try YouTube search
-          if (!cancelled) {
-            const query = `${currentTrack.artist} ${currentTrack.title}`;
-            const ytResults = await searchYoutube(query);
-            if (ytResults && ytResults.length > 0 && !cancelled) {
-              const url = await getYoutubeAudioStream(ytResults[0].id);
-              console.log(`[Spotify Match] Found YouTube stream: ${ytResults[0].title}`);
-              setYtStreamUrl(url);
-              setYtLoading(false);
-              return;
-            }
-          }
-
-          if (!cancelled) {
-            throw new Error('No stream found in any service');
-          }
-        } else {
-          // Standard track
-          setYtLoading(false);
-        }
-      } catch (err) {
-        console.error('[Spotify/YouTube Match] Failed to resolve audio stream:', err);
-        if (!cancelled) {
-          setYtStreamUrl(null);
-          setYtLoading(false);
-        }
+    resolveStream(currentTrack, {
+      signal: controller.signal,
+      onProgress: (tier, message) => {
+        setResolvePhase(message);
+      },
+      maxRetries: 2
+    })
+    .then(result => {
+      if (!controller.signal.aborted) {
+        setResolvedStreamUrl(result.streamUrl);
+        setResolvedVia(result.resolvedVia);
+        setStreamLoading(false);
+        setResolvePhase('');
+        console.log(`[PlayerBar] Stream resolved via: ${result.resolvedVia}`);
       }
-    };
+    })
+    .catch(err => {
+      if (!controller.signal.aborted) {
+        console.error('[PlayerBar] Stream resolution failed:', err.message);
+        setStreamError(err.message);
+        setStreamLoading(false);
+        setResolvePhase('');
+      }
+    });
 
-    resolveStream();
+    return () => controller.abort();
+  }, [currentTrack?.id]);
 
-    return () => { cancelled = true; };
-  }, [currentTrack?.id, isYoutubeTrack, isSpotifyTrack]);
+  // ─── Retry Stream Resolution ────────────────────────────────
+  const retryResolve = () => {
+    if (!currentTrack) return;
+    
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setStreamLoading(true);
+    setStreamError(null);
+    setResolvedStreamUrl(null);
+    setResolvePhase('Retrying...');
+
+    resolveStream(currentTrack, {
+      signal: controller.signal,
+      onProgress: (tier, message) => setResolvePhase(message),
+      maxRetries: 3
+    })
+    .then(result => {
+      if (!controller.signal.aborted) {
+        setResolvedStreamUrl(result.streamUrl);
+        setResolvedVia(result.resolvedVia);
+        setStreamLoading(false);
+        setResolvePhase('');
+      }
+    })
+    .catch(err => {
+      if (!controller.signal.aborted) {
+        setStreamError(err.message);
+        setStreamLoading(false);
+        setResolvePhase('');
+      }
+    });
+  };
 
   // Configure Media Session API for mobile OS controls
   useEffect(() => {
@@ -142,18 +155,15 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   }, [currentTrack]);
 
-  // The effective stream URL for the <audio> element
-  const effectiveStreamUrl = (isYoutubeTrack || isSpotifyTrack) ? ytStreamUrl : currentTrack?.streamUrl;
-
   // === Standard <audio> element playback control ===
   useEffect(() => {
-    if (!audioRef.current || !effectiveStreamUrl) return;
+    if (!audioRef.current || !resolvedStreamUrl) return;
     if (isPlaying) {
       audioRef.current.play().catch(err => console.warn('Audio play error:', err));
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, effectiveStreamUrl]);
+  }, [isPlaying, resolvedStreamUrl]);
 
   useEffect(() => {
     if (!audioRef.current) return;
@@ -200,7 +210,18 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   };
 
-  if (!currentTrack) return <div className="player-bar empty-debug" style={{ color: 'red' }}>NO CURRENT TRACK</div>;
+  // Source badge helper
+  const getSourceBadge = () => {
+    if (!resolvedVia) return null;
+    if (resolvedVia.includes('jiosaavn') || resolvedVia === 'direct') return { label: 'JS', color: '#1ed760', title: 'JioSaavn' };
+    if (resolvedVia.includes('youtube')) return { label: 'YT', color: '#FF0000', title: 'YouTube' };
+    if (resolvedVia.includes('cache')) return { label: '⚡', color: '#FFD700', title: 'Cached' };
+    return null;
+  };
+
+  if (!currentTrack) return null;
+
+  const sourceBadge = getSourceBadge();
 
   return (
     <div className="player-bar">
@@ -220,11 +241,28 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           ) : (
             <div className="art-placeholder"><Music size={20} /></div>
           )}
+          {sourceBadge && (
+            <span className="player-source-badge" style={{ background: sourceBadge.color }} title={sourceBadge.title}>
+              {sourceBadge.label}
+            </span>
+          )}
         </div>
         <div className="track-info">
           <h4 className="player-track-title">{currentTrack.title}</h4>
           <p className="player-track-artist">
-            {ytLoading ? 'Loading stream...' : currentTrack.artist}
+            {streamLoading ? (
+              <span className="stream-loading-text">
+                <Loader2 size={12} className="spin" style={{ display: 'inline', marginRight: '4px' }} />
+                {resolvePhase || 'Resolving stream...'}
+              </span>
+            ) : streamError ? (
+              <span className="stream-error-text" onClick={(e) => { e.stopPropagation(); retryResolve(); }} style={{ color: '#ff6b6b', cursor: 'pointer' }}>
+                <RefreshCw size={12} style={{ display: 'inline', marginRight: '4px' }} />
+                Tap to retry
+              </span>
+            ) : (
+              currentTrack.artist
+            )}
           </p>
         </div>
         <button 
@@ -263,15 +301,22 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           >
             <SkipBack size={20} fill="currentColor" />
           </button>
-          <button className="play-btn-circle" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
-            {isPlaying ? <Pause size={24} fill="currentColor" /> : <Play size={24} fill="currentColor" style={{ marginLeft: '4px' }} />}
+          <button className="play-btn-circle" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'} disabled={streamLoading}>
+            {streamLoading ? (
+              <Loader2 size={24} className="spin" />
+            ) : isPlaying ? (
+              <Pause size={24} fill="currentColor" />
+            ) : (
+              <Play size={24} fill="currentColor" style={{ marginLeft: '4px' }} />
+            )}
           </button>
           <button 
             className="control-btn" 
             onClick={() => playNext()} 
             title="Next"
+            disabled={isLoadingNext}
           >
-            <SkipForward size={20} fill="currentColor" />
+            {isLoadingNext ? <Loader2 size={20} className="spin" /> : <SkipForward size={20} fill="currentColor" />}
           </button>
           <button 
             className={`control-btn ${repeatMode !== 'off' ? 'active' : ''}`}
@@ -401,20 +446,19 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         </div>
       </div>
 
-      {/* Unified <audio> for all sources (JioSaavn + YouTube via Invidious) */}
-      {effectiveStreamUrl && (
+      {/* Unified <audio> for all sources */}
+      {resolvedStreamUrl && (
         <audio
           ref={audioRef}
-          src={effectiveStreamUrl}
+          src={resolvedStreamUrl}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={playNext}
           onError={(e) => {
             console.error('Audio element error:', e);
-            if (isYoutubeTrack) {
-              console.warn('YouTube stream failed, trying next track...');
-              // Optional: playNext(); 
-            }
+            // Auto-skip to next on audio error
+            console.warn('Stream failed, trying next track...');
+            setTimeout(() => playNext(), 1000);
           }}
           preload="auto"
           hidden

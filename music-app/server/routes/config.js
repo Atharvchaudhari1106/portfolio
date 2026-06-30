@@ -104,4 +104,24 @@ router.post('/', (req, res) => {
   }
 });
 
+// GET download Windows launcher
+router.get('/download-launcher', (req, res) => {
+  const launcherPath = path.resolve(process.cwd(), '..', 'Run-App.bat');
+  if (fs.existsSync(launcherPath)) {
+    res.download(launcherPath, 'Run-App.bat');
+  } else {
+    res.status(404).json({ error: 'Launcher script not found' });
+  }
+});
+
+// GET download macOS/Linux launcher
+router.get('/download-launcher-sh', (req, res) => {
+  const launcherPath = path.resolve(process.cwd(), '..', 'Run-App.sh');
+  if (fs.existsSync(launcherPath)) {
+    res.download(launcherPath, 'Run-App.sh');
+  } else {
+    res.status(404).json({ error: 'Launcher script not found' });
+  }
+});
+
 export default router;

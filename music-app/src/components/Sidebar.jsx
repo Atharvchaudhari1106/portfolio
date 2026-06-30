@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc, Music2, TvMinimalPlay, Settings } from 'lucide-react';
+import { Home, Search, Library, Plus, ArrowRight, LogOut, Download, Disc, Music2, TvMinimalPlay, Settings, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useAudio } from '../context/AudioContext';
 import { useMusic } from '../context/MusicContext';
@@ -7,7 +7,7 @@ import { getSpotifyLoginUrl } from '../services/spotifyService';
 // SettingsModal import removed, now rendered globally at App level
 import logo from '../assets/logo.png';
 
-const Sidebar = ({ setView, activeView, onOpenSettings, onInstall, showInstallButton }) => {
+const Sidebar = ({ setView, activeView, onOpenSettings, onInstall, showInstallButton, onOpenAIMix, onOpenInstallModal }) => {
   const { logout, user } = useAuth();
   const { createPlaylist } = useAudio();
   const { spotifyToken } = useMusic();
@@ -65,27 +65,35 @@ const Sidebar = ({ setView, activeView, onOpenSettings, onInstall, showInstallBu
           <TvMinimalPlay size={24} color="#FF0000" />
           <span>YouTube</span>
         </button>
+        <button
+          className="nav-item ai-mix-nav"
+          onClick={onOpenAIMix}
+          style={{ gap: '12px' }}
+        >
+          <Sparkles size={24} style={{ color: 'var(--accent-primary)' }} />
+          <span>AI Mix Generator</span>
+        </button>
 
-        {showInstallButton && (
-          <div className="install-banner" style={{ padding: '8px 16px', marginTop: '8px' }}>
-            <button
-              className="pill-btn"
-              onClick={onInstall}
-              style={{ 
-                width: '100%', 
-                background: 'var(--accent-primary)', 
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <Download size={18} />
-              <span>Install App</span>
-            </button>
-          </div>
-        )}
+        <div className="install-banner" style={{ padding: '8px 16px', marginTop: '8px' }}>
+          <button
+            className="pill-btn"
+            onClick={onOpenInstallModal}
+            style={{ 
+              width: '100%', 
+              background: 'rgba(255,255,255,0.05)', 
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              border: '1px solid rgba(255,255,255,0.05)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <Download size={18} style={{ color: 'var(--accent-primary)' }} />
+            <span>Download App</span>
+          </button>
+        </div>
       </div>
 
       {/* Block 2: Your Library */}

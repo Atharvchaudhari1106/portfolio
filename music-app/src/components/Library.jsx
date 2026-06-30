@@ -1,12 +1,48 @@
-import React, { useState } from 'react';
-import { Plus, Play, Heart, Music2, MoreVertical, X, Check, Settings, TvMinimalPlay, Download } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Play, Heart, Music2, MoreVertical, X, Check, Settings, TvMinimalPlay, Download, Sparkles, BarChart2, Trash2 } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
+import { autoOrganizeLibrary } from '../services/musicIntelligence';
+import { getListeningStats } from '../services/analyticsService';
 import TrackRow from './TrackRow';
 
-const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
-  const { library, playlists, createPlaylist, playTrack, addToPlaylist, currentTrack } = useAudio();
+const Library = ({ setView, onOpenSettings, onInstall, showInstallButton, onOpenAIMix }) => {
+  const { library, playlists, createPlaylist, playTrack, addToPlaylist, deletePlaylist, currentTrack } = useAudio();
   const [showNewPlaylist, setShowNewPlaylist] = useState(false);
   const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    setStats(getListeningStats());
+  }, [library]);
+
+  const handleAIOrganize = () => {
+    if (library.length < 4) {
+      alert("Add at least 4 songs to your liked songs first so the AI can group them by mood!");
+      return;
+    }
+    const smartPlaylists = autoOrganizeLibrary(library);
+    if (smartPlaylists.length === 0) {
+      alert("AI couldn't categorize your songs yet. Try adding more diverse tracks.");
+      return;
+    }
+    
+    let createdCount = 0;
+    for (const sp of smartPlaylists) {
+      if (playlists.some(p => p.name === sp.name)) continue;
+      
+      const created = createPlaylist(sp.name);
+      for (const track of sp.tracks) {
+        addToPlaylist(created.id, track);
+      }
+      createdCount++;
+    }
+
+    if (createdCount === 0) {
+      alert("AI mood playlists are already in your library!");
+    } else {
+      alert(`AI organized your library into ${createdCount} new mood-based playlists!`);
+    }
+  };
 
   const handleCreatePlaylist = () => {
     setShowNewPlaylist(true);
@@ -124,7 +160,7 @@ const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
 
         <div 
           className="import-shortcut-card glass-card group" 
-          onClick={() => setView('youtube')}
+          onClick={setView ? () => setView('youtube') : undefined}
           style={{
             display: 'flex',
             flexDirection: 'column',
@@ -153,6 +189,72 @@ const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
           </div>
           <h4 style={{ margin: '4px 0 2px 0', fontSize: '13px', fontWeight: 'bold' }}>YouTube Import</h4>
           <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Play any playlist</span>
+        </div>
+
+        <div 
+          className="import-shortcut-card glass-card group" 
+          onClick={handleAIOrganize}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '16px',
+            cursor: 'pointer',
+            borderRadius: '16px',
+            textAlign: 'center',
+            transition: 'all 0.2s ease',
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div className="import-icon-wrap" style={{
+            background: 'rgba(30, 215, 96, 0.1)',
+            color: 'var(--accent-primary)',
+            borderRadius: '50%',
+            padding: '10px',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Sparkles size={22} />
+          </div>
+          <h4 style={{ margin: '4px 0 2px 0', fontSize: '13px', fontWeight: 'bold' }}>AI Organize</h4>
+          <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Group liked by mood</span>
+        </div>
+
+        <div 
+          className="import-shortcut-card glass-card group" 
+          onClick={onOpenAIMix}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '16px',
+            cursor: 'pointer',
+            borderRadius: '16px',
+            textAlign: 'center',
+            transition: 'all 0.2s ease',
+            border: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}
+        >
+          <div className="import-icon-wrap" style={{
+            background: 'rgba(139, 92, 246, 0.1)',
+            color: '#8B5CF6',
+            borderRadius: '50%',
+            padding: '10px',
+            marginBottom: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Sparkles size={22} />
+          </div>
+          <h4 style={{ margin: '4px 0 2px 0', fontSize: '13px', fontWeight: 'bold' }}>AI Mix</h4>
+          <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>Generate themed playlist</span>
         </div>
       </div>
 
@@ -237,11 +339,33 @@ const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
                   </div>
                 )}
               </div>
-              <div className="pulse-playlist-info">
+              <div className="pulse-playlist-info" style={{ flexGrow: 1 }}>
                 <h4>{playlist.name}</h4>
                 <p>Playlist • {playlist.tracks.length} songs</p>
               </div>
-              <Play size={20} className="pulse-playlist-play-icon" />
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button 
+                  className="action-btn-no-style" 
+                  title="Play Playlist"
+                  onClick={(e) => handlePlayPlaylist(e, playlist.tracks)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer' }}
+                >
+                  <Play size={20} fill="currentColor" />
+                </button>
+                <button 
+                  className="action-btn-no-style" 
+                  title="Delete Playlist"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(`Delete "${playlist.name}"?`)) {
+                      deletePlaylist(playlist.id);
+                    }
+                  }}
+                  style={{ background: 'transparent', border: 'none', color: '#ff4d4d', cursor: 'pointer' }}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             </div>
           ))}
           {playlists.length === 0 && !showNewPlaylist && (
@@ -255,6 +379,45 @@ const Library = ({ setView, onOpenSettings, onInstall, showInstallButton }) => {
           )}
         </div>
       </section>
+
+      {/* Listening Stats & Intelligence Section */}
+      {stats && stats.totalPlays > 0 && (
+        <section className="pulse-lib-section">
+          <h3 className="pulse-section-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BarChart2 size={20} style={{ color: 'var(--accent-primary)' }} /> Listening Intelligence
+          </h3>
+          <div className="glass-card" style={{ padding: '20px', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '15px', textAlign: 'center' }}>
+              <div style={{ padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--accent-primary)' }}>{stats.totalPlays}</span>
+                <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: 'var(--text-secondary)' }}>Total Plays</p>
+              </div>
+              <div style={{ padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#8B5CF6' }}>{stats.uniqueSongs}</span>
+                <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: 'var(--text-secondary)' }}>Unique Tracks</p>
+              </div>
+              <div style={{ padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+                <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#FF6B35' }}>{stats.thisWeekPlays}</span>
+                <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: 'var(--text-secondary)' }}>This Week</p>
+              </div>
+            </div>
+
+            {stats.topArtists.length > 0 && (
+              <div style={{ marginTop: '10px' }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '13px', fontWeight: 'bold' }}>Top Artists</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {stats.topArtists.slice(0, 3).map((art, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px' }}>
+                      <span style={{ color: 'white', fontWeight: '500' }}>{art.artist}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>{art.count} plays</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Liked Tracks List */}
       {library.length > 0 && (

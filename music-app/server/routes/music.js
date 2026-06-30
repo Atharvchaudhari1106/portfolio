@@ -1,17 +1,23 @@
 import express from 'express';
 import axios from 'axios';
+import https from 'https';
 
 const router = express.Router();
+
+const agent = new https.Agent({
+  rejectUnauthorized: false
+});
 
 // Proxy JioSaavn API search requests to avoid CORS and local client network blocks
 router.get('/saavn/search/songs', async (req, res) => {
   const queryParams = req.query;
-  const targetUrl = 'https://jiosaavn-api-v4.vercel.app/api/search/songs';
+  const targetUrl = 'https://jiosaavn-api-beta.vercel.app/search/songs';
 
   try {
     const response = await axios.get(targetUrl, {
       params: queryParams,
-      timeout: 15000
+      timeout: 15000,
+      httpsAgent: agent
     });
     res.json(response.data);
   } catch (error) {

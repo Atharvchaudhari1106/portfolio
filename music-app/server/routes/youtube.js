@@ -12,6 +12,70 @@ const ytdlpPath = path.join(__dirname, '..', 'yt-dlp.exe');
 
 const router = express.Router();
 
+async function resolveYTStream(videoId) {
+  // Try yt-dlp first (since we just downloaded the official binary and it is extremely reliable)
+  try {
+    console.log(`[YouTube] Resolving stream for video: ${videoId} using yt-dlp`);
+    return await new Promise((resolve, reject) => {
+      const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      execFile(
+        ytdlpPath,
+        ['-f', 'ba', '-g', videoUrl],
+        { timeout: 15000 },
+        (error, stdout, stderr) => {
+          if (error) {
+            return reject(error);
+          }
+          const url = stdout.trim();
+          if (!url) {
+            return reject(new Error('No stream URL returned by yt-dlp'));
+          }
+          resolve(url);
+        }
+      );
+    });
+  } catch (err) {
+    console.warn('[YouTube] yt-dlp resolution failed, trying ytdl-core fallback:', err.message);
+  }
+
+  // Fallback to ytdl-core
+  console.log(`[YouTube] Resolving stream for video: ${videoId} using ytdl-core`);
+  const info = await ytdl.getInfo(videoId);
+  // Filter for audio formats manually to avoid chooseFormat throw
+  const formats = ytdl.filterFormats(info.formats, 'audioonly');
+  if (formats.length === 0) {
+    throw new Error('No audio formats found in ytdl-core fallback');
+  }
+  const format = formats[0];
+  if (format && format.url) {
+    console.log(`[YouTube] ytdl-core resolved stream successfully`);
+    return format.url;
+  }
+  throw new Error('No stream URL found in ytdl-core formats');
+}
+
+// ─── In-Memory Stream Cache (TTL: 2 hours) ─────────────────────
+const streamCache = new Map();
+const STREAM_CACHE_TTL = 2 * 60 * 60 * 1000;
+
+function getCachedStream(videoId) {
+  const entry = streamCache.get(videoId);
+  if (entry && Date.now() - entry.timestamp < STREAM_CACHE_TTL) {
+    return entry.url;
+  }
+  streamCache.delete(videoId);
+  return null;
+}
+
+function setCachedStream(videoId, url) {
+  // Limit cache size
+  if (streamCache.size > 500) {
+    const oldest = streamCache.keys().next().value;
+    streamCache.delete(oldest);
+  }
+  streamCache.set(videoId, { url, timestamp: Date.now() });
+}
+
 // Extract playlist ID from various YouTube & YouTube Music URL formats
 const extractPlaylistId = (url) => {
   if (!url) return '';
@@ -50,7 +114,7 @@ const extractPlaylistId = (url) => {
   return url;
 };
 
-// Import Playlist by URL
+// Import Playlist by URL — with better error handling
 router.get('/playlist', async (req, res) => {
   const { url } = req.query;
   if (!url) return res.status(400).json({ error: 'Playlist URL is required' });
@@ -62,18 +126,32 @@ router.get('/playlist', async (req, res) => {
 
   execFile(
     ytdlpPath,
-    ['--dump-single-json', '--flat-playlist', '--playlist-end', '100', playlistUrl],
-    { maxBuffer: 15 * 1024 * 1024 }, // 15MB buffer
+    ['--dump-single-json', '--flat-playlist', '--playlist-end', '200', playlistUrl],
+    { maxBuffer: 25 * 1024 * 1024, timeout: 60000 }, // 25MB buffer, 60s timeout
     (error, stdout, stderr) => {
       if (error) {
         console.error('[YouTube] yt-dlp playlist fetch failed:', error.message, stderr);
         let errorMsg = 'Failed to fetch playlist';
+        let statusCode = 500;
+        
         if (stderr.includes('The playlist does not exist') || stderr.includes('does not exist') || error.message.includes('does not exist')) {
           errorMsg = 'The playlist does not exist or is private. If it is your playlist, please change its visibility to Public or Unlisted in YouTube/YouTube Music settings.';
+          statusCode = 404;
         } else if (stderr.includes('404')) {
           errorMsg = 'Playlist not found (404). Check the URL/ID.';
+          statusCode = 404;
+        } else if (error.killed || stderr.includes('timed out')) {
+          errorMsg = 'Playlist fetch timed out. The playlist might be too large. Try a playlist with fewer than 200 tracks.';
+          statusCode = 408;
+        } else if (stderr.includes('HTTP Error 429') || stderr.includes('Too Many Requests')) {
+          errorMsg = 'YouTube rate limit hit. Please wait a minute and try again.';
+          statusCode = 429;
+        } else if (stderr.includes('Sign in') || stderr.includes('age-restricted')) {
+          errorMsg = 'This playlist contains age-restricted content. Try a different playlist.';
+          statusCode = 403;
         }
-        return res.status(404).json({ error: errorMsg });
+        
+        return res.status(statusCode).json({ error: errorMsg, errorType: statusCode === 404 ? 'not_found' : statusCode === 429 ? 'rate_limit' : 'server_error' });
       }
 
       try {
@@ -94,10 +172,13 @@ router.get('/playlist', async (req, res) => {
 
         const playlistThumbnail = data.thumbnails?.[0]?.url || (tracks[0]?.thumbnail || 'https://via.placeholder.com/300?text=No+Thumbnail');
 
+        console.log(`[YouTube] Successfully fetched ${tracks.length} tracks from "${data.title}"`);
+
         res.json({
           title: data.title || 'YouTube Playlist',
           description: data.description || '',
           thumbnail: playlistThumbnail,
+          trackCount: tracks.length,
           tracks
         });
       } catch (err) {
@@ -107,6 +188,66 @@ router.get('/playlist', async (req, res) => {
     }
   );
 });
+
+function findVideoRenderers(obj, results = []) {
+  if (!obj || typeof obj !== 'object') return results;
+  
+  if (obj.videoRenderer) {
+    results.push(obj.videoRenderer);
+    // Don't recurse deeper into this branch to avoid duplicate matches
+    return results;
+  }
+  
+  for (const key of Object.keys(obj)) {
+    findVideoRenderers(obj[key], results);
+  }
+  
+  return results;
+}
+
+async function fallbackSearchYoutube(query) {
+  const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' music')}&sp=EgIQAQ%253D%253D`;
+  const response = await axios.get(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      'Accept-Language': 'en-US,en;q=0.9'
+    },
+    timeout: 10000
+  });
+
+  const html = response.data;
+  const regex = /ytInitialData\s*=\s*({.+?});/;
+  const match = html.match(regex);
+  if (!match) throw new Error('Could not find ytInitialData in response');
+
+  const data = JSON.parse(match[1]);
+  
+  const videoRenderers = findVideoRenderers(data);
+  if (videoRenderers.length === 0) throw new Error('No video items found in ytInitialData');
+
+  const results = [];
+  for (const video of videoRenderers) {
+    const id = video.videoId;
+    if (!id) continue;
+
+    const title = video.title?.runs?.[0]?.text || '';
+    const artist = video.ownerText?.runs?.[0]?.text || 'Unknown Artist';
+    const thumbnail = video.thumbnail?.thumbnails?.[0]?.url || '';
+    
+    const durationText = video.lengthText?.simpleText || '';
+    const duration = parseDuration(durationText);
+
+    results.push({
+      id,
+      title: cleanTitle(title),
+      artist: artist.replace(' - Topic', ''),
+      thumbnail,
+      source: 'youtube',
+      duration
+    });
+  }
+  return results;
+}
 
 // Search YouTube
 router.get('/search', async (req, res) => {
@@ -129,38 +270,87 @@ router.get('/search', async (req, res) => {
 
     res.json(results);
   } catch (error) {
-    console.error('[YouTube] Error searching:', error.message);
-    res.status(500).json({ error: 'Failed to search YouTube' });
+    console.error('[YouTube] ytsr search failed, using fallback scraper:', error.message);
+    try {
+      const fallbackResults = await fallbackSearchYoutube(q);
+      res.json(fallbackResults);
+    } catch (fallbackError) {
+      console.error('[YouTube] Fallback search also failed:', fallbackError.message);
+      res.status(500).json({ error: 'Failed to search YouTube' });
+    }
   }
 });
 
-// Stream YouTube Video Audio
 router.get('/stream', async (req, res) => {
   const { videoId } = req.query;
   if (!videoId) return res.status(400).json({ error: 'Video ID is required' });
 
-  console.log(`[YouTube] Resolving stream for video: ${videoId} using yt-dlp`);
-
-  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  
-  execFile(
-    ytdlpPath,
-    ['--js-runtime', 'node', '-f', 'ba', '-g', videoUrl],
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error('[YouTube] yt-dlp resolution failed:', error.message, stderr);
-        return res.status(500).json({ error: 'Failed to resolve stream URL' });
-      }
-
-      const streamUrl = stdout.trim();
-      if (!streamUrl) {
-        return res.status(404).json({ error: 'No stream URL returned' });
-      }
-
-      // Redirect to the direct stream URL on YouTube CDN
-      res.redirect(streamUrl);
+  try {
+    let streamUrl = getCachedStream(videoId);
+    if (!streamUrl) {
+      streamUrl = await resolveYTStream(videoId);
+      setCachedStream(videoId, streamUrl);
     }
-  );
+
+    console.log(`[YouTube] Proxying stream for video: ${videoId}`);
+
+    const headers = {};
+    if (req.headers.range) {
+      headers.Range = req.headers.range;
+    }
+
+    const streamResponse = await axios({
+      method: 'get',
+      url: streamUrl,
+      headers: headers,
+      responseType: 'stream',
+      decompress: false, // Prevent axios from automatically decompressing the response data
+      timeout: 20000
+    });
+
+    res.status(streamResponse.status);
+    Object.entries(streamResponse.headers).forEach(([key, val]) => {
+      if (['content-type', 'content-length', 'content-range', 'accept-ranges', 'content-encoding'].includes(key.toLowerCase())) {
+        res.setHeader(key, val);
+      }
+    });
+
+    streamResponse.data.pipe(res);
+  } catch (err) {
+    console.error('[YouTube] Stream proxying failed:', err.message);
+    res.status(500).json({ error: err.message || 'Failed to stream audio' });
+  }
+});
+
+// Batch stream resolution (for playlist pre-loading)
+router.post('/batch-stream', async (req, res) => {
+  const { videoIds } = req.body;
+  if (!videoIds || !Array.isArray(videoIds) || videoIds.length === 0) {
+    return res.status(400).json({ error: 'videoIds array is required' });
+  }
+
+  // Limit to 10 at a time
+  const ids = videoIds.slice(0, 10);
+  const results = {};
+
+  for (const videoId of ids) {
+    // Check cache
+    const cached = getCachedStream(videoId);
+    if (cached) {
+      results[videoId] = { streamUrl: cached, cached: true };
+      continue;
+    }
+
+    try {
+      const streamUrl = await resolveYTStream(videoId);
+      setCachedStream(videoId, streamUrl);
+      results[videoId] = { streamUrl, cached: false };
+    } catch (err) {
+      results[videoId] = { error: err.message };
+    }
+  }
+
+  res.json(results);
 });
 
 // Parse "3:45" duration string to seconds

@@ -2,10 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   SkipBack, Play, Pause, SkipForward, 
   Shuffle, Repeat, Heart, ChevronDown, 
-  Share2, ListMusic, Music, Plus, Download
+  Share2, ListMusic, Music, Plus, Download, Sparkles
 } from 'lucide-react';
 import { useAudio } from '../context/AudioContext';
 import { downloadSong } from '../services/musicService';
+import { getSmartNextTracks } from '../services/musicIntelligence';
 
 const NowPlaying = ({ goBack }) => {
   const { 
@@ -23,12 +24,30 @@ const NowPlaying = ({ goBack }) => {
     removeFromLibrary,
     playlists,
     addToPlaylist,
-    createPlaylist
+    createPlaylist,
+    playTrack
   } = useAudio();
 
   const [showPlaylists, setShowPlaylists] = useState(false);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [similarSongs, setSimilarSongs] = useState([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
+
+  // Fetch similar songs on track change
+  useEffect(() => {
+    if (!currentTrack) return;
+    setLoadingSimilar(true);
+    getSmartNextTracks(currentTrack, library)
+      .then(res => {
+        setSimilarSongs(res.slice(0, 5));
+        setLoadingSimilar(false);
+      })
+      .catch(err => {
+        console.warn('Failed to load similar songs:', err);
+        setLoadingSimilar(false);
+      });
+  }, [currentTrack?.id, library.length]);
 
   // Listen to the audio element for time updates (shared via the PlayerBar audio element)
   useEffect(() => {
@@ -249,6 +268,45 @@ const NowPlaying = ({ goBack }) => {
           <ListMusic size={22} />
         </button>
       </div>
+
+      {/* Similar Songs (AI Recommended) */}
+      {similarSongs.length > 0 && (
+        <div className="np-similar-section" style={{ marginTop: '20px', width: '100%', padding: '0 20px 20px 20px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', marginBottom: '10px' }}>
+            <Sparkles size={14} style={{ color: 'var(--accent-primary)' }} /> AI Recommended Next
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {similarSongs.map(song => (
+              <div 
+                key={song.id} 
+                onClick={() => playTrack(song, [song, ...similarSongs])}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '10px', 
+                  background: 'rgba(255,255,255,0.03)', 
+                  padding: '8px 12px', 
+                  borderRadius: '8px', 
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+                className="np-similar-row"
+              >
+                <img 
+                  src={song.thumbnail} 
+                  alt={song.title} 
+                  style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover' }} 
+                />
+                <div style={{ flexGrow: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: '12px', fontWeight: '500', margin: 0, color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.title}</p>
+                  <p style={{ fontSize: '10px', margin: 0, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{song.artist}</p>
+                </div>
+                <Play size={12} fill="var(--accent-primary)" stroke="none" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

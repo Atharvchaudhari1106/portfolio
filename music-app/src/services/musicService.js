@@ -1,4 +1,5 @@
 import { getBackendUrl } from '../utils/api';
+import { searchYoutube } from './youtubeService';
 
 const SAAVN_API = `${getBackendUrl()}/api/music/saavn`;
 const PREFERRED_QUALITY = '96kbps'; // DO NOT change - higher qualities are DRM encrypted
@@ -23,6 +24,11 @@ const mapSongItem = (item) => {
   // If none of those, take the first available one as last resort
   if (!streamUrl && downloadUrls.length > 0) {
     streamUrl = downloadUrls[0].url || downloadUrls[0].link;
+  }
+
+  // Force HTTP on saavncdn.com to bypass Jio SSL/TLS hijacking blocks
+  if (streamUrl && streamUrl.includes('saavncdn.com')) {
+    streamUrl = streamUrl.replace('https://', 'http://');
   }
 
   // Handle image structure variations
@@ -56,6 +62,27 @@ const mapSongItem = (item) => {
 
 export const searchMusic = async (query) => {
   try {
+    const ytTracks = await searchYoutube(query);
+    if (ytTracks && ytTracks.length > 0) {
+      return ytTracks.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist || 'Unknown Artist',
+        thumbnail: track.thumbnail,
+        duration: track.duration || 0,
+        streamUrl: `${getBackendUrl()}/api/youtube/stream?videoId=${track.id}`,
+        source: 'youtube',
+        album: track.album || '',
+        year: track.year || '',
+        playCount: track.playCount || 0
+      }));
+    }
+  } catch (err) {
+    console.warn('YouTube primary search failed, falling back to JioSaavn:', err.message);
+  }
+
+  // Fallback to JioSaavn proxy search
+  try {
     const response = await fetch(
       `${SAAVN_API}/search/songs?query=${encodeURIComponent(query)}&limit=20`
     );
@@ -63,7 +90,7 @@ export const searchMusic = async (query) => {
     const data = await response.json();
 
     const results = data.data?.results || data.results;
-    if ((data.status === 'SUCCESS' || data.success === true || data.status === 'success') && results) {
+    if (results) {
       const mapped = results.map(mapSongItem);
       
       // Deduplicate songs by title and artist to fix duplicate UI issues
@@ -78,8 +105,8 @@ export const searchMusic = async (query) => {
     }
     return [];
   } catch (error) {
-    console.error('Search failed:', error);
-    throw error;
+    console.error('Saavn fallback search failed:', error);
+    return [];
   }
 };
 
@@ -97,16 +124,9 @@ export const getTrending = async () => {
     'Raataan Lambiyan Shershaah',
   ];
 
-  const results = [];
-
-  for (const hit of hits) {
+  const promises = hits.map(async (hit) => {
     try {
       const res = await searchMusic(hit);
-
-      // Pick the first result that:
-      // 1. Has a valid stream URL
-      // 2. Is NOT an instrumental/remix/lofi (filter by name keywords)
-      // 3. Has the HIGHEST play count (most popular = original version)
       const filtered = res.filter(song => {
         if (!song.streamUrl) return false;
         const lower = song.title.toLowerCase();
@@ -116,16 +136,15 @@ export const getTrending = async () => {
 
       // Sort by play count to get original version first
       const sorted = filtered.sort((a, b) => b.playCount - a.playCount);
-
-      if (sorted.length > 0) {
-        results.push(sorted[0]);
-      }
+      return sorted.length > 0 ? sorted[0] : null;
     } catch (err) {
-      console.error(`Failed to fetch: ${hit}`, err);
+      console.warn(`Failed to fetch: ${hit}`, err.message);
+      return null;
     }
-  }
+  });
 
-  return results;
+  const results = await Promise.all(promises);
+  return results.filter(Boolean);
 };
 
 export const getRecommendations = async (song) => {

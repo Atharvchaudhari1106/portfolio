@@ -67,7 +67,7 @@ export const importYoutubePlaylist = async (playlistUrl) => {
   try {
     const response = await axios.get(`${API_URL}/playlist`, {
       params: { url: playlistId },
-      timeout: 15000
+      timeout: 45000
     });
     
     const data = response.data;

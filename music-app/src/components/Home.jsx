@@ -3,53 +3,44 @@ import { getTrending, getHomeSuggestions } from '../services/musicService';
 import { getRecentSearchTerms } from '../services/searchHistory';
 import { useAudio } from '../context/AudioContext';
 import { useMusic } from '../context/MusicContext';
-import { getSpotifyLikedSongs } from '../services/spotifyService';
+import { generateMoodMixes, getTimeBasedGreeting, MOOD_COLORS } from '../services/aiEngine';
+import { getInsight, getListeningStats } from '../services/analyticsService';
+import { generateBecauseYouListened } from '../services/musicIntelligence';
+import AIInsightCard from './AIInsightCard';
 import SongCard from './SongCard';
 import TrackRow from './TrackRow';
-import { Play, Heart, MoreVertical, Music2, TvMinimalPlay } from 'lucide-react';
+import { Play, Heart, Sparkles, Music2, TvMinimalPlay, Download } from 'lucide-react';
 
-const Home = () => {
+const Home = ({ onOpenAIMix, onOpenInstallModal }) => {
   const [categories, setCategories] = useState([]);
   const [featuredSong, setFeaturedSong] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const { playTrack, currentTrack, isPlaying } = useAudio();
+  const [moodMixes, setMoodMixes] = useState([]);
+  const [aiSections, setAiSections] = useState([]);
+  const [insight, setInsight] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [greeting, setGreeting] = useState(null);
+  const { playTrack, currentTrack, isPlaying, library } = useAudio();
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e);
-      // Update UI notify the user they can install the PWA
-      setShowInstallPrompt(true);
-    };
+    setGreeting(getTimeBasedGreeting());
+    setInsight(getInsight());
+    setStats(getListeningStats());
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // If already in standalone mode, don't show the prompt
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setShowInstallPrompt(false);
+    // Generate mood mixes from library
+    if (library.length >= 3) {
+      setMoodMixes(generateMoodMixes(library));
     }
+  }, [library]);
 
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    if (deferredPrompt) {
-      // Show the install prompt
-      deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      // We've used the prompt, and can't use it again, so clear it
-      setDeferredPrompt(null);
-      setShowInstallPrompt(false);
+  // Fetch AI "Because you listened to" sections
+  useEffect(() => {
+    if (library.length >= 2) {
+      generateBecauseYouListened(library).then(sections => {
+        setAiSections(sections);
+      }).catch(err => console.warn('AI sections failed:', err));
     }
-  };
+  }, [library.length]);
 
   useEffect(() => {
     const fetchMusic = async () => {
@@ -93,14 +84,85 @@ const Home = () => {
     fetchMusic();
   }, []);
 
+  // Source badge for track cards
+  const getSourceBadge = (track) => {
+    if (track.source === 'youtube') return { label: 'YT', color: '#FF0000' };
+    if (track.source === 'spotify') return { label: 'SP', color: '#1DB954' };
+    return null;
+  };
+
   return (
     <div className="home-view animate-fade-in">
-
+      {/* Greeting Header */}
+      {greeting && (
+        <div className="home-greeting" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+          <div>
+            <h1 className="greeting-text" style={{ margin: 0 }}>
+              <span className="greeting-icon">{greeting.icon}</span> {greeting.greeting}
+            </h1>
+            <p className="greeting-subtext" style={{ margin: '5px 0 0 0' }}>{greeting.subtext}</p>
+          </div>
+          <button 
+            onClick={onOpenInstallModal}
+            className="btn-primary"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              padding: '10px 18px', 
+              borderRadius: '20px', 
+              fontSize: '13px',
+              fontWeight: '600',
+              boxShadow: '0 0 15px rgba(29, 185, 84, 0.2)',
+              cursor: 'pointer'
+            }}
+          >
+            <Download size={16} /> Install App
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
-        <div className="loading-state">Loading your music...</div>
+        <div className="loading-state">
+          <div className="pulse-loading-spinner"></div>
+          <span>Loading your music...</span>
+        </div>
       ) : (
         <div className="home-content-sections">
+          {/* AI Insight Card */}
+          {insight && (
+            <AIInsightCard insight={insight} stats={stats} onGenerateMix={onOpenAIMix} />
+          )}
+
+          {/* Mood Mixes Row */}
+          {moodMixes.length > 0 && (
+            <section className="home-section">
+              <div className="section-header-flex">
+                <h3 className="section-title">
+                  <Sparkles size={18} className="section-ai-icon" /> Mood Mixes
+                </h3>
+              </div>
+              <div className="mood-mixes-scroll">
+                {moodMixes.map(mix => (
+                  <div
+                    key={mix.mood}
+                    className="mood-mix-card"
+                    style={{ background: mix.gradient }}
+                    onClick={() => mix.tracks.length > 0 && playTrack(mix.tracks[0], mix.tracks)}
+                  >
+                    <span className="mood-mix-emoji">{mix.emoji}</span>
+                    <h4 className="mood-mix-title">{mix.title}</h4>
+                    <p className="mood-mix-count">{mix.tracks.length} tracks</p>
+                    <div className="mood-mix-play">
+                      <Play size={16} fill="white" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Featured Song Hero */}
           {featuredSong && (
             <section className="hero-section">
               <div className="hero-card group" onClick={() => playTrack(featuredSong, [featuredSong])}>
@@ -118,19 +180,82 @@ const Home = () => {
             </section>
           )}
 
-          {categories[0] && (
-            <section className="home-section">
+          {/* Dynamic Categories */}
+          {categories.map((cat, catIdx) => (
+            <section key={cat.id || catIdx} className="home-section">
               <div className="section-header-flex">
-                <h3 className="section-title">{categories[0].title}</h3>
+                <h3 className="section-title">{cat.title}</h3>
                 <span className="see-all-link">See All</span>
               </div>
+              {catIdx % 3 === 2 ? (
+                // Every 3rd section: list view
+                <div className="trending-list">
+                  {cat.tracks.map((song, index) => (
+                    <TrackRow key={song.id} track={song} index={index} queueContext={cat.tracks} />
+                  ))}
+                </div>
+              ) : catIdx % 3 === 1 ? (
+                // Every 2nd section: horizontal scroll
+                <div className="releases-scroll">
+                  {cat.tracks.map(song => (
+                    <div key={song.id} className="release-card group" onClick={() => playTrack(song, cat.tracks)}>
+                      <div className="release-image-container border-glow">
+                        <img src={song.thumbnail} alt={song.title} />
+                        {getSourceBadge(song) && (
+                          <span className="yt-source-badge" style={{ background: getSourceBadge(song).color }}>
+                            {getSourceBadge(song).label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="release-info">
+                        <h4 className="release-title">{song.title}</h4>
+                        <p className="release-artist">{song.artist}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                // Default: grid view
+                <div className="mixes-grid">
+                  {cat.tracks.map(song => (
+                    <div key={song.id} className="mix-card glass-card group" onClick={() => playTrack(song, cat.tracks)}>
+                      <div className="mix-image-container">
+                        <img src={song.thumbnail} alt={song.title} />
+                        <div className="mix-play-overlay">
+                          <Play size={36} fill="white" className="text-white" />
+                        </div>
+                        {getSourceBadge(song) && (
+                          <span className="yt-source-badge" style={{ background: getSourceBadge(song).color }}>
+                            {getSourceBadge(song).label}
+                          </span>
+                        )}
+                      </div>
+                      <div className="mix-info">
+                        <p className="mix-title">{song.title}</p>
+                        <p className="mix-desc">{song.artist}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          ))}
+
+          {/* AI "Because you listened to..." Sections */}
+          {aiSections.map(section => (
+            <section key={section.id} className="home-section ai-section">
+              <div className="section-header-flex">
+                <h3 className="section-title">
+                  <Sparkles size={16} className="section-ai-icon" /> {section.title}
+                </h3>
+              </div>
               <div className="mixes-grid">
-                {categories[0].tracks.map(song => (
-                  <div key={song.id} className="mix-card glass-card group" onClick={() => playTrack(song, categories[0].tracks)}>
+                {section.tracks.map(song => (
+                  <div key={song.id} className="mix-card glass-card group" onClick={() => playTrack(song, section.tracks)}>
                     <div className="mix-image-container">
                       <img src={song.thumbnail} alt={song.title} />
                       <div className="mix-play-overlay">
-                        <Play size={36} fill="white" className="text-white" />
+                        <Play size={36} fill="white" />
                       </div>
                     </div>
                     <div className="mix-info">
@@ -141,56 +266,7 @@ const Home = () => {
                 ))}
               </div>
             </section>
-          )}
-
-          {categories[1] && (
-            <section className="home-section">
-              <h3 className="section-title">{categories[1].title}</h3>
-              <div className="releases-scroll">
-                {categories[1].tracks.map(song => (
-                  <div key={song.id} className="release-card group" onClick={() => playTrack(song, categories[1].tracks)}>
-                    <div className="release-image-container border-glow">
-                      <img src={song.thumbnail} alt={song.title} />
-                    </div>
-                    <div className="release-info">
-                      <h4 className="release-title">{song.title}</h4>
-                      <p className="release-artist">{song.artist}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {categories[2] && (
-            <section className="home-section">
-              <h3 className="section-title">{categories[2].title}</h3>
-              <div className="trending-list">
-                {categories[2].tracks.map((song, index) => (
-                  <TrackRow 
-                    key={song.id} 
-                    track={song} 
-                    index={index} 
-                    queueContext={categories[2].tracks} 
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {showInstallPrompt && (
-            <section className="home-section install-section">
-              <div className="install-banner-wide glass-card">
-                <div className="install-content">
-                  <h3>Get the AesthetiCore App</h3>
-                  <p>Install our app for a full-screen, premium experience with offline-like performance.</p>
-                </div>
-                <button className="pill-btn neon-glow" onClick={handleInstall}>
-                  Install Now
-                </button>
-              </div>
-            </section>
-          )}
+          ))}
         </div>
       )}
     </div>

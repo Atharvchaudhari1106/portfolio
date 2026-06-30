@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { useAudio } from '../context/AudioContext';
 import { importYoutubePlaylist } from '../services/youtubeService';
-import { TvMinimalPlay, Plus, Play, Pause, Trash2, Link } from 'lucide-react';
+import { TvMinimalPlay, Plus, Play, Pause, Trash2, Link, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 
 const YoutubeView = () => {
   const { youtubePlaylists, setYoutubePlaylists } = useMusic();
@@ -10,21 +10,50 @@ const YoutubeView = () => {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [importProgress, setImportProgress] = useState(null);
 
   const handleImport = async (e) => {
     e.preventDefault();
     if (!url.trim()) return;
     setLoading(true);
     setError('');
+    setImportProgress({ phase: 'Connecting to YouTube...', percent: 15 });
+
     try {
+      setImportProgress({ phase: 'Fetching playlist data (this may take a moment)...', percent: 40 });
       const data = await importYoutubePlaylist(url.trim());
+      
+      setImportProgress({ phase: `Found ${data.tracks?.length || 0} tracks!`, percent: 90 });
+
+      // Check for duplicate playlists
+      const isDuplicate = youtubePlaylists.some(p => 
+        p.title === data.title && p.tracks.length === data.tracks.length
+      );
+
+      if (isDuplicate) {
+        setError('This playlist has already been imported.');
+        setImportProgress(null);
+        setLoading(false);
+        return;
+      }
+
       const newPlaylists = [...youtubePlaylists, data];
       setYoutubePlaylists(newPlaylists);
       localStorage.setItem('youtube_playlists', JSON.stringify(newPlaylists));
       setUrl('');
+      
+      setImportProgress({ phase: `Successfully imported "${data.title}"!`, percent: 100 });
+      setTimeout(() => setImportProgress(null), 2500);
     } catch (e) {
       console.error('Failed to import YouTube playlist', e);
-      setError(e.message || 'Failed to import. Make sure the playlist URL is correct and the playlist is set to public.');
+      
+      let errorMsg = e.message || 'Failed to import playlist.';
+      if (errorMsg.includes('private') || errorMsg.includes('exist')) {
+        errorMsg += ' Make sure the playlist is set to Public or Unlisted.';
+      }
+      
+      setError(errorMsg);
+      setImportProgress(null);
     } finally {
       setLoading(false);
     }
@@ -34,6 +63,12 @@ const YoutubeView = () => {
     const newPlaylists = youtubePlaylists.filter((_, i) => i !== index);
     setYoutubePlaylists(newPlaylists);
     localStorage.setItem('youtube_playlists', JSON.stringify(newPlaylists));
+  };
+
+  const handlePlayAll = (playlist) => {
+    if (playlist.tracks.length > 0) {
+      playTrack(playlist.tracks[0], playlist.tracks);
+    }
   };
 
   return (
@@ -54,21 +89,50 @@ const YoutubeView = () => {
           <Link size={18} className="yt-import-icon" />
           <input
             type="text"
-            placeholder="Paste YouTube Playlist URL (e.g., https://youtube.com/playlist?list=...)"
+            placeholder="Paste YouTube or YouTube Music Playlist URL..."
             className="yt-import-input"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
         </div>
         <button type="submit" className="btn-primary yt-import-btn" disabled={loading || !url.trim()}>
-          {loading ? 'Importing...' : <><Plus size={18} /> Import</>}
+          {loading ? (
+            <><Loader2 size={18} className="spin" /> Importing...</>
+          ) : (
+            <><Plus size={18} /> Import</>
+          )}
         </button>
       </form>
 
-      {error && <div className="yt-error-msg">{error}</div>}
+      {/* Progress Bar */}
+      {importProgress && (
+        <div className="import-progress glass-card">
+          <div className="import-progress-bar">
+            <div className="import-progress-fill yt-progress" style={{ width: `${importProgress.percent}%` }} />
+          </div>
+          <div className="import-progress-text">
+            {importProgress.percent === 100 ? <CheckCircle size={16} color="#FF0000" /> : <Loader2 size={16} className="spin" />}
+            <span>{importProgress.phase}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Error */}
+      {error && (
+        <div className="yt-error-msg">
+          <AlertCircle size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="yt-info-note glass-card">
-        <p><strong>Tip:</strong> Paste any public or <strong>unlisted</strong> playlist URL. If your playlist is private, change its visibility setting to <strong>Unlisted</strong> in YouTube/YouTube Music. This allows the app to import it while keeping it hidden from search engines and your public profile.</p>
+        <p><strong>Tip:</strong> Paste any public or <strong>unlisted</strong> playlist URL. Both YouTube and YouTube Music URLs are supported.</p>
+        <p><strong>Supported formats:</strong></p>
+        <ul style={{ margin: '4px 0', paddingLeft: '16px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+          <li><code>https://youtube.com/playlist?list=...</code></li>
+          <li><code>https://music.youtube.com/playlist?list=...</code></li>
+          <li><code>https://music.youtube.com/browse/VL...</code></li>
+        </ul>
       </div>
 
       {/* Playlists */}
@@ -83,17 +147,29 @@ const YoutubeView = () => {
           {youtubePlaylists.map((playlist, pIndex) => (
             <section key={pIndex} className="home-section">
               <div className="section-header-flex">
-                <h3 className="section-title">{playlist.title}</h3>
-                <button
-                  className="yt-remove-btn"
-                  onClick={() => removePlaylist(pIndex)}
-                  title="Remove playlist"
-                >
-                  <Trash2 size={16} /> Remove
-                </button>
+                <h3 className="section-title">
+                  {playlist.title}
+                  <span className="playlist-track-count">({playlist.tracks.length} tracks)</span>
+                </h3>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    className="btn-primary"
+                    style={{ padding: '6px 14px', fontSize: '12px' }}
+                    onClick={() => handlePlayAll(playlist)}
+                  >
+                    <Play size={14} fill="currentColor" /> Play All
+                  </button>
+                  <button
+                    className="yt-remove-btn"
+                    onClick={() => removePlaylist(pIndex)}
+                    title="Remove playlist"
+                  >
+                    <Trash2 size={16} /> Remove
+                  </button>
+                </div>
               </div>
               <div className="mixes-grid">
-                {playlist.tracks.map(song => (
+                {playlist.tracks.slice(0, 12).map(song => (
                   <div
                     key={song.id}
                     className={`mix-card glass-card group ${currentTrack?.id === song.id ? 'active-card' : ''}`}
@@ -116,6 +192,11 @@ const YoutubeView = () => {
                   </div>
                 ))}
               </div>
+              {playlist.tracks.length > 12 && (
+                <p className="show-more-text" onClick={() => handlePlayAll(playlist)}>
+                  + {playlist.tracks.length - 12} more tracks — Play All to hear them
+                </p>
+              )}
             </section>
           ))}
         </div>
