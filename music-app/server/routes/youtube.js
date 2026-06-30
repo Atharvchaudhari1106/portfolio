@@ -5,10 +5,15 @@ import ytdl from '@distube/ytdl-core';
 import { execFile } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const ytdlpPath = path.join(__dirname, '..', 'yt-dlp.exe');
+
+// Use local .exe on Windows, system-installed yt-dlp on Linux (Render)
+const ytdlpPath = os.platform() === 'win32'
+  ? path.join(__dirname, '..', 'yt-dlp.exe')
+  : 'yt-dlp';
 
 const router = express.Router();
 

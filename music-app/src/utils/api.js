@@ -1,15 +1,26 @@
 /**
- * Dynamically resolves the backend server URL based on the current hostname.
- * Falls back to localhost:5000 if hosted on a public domain (like GitHub Pages)
- * so it can connect to the local server running on the user's computer.
+ * Dynamically resolves the backend server URL.
+ * 
+ * Priority:
+ * 1. User-saved URL in localStorage (from Settings modal)
+ * 2. If running on localhost/LAN → use same hostname with port 5000 (local dev)
+ * 3. If running on a deployed frontend → use the Render backend URL
  */
+
+// ⚠️ AFTER DEPLOYING TO RENDER: Replace this with your actual Render URL
+// Example: 'https://aestheticore-backend.onrender.com'
+const RENDER_BACKEND_URL = 'PASTE_YOUR_RENDER_URL_HERE';
+
 export const getBackendUrl = () => {
+  // 1. Check for user-configured URL in localStorage
   const savedUrl = localStorage.getItem('AESTHETICORE_BACKEND_URL');
   if (savedUrl) {
     return savedUrl.replace(/\/$/, ''); // Trim trailing slash
   }
-  
+
   const hostname = window.location.hostname;
+
+  // 2. Local development — connect to local backend
   if (
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
@@ -19,5 +30,12 @@ export const getBackendUrl = () => {
   ) {
     return `http://${hostname}:5000`;
   }
+
+  // 3. Deployed frontend — connect to Render backend
+  if (RENDER_BACKEND_URL && RENDER_BACKEND_URL !== 'PASTE_YOUR_RENDER_URL_HERE') {
+    return RENDER_BACKEND_URL;
+  }
+
+  // Fallback
   return 'http://localhost:5000';
 };

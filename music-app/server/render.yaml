@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: aestheticore-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && pip install yt-dlp
+    startCommand: node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      - key: SPOTIFY_REDIRECT_URI
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false

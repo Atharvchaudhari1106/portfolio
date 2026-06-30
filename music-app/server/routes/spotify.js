@@ -109,10 +109,12 @@ router.get('/callback', async (req, res) => {
     const data = await spotifyApi.authorizationCodeGrant(code);
     const { access_token, refresh_token, expires_in } = data.body;
 
-    res.redirect(`http://localhost:5173/spotify-callback?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/spotify-callback?access_token=${access_token}&refresh_token=${refresh_token}&expires_in=${expires_in}`);
   } catch (error) {
     console.error('Error during Spotify callback:', error);
-    res.redirect('http://localhost:5173/error?message=spotify_auth_failed');
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/error?message=spotify_auth_failed`);
   }
 });
 

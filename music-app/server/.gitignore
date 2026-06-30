@@ -1,0 +1,8 @@
+node_modules/
+.env
+logs/
+yt-dlp.exe
+*.log
+ecosystem.config.cjs
+start-backend.bat
+start-backend-silent.vbs

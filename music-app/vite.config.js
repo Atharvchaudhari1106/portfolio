@@ -13,6 +13,12 @@ function startBackendServerPlugin() {
   return {
     name: 'start-backend-server',
     configureServer(server) {
+      // Skip if backend is deployed on Render (not needed locally)
+      if (process.env.SKIP_LOCAL_BACKEND === 'true') {
+        console.log('⏭️  [Vite] Skipping local backend (using remote Render backend)');
+        return;
+      }
+
       console.log('🚀 [Vite] Starting backend server in server directory...');
       
       const serverDir = path.resolve(__dirname, 'server');
