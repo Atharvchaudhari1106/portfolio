@@ -32,7 +32,7 @@ export const getBackendUrl = () => {
   }
 
   // 3. Deployed frontend — connect to Render backend
-  if (RENDER_BACKEND_URL && RENDER_BACKEND_URL !== 'PASTE_YOUR_RENDER_URL_HERE') {
+  if (RENDER_BACKEND_URL && RENDER_BACKEND_URL !== 'https://aestheticore-backend.onrender.com') {
     return RENDER_BACKEND_URL;
   }
 
