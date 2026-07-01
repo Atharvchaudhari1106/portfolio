@@ -136,7 +136,7 @@ router.get('/playlist', async (req, res) => {
 
   execFile(
     ytdlpPath,
-    ['--dump-single-json', '--flat-playlist', '--playlist-end', '200', playlistUrl],
+    ['--dump-single-json', '--flat-playlist', '--playlist-end', '10000', playlistUrl],
     { maxBuffer: 25 * 1024 * 1024, timeout: 60000 }, // 25MB buffer, 60s timeout
     (error, stdout, stderr) => {
       if (error) {

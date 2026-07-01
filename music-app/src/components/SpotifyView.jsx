@@ -159,7 +159,7 @@ const SpotifyView = () => {
                 </div>
               </div>
               <div className="mixes-grid">
-                {playlist.tracks.slice(0, expandedPlaylists[playlist.id || playlist.title] ? undefined : 12).map(song => (
+                {playlist.tracks.map(song => (
                   <div
                     key={song.id}
                     className={`mix-card glass-card group ${currentTrack?.id === song.id ? 'active-card' : ''}`}
@@ -182,17 +182,6 @@ const SpotifyView = () => {
                   </div>
                 ))}
               </div>
-              {playlist.tracks.length > 12 && (
-                <p 
-                  className="show-more-text" 
-                  onClick={() => toggleExpandPlaylist(playlist.id || playlist.title)}
-                  style={{ cursor: 'pointer', userSelect: 'none' }}
-                >
-                  {expandedPlaylists[playlist.id || playlist.title] 
-                    ? 'Show Less' 
-                    : `+ ${playlist.tracks.length - 12} more tracks — Show All`}
-                </p>
-              )}
             </section>
           ))}
         </div>

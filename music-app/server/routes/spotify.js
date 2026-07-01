@@ -210,7 +210,7 @@ router.get('/playlist', async (req, res) => {
     // Paginate to get ALL tracks
     const allTracks = [];
     const pageSize = 100;
-    const maxPages = 10;
+    const maxPages = 100; // Allow up to 10,000 tracks
 
     for (let offset = 0; offset < totalTracks && offset < maxPages * pageSize; offset += pageSize) {
       try {
