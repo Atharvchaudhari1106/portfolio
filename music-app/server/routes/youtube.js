@@ -6,14 +6,16 @@ import { execFile } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Use local .exe on Windows, system-installed yt-dlp on Linux (Render)
+// Use local .exe on Windows, check downloaded binary or system path on Linux (Render)
+const localYtdlpPath = path.join(__dirname, '..', 'yt-dlp');
 const ytdlpPath = os.platform() === 'win32'
   ? path.join(__dirname, '..', 'yt-dlp.exe')
-  : 'yt-dlp';
+  : (fs.existsSync(localYtdlpPath) ? localYtdlpPath : 'yt-dlp');
 
 const router = express.Router();
 
