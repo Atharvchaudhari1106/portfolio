@@ -9,7 +9,7 @@
 
 // ⚠️ AFTER DEPLOYING TO RENDER: Replace this with your actual Render URL
 // Example: 'https://aestheticore-backend.onrender.com'
-const RENDER_BACKEND_URL = 'PASTE_YOUR_RENDER_URL_HERE';
+const RENDER_BACKEND_URL = 'https://aestheticore-backend.onrender.com';
 
 export const getBackendUrl = () => {
   // 1. Check for user-configured URL in localStorage
