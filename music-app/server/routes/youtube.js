@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
 import fs from 'fs';
+import { Innertube } from 'youtubei.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,15 @@ const ytdlpPath = os.platform() === 'win32'
   : (fs.existsSync(localYtdlpPath) ? localYtdlpPath : 'yt-dlp');
 
 const router = express.Router();
+
+let ytInstance = null;
+async function getYTInstance() {
+  if (!ytInstance) {
+    console.log('[YouTube] Initializing Innertube instance...');
+    ytInstance = await Innertube.create();
+  }
+  return ytInstance;
+}
 
 async function resolveYTStream(videoId) {
   // Try yt-dlp first (since we just downloaded the official binary and it is extremely reliable)
@@ -47,7 +57,25 @@ async function resolveYTStream(videoId) {
       );
     });
   } catch (err) {
-    console.warn('[YouTube] yt-dlp resolution failed, trying ytdl-core fallback:', err.message);
+    console.warn('[YouTube] yt-dlp resolution failed, trying youtubei.js fallback:', err.message);
+  }
+
+  // Fallback to youtubei.js
+  try {
+    console.log(`[YouTube] Resolving stream for video: ${videoId} using youtubei.js`);
+    const yt = await getYTInstance();
+    const info = await yt.getInfo(videoId);
+    const format = info.chooseFormat({ type: 'audio', quality: 'best' });
+    if (format) {
+      const url = format.decipher(yt.session.player);
+      if (url) {
+        console.log(`[YouTube] youtubei.js resolved stream successfully`);
+        return url;
+      }
+    }
+    console.warn('[YouTube] youtubei.js did not return a valid audio format');
+  } catch (err) {
+    console.warn('[YouTube] youtubei.js resolution failed, trying ytdl-core:', err.message);
   }
 
   // Fallback to ytdl-core
