@@ -128,9 +128,22 @@ export const searchMusic = async (query) => {
     return yt;
   });
 
+  // Find JioSaavn tracks that were NOT matched into YouTube tracks
+  const unmatchedSaavn = saavnMeta.filter(s => {
+    const normSTitle = normalize(s.title);
+    return !ytTracks.some(yt => {
+      const normYtTitle = normalize(yt.title);
+      return normSTitle && normYtTitle &&
+        (normYtTitle.includes(normSTitle) || normSTitle.includes(normYtTitle));
+    });
+  });
+
+  // Combine enriched YouTube tracks and unmatched JioSaavn tracks
+  const combined = [...enriched, ...unmatchedSaavn];
+
   // Deduplicate by normalized title + primary artist
   const seen = new Set();
-  return enriched.filter(song => {
+  return combined.filter(song => {
     const key = `${(song.title || '').toLowerCase().trim()}-${(song.artist || '').split(',')[0].toLowerCase().trim()}`;
     if (seen.has(key)) return false;
     seen.add(key);

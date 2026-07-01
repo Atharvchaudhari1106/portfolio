@@ -236,11 +236,12 @@ async function tryYoutubeSearchStream(track) {
       }))
       .sort((a, b) => b.matchScore - a.matchScore);
 
-    if (scored.length > 0 && scored[0].matchScore > 0.25) {
-      const streamUrl = await getYoutubeAudioStream(scored[0].id);
+    if (scored.length > 0) {
+      const bestMatch = scored[0];
+      const streamUrl = await getYoutubeAudioStream(bestMatch.id);
       if (streamUrl) {
-        console.log(`[StreamResolver] YouTube search match: "${scored[0].title}" (score: ${scored[0].matchScore.toFixed(2)})`);
-        return { streamUrl, resolvedVia: 'youtube-search', matchScore: scored[0].matchScore };
+        console.log(`[StreamResolver] YouTube search match: "${bestMatch.title}" (score: ${bestMatch.matchScore.toFixed(2)})`);
+        return { streamUrl, resolvedVia: 'youtube-search', matchScore: bestMatch.matchScore };
       }
     }
   } catch (err) {
