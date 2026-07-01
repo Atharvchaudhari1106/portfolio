@@ -67,9 +67,12 @@ async function resolveYTStream(videoId) {
     const info = await yt.getInfo(videoId);
     const format = info.chooseFormat({ type: 'audio', quality: 'best' });
     if (format) {
-      const url = format.decipher(yt.session.player);
+      let url = format.url;
+      if (!url && typeof format.decipher === 'function') {
+        url = await format.decipher(yt.session.player);
+      }
       if (url) {
-        console.log(`[YouTube] youtubei.js resolved stream successfully`);
+        console.log(`[YouTube] youtubei.js resolved stream successfully: ${url.slice(0, 50)}...`);
         return url;
       }
     }
