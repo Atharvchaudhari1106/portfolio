@@ -417,4 +417,7 @@ function cleanTitle(title) {
     .replace(/&gt;/g, '>');
 }
 
+// Pre-initialize Innertube at startup in the background
+getYTInstance().catch(err => console.error('[YouTube] Pre-initialize Innertube failed:', err.message));
+
 export default router;
