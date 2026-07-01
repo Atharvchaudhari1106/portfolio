@@ -25,7 +25,12 @@ async function resolveYTStream(videoId) {
       const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
       execFile(
         ytdlpPath,
-        ['-f', 'ba', '-g', videoUrl],
+        [
+          '--js-runtimes', 'node',
+          '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          '-f', 'ba',
+          '-g', videoUrl
+        ],
         { timeout: 15000 },
         (error, stdout, stderr) => {
           if (error) {
@@ -299,7 +304,9 @@ router.get('/stream', async (req, res) => {
 
     console.log(`[YouTube] Proxying stream for video: ${videoId}`);
 
-    const headers = {};
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    };
     if (req.headers.range) {
       headers.Range = req.headers.range;
     }
