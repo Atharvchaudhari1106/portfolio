@@ -2,36 +2,15 @@ import { getBackendUrl } from '../utils/api';
 import { searchYoutube } from './youtubeService';
 
 const SAAVN_API = `${getBackendUrl()}/api/music/saavn`;
-const PREFERRED_QUALITY = '96kbps'; // DO NOT change - higher qualities are DRM encrypted
 
-const mapSongItem = (item) => {
-  // Extract download URLs
-  const downloadUrls = item.downloadUrl || [];
-  
-  // Find highest quality unencrypted stream (96kbps is safe)
-  // Fallback chain: 96kbps → 48kbps → 12kbps
-  const qualities = ['96kbps', '48kbps', '12kbps'];
-  let streamUrl = null;
-  
-  for (const q of qualities) {
-    const found = downloadUrls.find(u => u.quality === q);
-    if (found) {
-      streamUrl = found.url || found.link;
-      if (streamUrl) break;
-    }
-  }
-
-  // If none of those, take the first available one as last resort
-  if (!streamUrl && downloadUrls.length > 0) {
-    streamUrl = downloadUrls[0].url || downloadUrls[0].link;
-  }
-
-  // Force HTTP on saavncdn.com to bypass Jio SSL/TLS hijacking blocks
-  if (streamUrl && streamUrl.includes('saavncdn.com')) {
-    streamUrl = streamUrl.replace('https://', 'http://');
-  }
-
-  // Handle image structure variations
+/**
+ * Map a JioSaavn API song item to our internal track format.
+ * NOTE: JioSaavn CDN (aac.saavncdn.com) is broken — all audio URLs return 404.
+ * We use JioSaavn ONLY for metadata (title, artist, album art, play count).
+ * Stream URLs are never extracted from JioSaavn responses.
+ */
+const mapSaavnMetadata = (item) => {
+  // Handle image structure variations — image CDN (c.saavncdn.com) still works
   let thumbnail = 'https://via.placeholder.com/300';
   if (Array.isArray(item.image) && item.image.length > 0) {
     const img = item.image[item.image.length - 1];
@@ -42,7 +21,7 @@ const mapSongItem = (item) => {
     thumbnail = item.thumbnail;
   }
 
-  // Ensure HTTPS
+  // Ensure HTTPS for images
   if (thumbnail.startsWith('http:')) {
     thumbnail = thumbnail.replace('http:', 'https:');
   }
@@ -53,17 +32,33 @@ const mapSongItem = (item) => {
     artist: item.primaryArtists || 'Unknown Artist',
     thumbnail,
     duration: parseInt(item.duration) || 0,
-    streamUrl,
+    streamUrl: null, // JioSaavn CDN is broken — do NOT use download URLs
     album: item.album?.name || '',
     year: item.year || '',
     playCount: parseInt(item.playCount) || 0
   };
 };
 
+/**
+ * Normalize a string for fuzzy comparison.
+ */
+function normalize(str) {
+  return (str || '')
+    .toLowerCase()
+    .replace(/\(.*?\)/g, '')
+    .replace(/\[.*?\]/g, '')
+    .replace(/feat\.?.*$/i, '')
+    .replace(/ft\.?.*$/i, '')
+    .replace(/[^\w\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export const searchMusic = async (query) => {
-  // Search YouTube and JioSaavn in PARALLEL for speed and resilience
+  // Search YouTube and JioSaavn in PARALLEL
+  // YouTube = streaming source, JioSaavn = metadata enrichment
   const [ytResult, saavnResult] = await Promise.allSettled([
-    // YouTube search
+    // YouTube search — primary source for playable tracks
     searchYoutube(query).then(tracks => {
       if (!tracks || tracks.length === 0) return [];
       return tracks.map(track => ({
@@ -83,32 +78,59 @@ export const searchMusic = async (query) => {
       return [];
     }),
 
-    // JioSaavn search
+    // JioSaavn search — metadata only (better album art, play counts, accurate titles)
     fetch(`${SAAVN_API}/search/songs?query=${encodeURIComponent(query)}&limit=20`)
       .then(async (response) => {
         if (!response.ok) throw new Error(`API error: ${response.status}`);
         const data = await response.json();
         const results = data.data?.results || data.results;
         if (results) {
-          return results.map(mapSongItem);
+          return results.map(mapSaavnMetadata);
         }
         return [];
       })
       .catch(err => {
-        console.warn('JioSaavn search failed:', err.message);
+        console.warn('JioSaavn metadata fetch failed:', err.message);
         return [];
       })
   ]);
 
   const ytTracks = ytResult.status === 'fulfilled' ? ytResult.value : [];
-  const saavnTracks = saavnResult.status === 'fulfilled' ? saavnResult.value : [];
+  const saavnMeta = saavnResult.status === 'fulfilled' ? saavnResult.value : [];
 
-  // Merge: JioSaavn first (has direct stream URLs), then YouTube
-  const combined = [...saavnTracks, ...ytTracks];
+  // Enrich YouTube tracks with JioSaavn metadata (better thumbnails, play counts)
+  const enriched = ytTracks.map(yt => {
+    const normYtTitle = normalize(yt.title);
+    const normYtArtist = normalize(yt.artist);
+
+    // Find a matching JioSaavn entry by title similarity
+    const match = saavnMeta.find(s => {
+      const normSTitle = normalize(s.title);
+      const normSArtist = normalize(s.artist);
+      // Check if titles share significant overlap
+      return normSTitle && normYtTitle &&
+        (normYtTitle.includes(normSTitle) || normSTitle.includes(normYtTitle));
+    });
+
+    if (match) {
+      return {
+        ...yt,
+        // Use JioSaavn's higher-quality album art if available
+        thumbnail: match.thumbnail && !match.thumbnail.includes('placeholder')
+          ? match.thumbnail : yt.thumbnail,
+        // Use JioSaavn's more accurate metadata
+        album: match.album || yt.album,
+        year: match.year || yt.year,
+        playCount: match.playCount || yt.playCount,
+        duration: match.duration || yt.duration,
+      };
+    }
+    return yt;
+  });
 
   // Deduplicate by normalized title + primary artist
   const seen = new Set();
-  return combined.filter(song => {
+  return enriched.filter(song => {
     const key = `${(song.title || '').toLowerCase().trim()}-${(song.artist || '').split(',')[0].toLowerCase().trim()}`;
     if (seen.has(key)) return false;
     seen.add(key);

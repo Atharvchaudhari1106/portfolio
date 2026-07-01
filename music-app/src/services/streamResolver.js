@@ -161,6 +161,11 @@ function getCachedStream(track) {
   const key = getCacheKey(track);
   const entry = cache[key];
   if (entry && Date.now() - entry.timestamp < CACHE_TTL) {
+    if (entry.streamUrl && entry.streamUrl.includes('saavncdn.com')) {
+      delete cache[key];
+      setCache(cache);
+      return null;
+    }
     return entry;
   }
   return null;
@@ -185,7 +190,8 @@ async function tryDirectStream(track) {
   if (track.streamUrl) {
     let url = track.streamUrl;
     if (url.includes('saavncdn.com')) {
-      url = url.replace('https://', 'http://');
+      // JioSaavn CDN links are currently returning 404. Bypass to force YouTube fallback.
+      return null;
     }
     return { streamUrl: url, resolvedVia: 'direct' };
   }
@@ -194,34 +200,7 @@ async function tryDirectStream(track) {
 
 // ─── Tier 2: JioSaavn Fuzzy Match ───────────────────────────────
 async function tryJioSaavnMatch(track) {
-  const mainArtist = (track.artist || '').split(',')[0].trim();
-  const query = `${mainArtist} ${track.title}`;
-  
-  try {
-    const results = await searchMusic(query);
-    if (!results || results.length === 0) return null;
-
-    // Score all results
-    const scored = results
-      .filter(r => r.streamUrl) // Only candidates with stream URLs
-      .map(r => ({
-        ...r,
-        matchScore: scoreMatch(r, track.title, track.artist, track.duration)
-      }))
-      .sort((a, b) => b.matchScore - a.matchScore);
-
-    // Accept if score is above threshold
-    if (scored.length > 0 && scored[0].matchScore > 0.4) {
-      console.log(`[StreamResolver] JioSaavn match: "${scored[0].title}" (score: ${scored[0].matchScore.toFixed(2)})`);
-      let url = scored[0].streamUrl;
-      if (url.includes('saavncdn.com')) {
-        url = url.replace('https://', 'http://');
-      }
-      return { streamUrl: url, resolvedVia: 'jiosaavn', matchScore: scored[0].matchScore };
-    }
-  } catch (err) {
-    console.warn('[StreamResolver] JioSaavn search failed:', err.message);
-  }
+  // JioSaavn CDN links are currently returning 404. Bypass to force YouTube fallback.
   return null;
 }
 
