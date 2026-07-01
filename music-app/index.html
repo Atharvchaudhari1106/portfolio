@@ -12,6 +12,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <title>AesthetiCore Music</title>
+    <script>
+      // Automatically clear old service workers and localStorage cache on upgrade
+      if (!localStorage.getItem('AESTHETICORE_V3_MIGRATED')) {
+        localStorage.clear();
+        localStorage.setItem('AESTHETICORE_V3_MIGRATED', 'true');
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for (let registration of registrations) {
+              registration.unregister();
+            }
+            window.location.reload(true);
+          });
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
