@@ -369,7 +369,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   /* ===== APP LAYOUT ===== */
   .app-container {
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr var(--player-height) var(--bottom-nav-height);
+    grid-template-rows: 1fr;
     padding: 0;
     gap: 0;
     border-radius: 0;
@@ -393,7 +393,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   .sidebar-wrapper.active { transform: translateX(0); }
 
   .sidebar-overlay {
-    display: block;
+    display: none;
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.75);
@@ -405,6 +405,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     transition: opacity 0.3s ease;
   }
   .sidebar-overlay.active {
+    display: block;
     opacity: 1;
     pointer-events: auto;
   }
@@ -419,17 +420,26 @@ input[type="range"]::-webkit-slider-runnable-track {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     min-height: 0;
+    height: 100%;
+    width: 100%;
   }
   .panel { border-radius: 0; border: none; }
 
   .content-overflow-wrapper {
-    padding: 14px 14px 20px;
+    padding: 14px 14px calc(var(--bottom-nav-height) + 20px);
+  }
+
+  .app-container.has-player .content-overflow-wrapper {
+    padding-bottom: calc(var(--bottom-nav-height) + var(--player-height) + 20px);
   }
 
   /* ===== PLAYER BAR MOBILE — clean single row mini-player ===== */
   .player-wrapper {
-    grid-row: 2 / 3;
-    grid-column: 1 / 2;
+    position: fixed;
+    bottom: var(--bottom-nav-height);
+    left: 0;
+    right: 0;
+    height: var(--player-height);
     border-radius: 0;
     padding: 0 12px;
     background: rgba(24, 24, 24, 0.98);
@@ -437,7 +447,12 @@ input[type="range"]::-webkit-slider-runnable-track {
     -webkit-backdrop-filter: blur(24px);
     border-top: 1px solid rgba(255,255,255,0.08);
     border-bottom: 1px solid rgba(255,255,255,0.04);
-    z-index: 100;
+    z-index: 999;
+    display: none;
+  }
+
+  .app-container.has-player .player-wrapper {
+    display: flex !important;
   }
 
   /* Override App.css player-bar to a single flex row */
@@ -1784,8 +1799,10 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 @media (max-width: 1024px) {
   .pulse-bottom-nav {
-    grid-row: 3 / 4;
-    grid-column: 1 / 2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-around;
     align-items: center;

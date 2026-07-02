@@ -19,23 +19,25 @@ export const getBackendUrl = () => {
   }
 
   const hostname = window.location.hostname;
+  const isLocalActive = localStorage.getItem('LOCAL_BACKEND_ACTIVE') === 'true';
 
-  // 2. Local development — connect to local backend
+  // 2. Local development — connect to local backend only if active
   if (
-    hostname === 'localhost' ||
-    hostname === '127.0.0.1' ||
-    hostname.startsWith('192.168.') ||
-    hostname.startsWith('10.') ||
-    hostname.startsWith('172.')
+    isLocalActive &&
+    (hostname === 'localhost' ||
+     hostname === '127.0.0.1' ||
+     hostname.startsWith('192.168.') ||
+     hostname.startsWith('10.') ||
+     hostname.startsWith('172.'))
   ) {
     return `http://${hostname}:5000`;
   }
 
-  // 3. Deployed frontend — connect to Render backend
-  if (RENDER_BACKEND_URL && RENDER_BACKEND_URL !== 'https://aestheticore-backend.onrender.com') {
+  // 3. Deployed frontend or fallback — connect to Render backend
+  if (RENDER_BACKEND_URL) {
     return RENDER_BACKEND_URL;
   }
 
   // Fallback
-  return 'http://localhost:5000';
+  return `http://${hostname === 'localhost' ? 'localhost' : hostname}:5000`;
 };

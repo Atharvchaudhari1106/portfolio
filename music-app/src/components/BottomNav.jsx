@@ -18,6 +18,7 @@ const BottomNav = ({ activeView, setView }) => {
             key={item.id}
             className={`pulse-nav-item ${isActive ? 'active' : ''}`}
             onClick={(e) => {
+              console.log(`[BottomNav] Clicked item: ${item.id}`);
               e.preventDefault();
               e.stopPropagation();
               setView(item.id);

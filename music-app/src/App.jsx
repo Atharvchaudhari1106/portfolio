@@ -14,6 +14,7 @@ import SettingsModal from './components/SettingsModal';
 import AIMixModal from './components/AIMixModal';
 import InstallModal from './components/InstallModal';
 import { useAuth } from './context/AuthContext';
+import { useAudio } from './context/AudioContext';
 
 function App() {
   const [activeView, setActiveView] = useState('home');
@@ -26,6 +27,7 @@ function App() {
   const [isIOS, setIsIOS] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const { user } = useAuth();
+  const { currentTrack } = useAudio();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -43,6 +45,43 @@ function App() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
+  }, []);
+
+  // ─── Backend URL Health Check & Render Wakeup ─────────────────
+  useEffect(() => {
+    const checkLocalBackend = async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      try {
+        const response = await fetch('http://localhost:5000/', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (response.ok) {
+          const prev = localStorage.getItem('LOCAL_BACKEND_ACTIVE');
+          localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'true');
+          if (prev !== 'true') {
+            window.location.reload();
+          }
+        } else {
+          throw new Error('Not OK');
+        }
+      } catch (err) {
+        clearTimeout(timeoutId);
+        const prev = localStorage.getItem('LOCAL_BACKEND_ACTIVE');
+        localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'false');
+        if (prev === 'true') {
+          window.location.reload();
+        }
+      }
+    };
+
+    const wakeUpRemoteBackend = () => {
+      fetch('https://aestheticore-backend.onrender.com/', { mode: 'no-cors' })
+        .then(() => console.log('[App] Cloud backend wakeup request sent.'))
+        .catch(err => console.warn('[App] Cloud backend wakeup failed:', err));
+    };
+
+    checkLocalBackend();
+    wakeUpRemoteBackend();
   }, []);
 
   const handleInstallClick = () => {
@@ -64,6 +103,7 @@ function App() {
   const showInstallButton = (deferredPrompt || isIOS || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) && !isStandalone;
 
   const handleSetView = (view) => {
+    console.log(`[App] Request to set view from "${activeView}" to "${view}"`);
     if (view !== activeView) {
       setPrevView(activeView);
       setActiveView(view);
@@ -100,7 +140,7 @@ function App() {
   const isNowPlaying = activeView === 'nowplaying';
 
   return (
-    <div className={`app-container ${isNowPlaying ? 'np-mode' : ''}`}>
+    <div className={`app-container ${isNowPlaying ? 'np-mode' : ''} ${currentTrack ? 'has-player' : ''}`}>
       <div 
         className={`sidebar-overlay ${isSidebarOpen ? 'active' : ''}`} 
         onClick={() => setIsSidebarOpen(false)} 
