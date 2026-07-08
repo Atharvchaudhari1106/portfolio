@@ -119,19 +119,6 @@ portfolio: Atharvchaudhari1106.github.io/portfolio
 
 ---
 
-## 📊 GitHub Stats
-
-<p align="center">
-  <img src="https://github-stats-extended.vercel.app/api?username=Atharvchaudhari1106&show_icons=true&theme=tokyonight&hide_border=true" alt="GitHub Stats" height="180px" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Atharvchaudhari1106&theme=tokyonight&hide_border=true" alt="GitHub Streak" height="180px" />
-</p>
-
-<p align="center">
-  <img src="https://github-stats-extended.vercel.app/api/top-langs/?username=Atharvchaudhari1106&layout=compact&theme=tokyonight&hide_border=true" alt="Top Languages" height="180px" />
-</p>
-
-
----
 
 <div align="center">
 
