@@ -16,6 +16,30 @@
 
 import { searchMusic } from './musicService';
 import { getYoutubeAudioStream, searchYoutube } from './youtubeService';
+import { getBackendUrl } from '../utils/api';
+
+// ─── Render URL that may be stale in cached stream URLs ─────────
+const RENDER_BACKEND_URL = 'https://aestheticore-backend.onrender.com';
+
+// ─── Startup: purge stale Render-backend entries from the cache ─
+(function purgeStaleRenderCache() {
+  try {
+    const raw = localStorage.getItem('stream_cache');
+    if (!raw) return;
+    const cache = JSON.parse(raw);
+    let changed = false;
+    for (const [key, entry] of Object.entries(cache)) {
+      if (entry.streamUrl && entry.streamUrl.includes(RENDER_BACKEND_URL)) {
+        delete cache[key];
+        changed = true;
+      }
+    }
+    if (changed) {
+      localStorage.setItem('stream_cache', JSON.stringify(cache));
+      console.log('[StreamResolver] Purged stale Render-backend entries from cache');
+    }
+  } catch { /* ignore */ }
+})();
 
 // ─── Cache Configuration ────────────────────────────────────────
 const CACHE_KEY = 'stream_cache';
@@ -192,6 +216,12 @@ async function tryDirectStream(track) {
     if (url.includes('saavncdn.com')) {
       // JioSaavn CDN links are currently returning 404. Bypass to force YouTube fallback.
       return null;
+    }
+    // Rewrite stale Render-backend URLs to use the current local backend
+    if (url.includes(RENDER_BACKEND_URL)) {
+      const localBase = getBackendUrl();
+      url = url.replace(RENDER_BACKEND_URL, localBase);
+      console.log('[StreamResolver] Rewrote stale Render URL →', url.slice(0, 60));
     }
     return { streamUrl: url, resolvedVia: 'direct' };
   }

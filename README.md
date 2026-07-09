@@ -119,13 +119,4 @@ portfolio: Atharvchaudhari1106.github.io/portfolio
 
 ---
 
-
-<div align="center">
-
-<img src="https://komarev.com/ghpvc/?username=Atharvchaudhari1106&style=for-the-badge&color=58A6FF&label=PROFILE+VIEWS" alt="Profile Views" />
-
-<br/><br/>
-
-**⭐ If you find my projects interesting, consider giving them a star!**
-
 </div>

@@ -72,13 +72,21 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     setResolvedVia('');
     setResolvePhase('');
 
-    resolveStream(currentTrack, {
+    // Wrap in a global 20s timeout to prevent hanging forever
+    const GLOBAL_RESOLVE_TIMEOUT = 20000;
+    const resolvePromise = resolveStream(currentTrack, {
       signal: controller.signal,
       onProgress: (tier, message) => {
         setResolvePhase(message);
       },
       maxRetries: 2
-    })
+    });
+
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Stream resolution timed out after 20s. Tap to retry.')), GLOBAL_RESOLVE_TIMEOUT);
+    });
+
+    Promise.race([resolvePromise, timeoutPromise])
     .then(result => {
       if (!controller.signal.aborted) {
         setResolvedStreamUrl(result.streamUrl);

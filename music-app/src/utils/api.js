@@ -19,25 +19,28 @@ export const getBackendUrl = () => {
   }
 
   const hostname = window.location.hostname;
-  const isLocalActive = localStorage.getItem('LOCAL_BACKEND_ACTIVE') === 'true';
 
-  // 2. Local development — connect to local backend only if active
+  // 2. Local / LAN development — ALWAYS connect to local backend.
+  //    The backend is co-started by vite.config.js, so if the frontend
+  //    is running on localhost / a LAN IP, the backend is guaranteed
+  //    to be available on the same host at port 5000.
+  //    This removes the previous race condition where LOCAL_BACKEND_ACTIVE
+  //    had to be set by a health check *before* any API call was made.
   if (
-    isLocalActive &&
-    (hostname === 'localhost' ||
-     hostname === '127.0.0.1' ||
-     hostname.startsWith('192.168.') ||
-     hostname.startsWith('10.') ||
-     hostname.startsWith('172.'))
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname.startsWith('192.168.') ||
+    hostname.startsWith('10.') ||
+    hostname.startsWith('172.')
   ) {
     return `http://${hostname}:5000`;
   }
 
-  // 3. Deployed frontend or fallback — connect to Render backend
+  // 3. Deployed frontend — connect to Render backend
   if (RENDER_BACKEND_URL) {
     return RENDER_BACKEND_URL;
   }
 
   // Fallback
-  return `http://${hostname === 'localhost' ? 'localhost' : hostname}:5000`;
+  return `http://${hostname}:5000`;
 };
