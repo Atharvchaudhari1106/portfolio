@@ -217,6 +217,21 @@ async function tryDirectStream(track) {
       // JioSaavn CDN links are currently returning 404. Bypass to force YouTube fallback.
       return null;
     }
+
+    // Bypass backend YouTube stream redirects on deployed environment
+    if (url.includes('/api/youtube/stream')) {
+      const backendUrl = getBackendUrl();
+      const isRemote = !backendUrl.includes('localhost') && 
+                       !backendUrl.includes('127.0.0.1') && 
+                       !backendUrl.includes('192.168.') && 
+                       !backendUrl.includes('10.') && 
+                       !backendUrl.includes('172.');
+      if (isRemote) {
+        console.log('[StreamResolver] Deployed environment: bypassing backend YouTube stream redirect');
+        return null;
+      }
+    }
+
     // Rewrite stale Render-backend URLs to use the current local backend
     if (url.includes(RENDER_BACKEND_URL)) {
       const localBase = getBackendUrl();
