@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { getBackendUrl } from '../utils/api';
 
-const API_URL = `${getBackendUrl()}/api/spotify`;
+const getApiUrl = () => `${getBackendUrl()}/api/spotify`;
 
 export const getSpotifyLoginUrl = async () => {
-  const response = await axios.get(`${API_URL}/login`, { timeout: 5000 });
+  const response = await axios.get(`${getApiUrl()}/login`, { timeout: 5000 });
   return response.data.url;
 };
 
 export const refreshSpotifyToken = async (refresh_token) => {
-  const response = await axios.post(`${API_URL}/refresh`, { refresh_token }, { timeout: 5000 });
+  const response = await axios.post(`${getApiUrl()}/refresh`, { refresh_token }, { timeout: 5000 });
   return response.data;
 };
 
@@ -87,7 +87,7 @@ export const importSpotifyPlaylist = async (url) => {
   const isAlbum = url.includes('/album/');
   const endpoint = isAlbum ? '/album' : '/playlist';
   try {
-    const response = await axios.get(`${API_URL}${endpoint}`, {
+    const response = await axios.get(`${getApiUrl()}${endpoint}`, {
       params: { url },
       timeout: 30000
     });

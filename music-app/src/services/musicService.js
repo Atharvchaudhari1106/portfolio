@@ -1,7 +1,7 @@
 import { getBackendUrl } from '../utils/api';
 import { searchYoutube } from './youtubeService';
 
-const SAAVN_API = `${getBackendUrl()}/api/music/saavn`;
+const getSaavnApiUrl = () => `${getBackendUrl()}/api/music/saavn`;
 
 /**
  * Map a JioSaavn API song item to our internal track format.
@@ -11,7 +11,7 @@ const SAAVN_API = `${getBackendUrl()}/api/music/saavn`;
  */
 const mapSaavnMetadata = (item) => {
   // Handle image structure variations — image CDN (c.saavncdn.com) still works
-  let thumbnail = 'https://via.placeholder.com/300';
+  let thumbnail = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300"><rect width="100%" height="100%" fill="%23121212"/><circle cx="150" cy="150" r="60" fill="%23181818" stroke="%23333" stroke-width="2"/><path d="M145 100v75c-5-3-12-5-20-5-16 0-30 11-30 25s14 25 30 25 30-11 30-25v-65h40v-30h-50z" fill="%231ed760"/></svg>';
   if (Array.isArray(item.image) && item.image.length > 0) {
     const img = item.image[item.image.length - 1];
     thumbnail = img.url || img.link;
@@ -79,7 +79,7 @@ export const searchMusic = async (query) => {
     }),
 
     // JioSaavn search — metadata only (better album art, play counts, accurate titles)
-    fetch(`${SAAVN_API}/search/songs?query=${encodeURIComponent(query)}&limit=20`)
+    fetch(`${getSaavnApiUrl()}/search/songs?query=${encodeURIComponent(query)}&limit=20`)
       .then(async (response) => {
         if (!response.ok) throw new Error(`API error: ${response.status}`);
         const data = await response.json();

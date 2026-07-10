@@ -40,7 +40,7 @@ const Home = ({ onOpenAIMix, onOpenInstallModal }) => {
         setAiSections(sections);
       }).catch(err => console.warn('AI sections failed:', err));
     }
-  }, [library.length]);
+  }, [library.map(t => t.id).join(',')]);
 
   useEffect(() => {
     const fetchMusic = async () => {

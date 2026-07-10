@@ -6,3 +6,5 @@ yt-dlp.exe
 ecosystem.config.cjs
 start-backend.bat
 start-backend-silent.vbs
+*player-script.js
+yt-dlp

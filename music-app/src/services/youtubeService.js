@@ -44,7 +44,7 @@ function extractPlaylistId(url) {
 
 /** Build the best thumbnail URL for a video. */
 function bestThumbnail(videoId) {
-  if (!videoId) return 'https://via.placeholder.com/300?text=No+Thumbnail';
+  if (!videoId) return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300"><rect width="100%" height="100%" fill="%23121212"/><circle cx="150" cy="150" r="60" fill="%23181818" stroke="%23333" stroke-width="2"/><path d="M145 100v75c-5-3-12-5-20-5-16 0-30 11-30 25s14 25 30 25 30-11 30-25v-65h40v-30h-50z" fill="%231ed760"/></svg>';
   return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
 }
 

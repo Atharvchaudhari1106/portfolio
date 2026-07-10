@@ -92,10 +92,6 @@ export const AudioProvider = ({ children }) => {
   // ─── Analytics Tracking ─────────────────────────────────────
   useEffect(() => {
     if (currentTrack) {
-      // Track play event
-      trackPlay(currentTrack);
-      playStartTimeRef.current = Date.now();
-
       // Check if the previous track was skipped (played less than 30% or <15 seconds)
       if (prevTrackRef.current && prevTrackRef.current.id !== currentTrack.id) {
         const playedMs = Date.now() - (playStartTimeRef.current || Date.now());
@@ -104,6 +100,10 @@ export const AudioProvider = ({ children }) => {
           trackSkip(prevTrackRef.current);
         }
       }
+
+      // Track play event
+      trackPlay(currentTrack);
+      playStartTimeRef.current = Date.now();
 
       prevTrackRef.current = currentTrack;
     }

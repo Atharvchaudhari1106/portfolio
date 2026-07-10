@@ -53,6 +53,46 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const abortRef = useRef(null);
   const consecutiveErrorsRef = useRef(0);
 
+  const isPlayingRef = useRef(isPlaying);
+  const playedSecondsRef = useRef(0);
+  const durationRef = useRef(0);
+
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  useEffect(() => {
+    playedSecondsRef.current = playedSeconds;
+  }, [playedSeconds]);
+
+  useEffect(() => {
+    durationRef.current = duration;
+  }, [duration]);
+
+  // Listen to seek requests and sync requests from other components
+  useEffect(() => {
+    const handleSeek = (e) => {
+      const time = e.detail.time;
+      if (playerRef.current) {
+        playerRef.current.seekTo(time);
+      }
+    };
+    const handleSyncRequest = () => {
+      window.dispatchEvent(new CustomEvent('music-progress', { 
+        detail: { playedSeconds: playedSecondsRef.current } 
+      }));
+      window.dispatchEvent(new CustomEvent('music-duration', { 
+        detail: { duration: durationRef.current } 
+      }));
+    };
+
+    window.addEventListener('music-seek', handleSeek);
+    window.addEventListener('music-request-sync', handleSyncRequest);
+    return () => {
+      window.removeEventListener('music-seek', handleSeek);
+      window.removeEventListener('music-request-sync', handleSyncRequest);
+    };
+  }, []);
   // ─── Stream Resolution via StreamResolver ───────────────────
   useEffect(() => {
     if (!currentTrack) {
@@ -105,7 +145,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         setResolvePhase('');
         
         // Auto-skip to next track if in active playback mode, to prevent hanging
-        if (isPlaying) {
+        if (isPlayingRef.current) {
           consecutiveErrorsRef.current += 1;
           if (consecutiveErrorsRef.current > 3) {
             console.error('[PlayerBar] Too many consecutive resolution errors. Stopping.');
@@ -113,7 +153,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
             consecutiveErrorsRef.current = 0;
           } else {
             console.warn('[PlayerBar] Auto-skipping to next track in 2 seconds...');
-            setTimeout(() => playNext(), 2000);
+            setTimeout(() => playNextRef.current(), 2000);
           }
         }
       }
@@ -166,8 +206,8 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         title: currentTrack.title,
         artist: currentTrack.artist,
         artwork: [
-          { src: trackImage || 'https://via.placeholder.com/96', sizes: '96x96', type: 'image/jpeg' },
-          { src: trackImage || 'https://via.placeholder.com/512', sizes: '512x512', type: 'image/jpeg' }
+          { src: trackImage || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96"><rect width="100%" height="100%" fill="%23121212"/><path d="M48 25v30c-2-2-5-3-8-3-6 0-11 5-11 11s5 11 11 11 11-5 11-11v-27h15v-11h-18z" fill="%231ed760"/></svg>', sizes: '96x96', type: 'image/svg+xml' },
+          { src: trackImage || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512"><rect width="100%" height="100%" fill="%23121212"/><path d="M256 128v160c-10-8-26-14-43-14-35 0-64 29-64 64s29 64 64 64 64-29 64-64v-144h85v-66h-106z" fill="%231ed760"/></svg>', sizes: '512x512', type: 'image/svg+xml' }
         ]
       });
 
@@ -228,7 +268,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
               className="now-playing-art" 
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = 'https://via.placeholder.com/96?text=No+Img';
+                e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96"><rect width="100%" height="100%" fill="%23121212"/><path d="M48 25v30c-2-2-5-3-8-3-6 0-11 5-11 11s5 11 11 11 11-5 11-11v-27h15v-11h-18z" fill="%231ed760"/></svg>';
               }}
             />
           ) : (
@@ -448,12 +488,18 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
           volume={volume}
           onProgress={(progress) => {
             setPlayedSeconds(progress.playedSeconds);
+            window.dispatchEvent(new CustomEvent('music-progress', { 
+              detail: { playedSeconds: progress.playedSeconds } 
+            }));
           }}
           onDuration={(duration) => {
             consecutiveErrorsRef.current = 0;
             setDuration(duration);
+            window.dispatchEvent(new CustomEvent('music-duration', { 
+              detail: { duration } 
+            }));
           }}
-          onEnded={playNext}
+          onEnded={() => playNextRef.current()}
           onError={(e) => {
             console.error('ReactPlayer error:', e);
             consecutiveErrorsRef.current += 1;
@@ -464,7 +510,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
               consecutiveErrorsRef.current = 0;
             } else {
               console.warn('[PlayerBar] Stream failed, auto-skipping to next track in 2 seconds...');
-              setTimeout(() => playNext(), 2000);
+              setTimeout(() => playNextRef.current(), 2000);
             }
           }}
           width="0px"

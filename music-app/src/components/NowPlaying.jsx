@@ -49,25 +49,26 @@ const NowPlaying = ({ goBack }) => {
       });
   }, [currentTrack?.id, library.length]);
 
-  // Listen to the audio element for time updates (shared via the PlayerBar audio element)
+  // Listen to custom events for time updates (shared via PlayerBar)
   useEffect(() => {
-    const audio = document.querySelector('audio');
-    if (!audio) return;
+    const handleProgress = (e) => {
+      setPlayedSeconds(e.detail.playedSeconds);
+    };
+    const handleDuration = (e) => {
+      setDuration(e.detail.duration);
+    };
 
-    const onTime = () => setPlayedSeconds(audio.currentTime);
-    const onMeta = () => setDuration(audio.duration);
+    window.addEventListener('music-progress', handleProgress);
+    window.addEventListener('music-duration', handleDuration);
 
-    audio.addEventListener('timeupdate', onTime);
-    audio.addEventListener('loadedmetadata', onMeta);
-    // Grab current values immediately
-    setPlayedSeconds(audio.currentTime || 0);
-    setDuration(audio.duration || 0);
+    // Ask PlayerBar to send current progress and duration immediately
+    window.dispatchEvent(new CustomEvent('music-request-sync'));
 
     return () => {
-      audio.removeEventListener('timeupdate', onTime);
-      audio.removeEventListener('loadedmetadata', onMeta);
+      window.removeEventListener('music-progress', handleProgress);
+      window.removeEventListener('music-duration', handleDuration);
     };
-  }, [currentTrack]);
+  }, [currentTrack?.id]);
 
   const formatTime = (seconds) => {
     if (isNaN(seconds)) return '0:00';
@@ -78,11 +79,8 @@ const NowPlaying = ({ goBack }) => {
 
   const handleSeek = (e) => {
     const time = parseFloat(e.target.value);
-    const audio = document.querySelector('audio');
-    if (audio) {
-      audio.currentTime = time;
-      setPlayedSeconds(time);
-    }
+    setPlayedSeconds(time);
+    window.dispatchEvent(new CustomEvent('music-seek', { detail: { time } }));
   };
 
   const isLiked = currentTrack ? library.some(t => t.id === currentTrack.id) : false;
@@ -135,7 +133,7 @@ const NowPlaying = ({ goBack }) => {
             className="np-art"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/400?text=No+Thumbnail';
+              e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300"><rect width="100%" height="100%" fill="%23121212"/><circle cx="150" cy="150" r="60" fill="%23181818" stroke="%23333" stroke-width="2"/><path d="M145 100v75c-5-3-12-5-20-5-16 0-30 11-30 25s14 25 30 25 30-11 30-25v-65h40v-30h-50z" fill="%231ed760"/></svg>';
             }}
           />
           <div className="np-art-glow"></div>
@@ -279,7 +277,7 @@ const NowPlaying = ({ goBack }) => {
             {similarSongs.map(song => (
               <div 
                 key={song.id} 
-                onClick={() => playTrack(song, [song, ...similarSongs])}
+                onClick={() => playTrack(song, [song, ...similarSongs.filter(s => s.id !== song.id)])}
                 style={{ 
                   display: 'flex', 
                   alignItems: 'center', 
