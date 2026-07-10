@@ -18,6 +18,7 @@ export const getBackendUrl = () => {
     return savedUrl.replace(/\/$/, ''); // Trim trailing slash
   }
 
+  const hostname = window.location.hostname;
   const isLocalActive = localStorage.getItem('LOCAL_BACKEND_ACTIVE') !== 'false';
 
   // 2. Local / LAN development — connect to local backend only if active.
