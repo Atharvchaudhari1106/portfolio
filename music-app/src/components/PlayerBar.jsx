@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactPlayer from 'react-player';
 import { 
   SkipBack, Play, Pause, SkipForward, Volume2, 
   VolumeX, Shuffle, Repeat, Music, Heart, Mic2, ListMusic, MonitorSpeaker, Download, Plus, Loader2, RefreshCw
@@ -48,7 +49,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const [streamError, setStreamError] = useState(null);
   const [resolvedVia, setResolvedVia] = useState('');
   const [resolvePhase, setResolvePhase] = useState('');
-  const audioRef = useRef(null);
+  const playerRef = useRef(null);
   const abortRef = useRef(null);
   const consecutiveErrorsRef = useRef(0);
 
@@ -177,42 +178,11 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   }, [currentTrack]);
 
-  // === Standard <audio> element playback control ===
-  useEffect(() => {
-    if (!audioRef.current || !resolvedStreamUrl) return;
-    if (isPlaying) {
-      audioRef.current.play().catch(err => console.warn('Audio play error:', err));
-    } else {
-      audioRef.current.pause();
-    }
-  }, [isPlaying, resolvedStreamUrl]);
-
-  useEffect(() => {
-    if (!audioRef.current) return;
-    audioRef.current.volume = volume;
-  }, [volume]);
-
   // When track changes, reset progress
   useEffect(() => {
     setPlayedSeconds(0);
     setDuration(0);
   }, [currentTrack?.id]);
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setPlayedSeconds(audioRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      consecutiveErrorsRef.current = 0;
-      setDuration(audioRef.current.duration);
-      if (isPlaying) {
-        audioRef.current.play().catch(err => console.warn('Auto-play error:', err));
-      }
-    }
-  };
 
   const handleVolumeChange = (e) => {
     setVolume(parseFloat(e.target.value));
@@ -228,8 +198,8 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
   const handleSeek = (e) => {
     const time = parseFloat(e.target.value);
     setPlayedSeconds(time);
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
+    if (playerRef.current) {
+      playerRef.current.seekTo(time);
     }
   };
 
@@ -469,29 +439,50 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
         </div>
       </div>
 
-      {/* Unified <audio> for all sources */}
+      {/* Unified ReactPlayer for all sources */}
       {resolvedStreamUrl && (
-        <audio
-          ref={audioRef}
-          src={resolvedStreamUrl}
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
+        <ReactPlayer
+          ref={playerRef}
+          url={resolvedStreamUrl}
+          playing={isPlaying}
+          volume={volume}
+          onProgress={(progress) => {
+            setPlayedSeconds(progress.playedSeconds);
+          }}
+          onDuration={(duration) => {
+            consecutiveErrorsRef.current = 0;
+            setDuration(duration);
+          }}
           onEnded={playNext}
           onError={(e) => {
-            console.error('Audio element error:', e);
+            console.error('ReactPlayer error:', e);
             consecutiveErrorsRef.current += 1;
             if (consecutiveErrorsRef.current > 3) {
               console.error('[PlayerBar] Too many consecutive playback errors. Stopping.');
               setIsPlaying(false);
-              setStreamError('Playback failed. Please check your internet connection or backend server.');
+              setStreamError('Playback failed. Please check your internet connection.');
               consecutiveErrorsRef.current = 0;
             } else {
               console.warn('[PlayerBar] Stream failed, auto-skipping to next track in 2 seconds...');
               setTimeout(() => playNext(), 2000);
             }
           }}
-          preload="auto"
-          hidden
+          width="0px"
+          height="0px"
+          style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0 }}
+          config={{
+            youtube: {
+              playerVars: {
+                autoplay: isPlaying ? 1 : 0,
+                controls: 0,
+                disablekb: 1,
+                fs: 0,
+                modestbranding: 1,
+                rel: 0,
+                showinfo: 0
+              }
+            }
+          }}
         />
       )}
     </div>

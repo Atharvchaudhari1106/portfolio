@@ -237,14 +237,10 @@ async function tryJioSaavnMatch(track) {
 // ─── Tier 3: YouTube Direct Stream ──────────────────────────────
 async function tryYoutubeDirectStream(track) {
   if (track.source === 'youtube' && track.id) {
-    try {
-      const streamUrl = await getYoutubeAudioStream(track.id);
-      if (streamUrl) {
-        return { streamUrl, resolvedVia: 'youtube-direct' };
-      }
-    } catch (err) {
-      console.warn('[StreamResolver] YouTube direct stream failed:', err.message);
-    }
+    return {
+      streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
+      resolvedVia: 'youtube-direct'
+    };
   }
   return null;
 }
@@ -268,11 +264,12 @@ async function tryYoutubeSearchStream(track) {
 
     if (scored.length > 0) {
       const bestMatch = scored[0];
-      const streamUrl = await getYoutubeAudioStream(bestMatch.id);
-      if (streamUrl) {
-        console.log(`[StreamResolver] YouTube search match: "${bestMatch.title}" (score: ${bestMatch.matchScore.toFixed(2)})`);
-        return { streamUrl, resolvedVia: 'youtube-search', matchScore: bestMatch.matchScore };
-      }
+      console.log(`[StreamResolver] YouTube search match: "${bestMatch.title}" (score: ${bestMatch.matchScore.toFixed(2)})`);
+      return {
+        streamUrl: `https://www.youtube.com/watch?v=${bestMatch.id}`,
+        resolvedVia: 'youtube-search',
+        matchScore: bestMatch.matchScore
+      };
     }
   } catch (err) {
     console.warn('[StreamResolver] YouTube search stream failed:', err.message);
