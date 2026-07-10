@@ -12,14 +12,24 @@
 const RENDER_BACKEND_URL = 'https://aestheticore-backend.onrender.com';
 
 export const getBackendUrl = () => {
+  const hostname = window.location.hostname;
+  const isLocalActive = localStorage.getItem('LOCAL_BACKEND_ACTIVE') !== 'false';
+
   // 1. Check for user-configured URL in localStorage
   const savedUrl = localStorage.getItem('AESTHETICORE_BACKEND_URL');
   if (savedUrl) {
-    return savedUrl.replace(/\/$/, ''); // Trim trailing slash
+    const trimmed = savedUrl.replace(/\/$/, '');
+    const isSavedLocal = trimmed.includes('localhost') || 
+                          trimmed.includes('127.0.0.1') || 
+                          trimmed.includes('192.168.') || 
+                          trimmed.includes('10.') || 
+                          trimmed.includes('172.');
+    
+    // Only use saved local backend URL if we are running locally OR the local server is verified active
+    if (!isSavedLocal || isLocalActive || hostname === 'localhost' || hostname === '127.0.0.1') {
+      return trimmed;
+    }
   }
-
-  const hostname = window.location.hostname;
-  const isLocalActive = localStorage.getItem('LOCAL_BACKEND_ACTIVE') !== 'false';
 
   // 2. Local / LAN development — connect to local backend only if active.
   if (
