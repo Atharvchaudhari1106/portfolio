@@ -237,10 +237,21 @@ async function tryJioSaavnMatch(track) {
 // ─── Tier 3: YouTube Direct Stream ──────────────────────────────
 async function tryYoutubeDirectStream(track) {
   if (track.source === 'youtube' && track.id) {
-    return {
-      streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
-      resolvedVia: 'youtube-direct'
-    };
+    try {
+      const streamUrl = await getYoutubeAudioStream(track.id);
+      if (streamUrl) {
+        return {
+          streamUrl,
+          resolvedVia: 'youtube-direct'
+        };
+      }
+    } catch (err) {
+      console.warn('[StreamResolver] YouTube direct audio resolution failed:', err.message);
+      return {
+        streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
+        resolvedVia: 'youtube-direct-fallback'
+      };
+    }
   }
   return null;
 }
@@ -265,9 +276,21 @@ async function tryYoutubeSearchStream(track) {
     if (scored.length > 0) {
       const bestMatch = scored[0];
       console.log(`[StreamResolver] YouTube search match: "${bestMatch.title}" (score: ${bestMatch.matchScore.toFixed(2)})`);
+      try {
+        const streamUrl = await getYoutubeAudioStream(bestMatch.id);
+        if (streamUrl) {
+          return {
+            streamUrl,
+            resolvedVia: 'youtube-search',
+            matchScore: bestMatch.matchScore
+          };
+        }
+      } catch (err) {
+        console.warn('[StreamResolver] YouTube search audio resolution failed:', err.message);
+      }
       return {
         streamUrl: `https://www.youtube.com/watch?v=${bestMatch.id}`,
-        resolvedVia: 'youtube-search',
+        resolvedVia: 'youtube-search-fallback',
         matchScore: bestMatch.matchScore
       };
     }
