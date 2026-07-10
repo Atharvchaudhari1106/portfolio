@@ -58,7 +58,7 @@ function App() {
         if (response.ok) {
           const prev = localStorage.getItem('LOCAL_BACKEND_ACTIVE');
           localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'true');
-          if (prev !== 'true') {
+          if (prev === 'false') {
             window.location.reload();
           }
         } else {
@@ -68,7 +68,7 @@ function App() {
         clearTimeout(timeoutId);
         const prev = localStorage.getItem('LOCAL_BACKEND_ACTIVE');
         localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'false');
-        if (prev === 'true') {
+        if (prev !== 'false') {
           window.location.reload();
         }
       }
