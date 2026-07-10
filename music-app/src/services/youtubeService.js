@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { getBackendUrl } from '../utils/api';
 
-const API_URL = `${getBackendUrl()}/api/youtube`;
+// Use a function to always get the current backend URL (avoids stale cached URL)
+const getApiUrl = () => `${getBackendUrl()}/api/youtube`;
 
 /** Extract the playlist ID from various YouTube & YouTube Music URL formats. */
 function extractPlaylistId(url) {
@@ -48,13 +49,45 @@ function bestThumbnail(videoId) {
 }
 
 /**
- * Fetch a direct audio stream URL for a YouTube video.
- * Returns a streamUrl (our backend proxy/redirect URL) that can be played with a standard <audio> element.
+ * Resolve a direct YouTube audio CDN URL via the backend /stream-url endpoint.
+ * Returns the raw CDN URL (e.g., https://rr5---sn-...googlevideo.com/...).
+ * Returns null if the backend can't resolve it.
+ */
+export async function resolveDirectStreamUrl(videoId) {
+  if (!videoId) return null;
+  try {
+    const response = await axios.get(`${getApiUrl()}/stream-url`, {
+      params: { videoId },
+      timeout: 35000
+    });
+    if (response.data?.streamUrl) {
+      return response.data.streamUrl;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[YT] /stream-url failed:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch an audio stream URL for a YouTube video.
+ * Tries the /stream-url endpoint first (returns a direct CDN URL).
+ * Falls back to the /stream endpoint (server-side redirect to CDN).
  */
 export async function getYoutubeAudioStream(videoId) {
   if (!videoId) return null;
-  // We return the backend stream endpoint which will redirect to the direct audio stream CDN URL
-  return `${API_URL}/stream?videoId=${videoId}`;
+
+  // Try to get the direct CDN URL first
+  const directUrl = await resolveDirectStreamUrl(videoId);
+  if (directUrl) {
+    console.log('[YT] Got direct CDN URL for', videoId);
+    return directUrl;
+  }
+
+  // Fallback: the /stream endpoint which does a 302 redirect
+  console.log('[YT] Falling back to redirect-based /stream for', videoId);
+  return `${getApiUrl()}/stream?videoId=${videoId}`;
 }
 
 /**
@@ -65,7 +98,7 @@ export const importYoutubePlaylist = async (playlistUrl) => {
   const playlistId = extractPlaylistId(playlistUrl);
   
   try {
-    const response = await axios.get(`${API_URL}/playlist`, {
+    const response = await axios.get(`${getApiUrl()}/playlist`, {
       params: { url: playlistId },
       timeout: 45000
     });
@@ -98,7 +131,7 @@ export const importYoutubePlaylist = async (playlistUrl) => {
 export const searchYoutube = async (query) => {
   if (!query.trim()) return [];
   try {
-    const response = await axios.get(`${API_URL}/search`, {
+    const response = await axios.get(`${getApiUrl()}/search`, {
       params: { q: query },
       timeout: 10000
     });
@@ -122,4 +155,12 @@ export const searchYoutube = async (query) => {
  */
 export const getYoutubeStreamUrl = (videoId) => {
   return `https://www.youtube.com/watch?v=${videoId}`;
+};
+
+/**
+ * Build the backend stream redirect URL for a given video ID.
+ * This is the fallback URL that does a 302 redirect to the CDN.
+ */
+export const getStreamRedirectUrl = (videoId) => {
+  return `${getApiUrl()}/stream?videoId=${videoId}`;
 };

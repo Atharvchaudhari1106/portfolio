@@ -43,7 +43,7 @@ async function resolveYTStream(videoId) {
           '-f', 'ba',
           '-g', videoUrl
         ],
-        { timeout: 15000 },
+        { timeout: 30000 },
         (error, stdout, stderr) => {
           if (error) {
             return reject(error);
@@ -335,35 +335,36 @@ router.get('/stream', async (req, res) => {
       setCachedStream(videoId, streamUrl);
     }
 
-    console.log(`[YouTube] Proxying stream for video: ${videoId}`);
+    console.log(`[YouTube] Redirecting stream for video: ${videoId}`);
 
-    const headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    };
-    if (req.headers.range) {
-      headers.Range = req.headers.range;
+    // Redirect the browser to the direct YouTube CDN URL.
+    // This is critical for deployed environments (Render, etc.) where
+    // proxying fails because YouTube blocks cloud server IPs.
+    // The browser (with a residential IP) fetches audio directly.
+    res.redirect(302, streamUrl);
+  } catch (err) {
+    console.error('[YouTube] Stream resolution failed:', err.message);
+    res.status(500).json({ error: err.message || 'Failed to resolve audio stream' });
+  }
+});
+
+// Return the raw stream URL as JSON (for clients that need to set <audio> src directly)
+router.get('/stream-url', async (req, res) => {
+  const { videoId } = req.query;
+  if (!videoId) return res.status(400).json({ error: 'Video ID is required' });
+
+  try {
+    let streamUrl = getCachedStream(videoId);
+    if (!streamUrl) {
+      streamUrl = await resolveYTStream(videoId);
+      setCachedStream(videoId, streamUrl);
     }
 
-    const streamResponse = await axios({
-      method: 'get',
-      url: streamUrl,
-      headers: headers,
-      responseType: 'stream',
-      decompress: false, // Prevent axios from automatically decompressing the response data
-      timeout: 20000
-    });
-
-    res.status(streamResponse.status);
-    Object.entries(streamResponse.headers).forEach(([key, val]) => {
-      if (['content-type', 'content-length', 'content-range', 'accept-ranges', 'content-encoding'].includes(key.toLowerCase())) {
-        res.setHeader(key, val);
-      }
-    });
-
-    streamResponse.data.pipe(res);
+    console.log(`[YouTube] Returning stream URL for video: ${videoId}`);
+    res.json({ streamUrl });
   } catch (err) {
-    console.error('[YouTube] Stream proxying failed:', err.message);
-    res.status(500).json({ error: err.message || 'Failed to stream audio' });
+    console.error('[YouTube] Stream URL resolution failed:', err.message);
+    res.status(500).json({ error: err.message || 'Failed to resolve audio stream' });
   }
 });
 
