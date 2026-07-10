@@ -78,7 +78,22 @@ export async function resolveDirectStreamUrl(videoId) {
 export async function getYoutubeAudioStream(videoId) {
   if (!videoId) return null;
 
-  // Try to get the direct CDN URL first
+  // If using the remote Render backend, bypass server resolution entirely
+  // since YouTube blocks cloud provider IPs (returns 429/403).
+  // ReactPlayer will load and play the watch URL directly on the client side.
+  const backendUrl = getBackendUrl();
+  const isRemote = !backendUrl.includes('localhost') && 
+                   !backendUrl.includes('127.0.0.1') && 
+                   !backendUrl.includes('192.168.') && 
+                   !backendUrl.includes('10.') && 
+                   !backendUrl.includes('172.');
+
+  if (isRemote) {
+    console.log('[YT] Remote backend detected. Using client-side YouTube watch URL directly.');
+    return `https://www.youtube.com/watch?v=${videoId}`;
+  }
+
+  // Try to get the direct CDN URL first (works for local development with residential IP)
   const directUrl = await resolveDirectStreamUrl(videoId);
   if (directUrl) {
     console.log('[YT] Got direct CDN URL for', videoId);
