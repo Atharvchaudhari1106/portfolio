@@ -93,15 +93,15 @@ export async function getYoutubeAudioStream(videoId) {
     return `https://www.youtube.com/watch?v=${videoId}`;
   }
 
-  // Try to get the direct CDN URL first (works for local development with residential IP)
-  const directUrl = await resolveDirectStreamUrl(videoId);
-  if (directUrl) {
-    console.log('[YT] Got direct CDN URL for', videoId);
-    return directUrl;
-  }
-
-  // Fallback: the /stream endpoint which does a 302 redirect
-  console.log('[YT] Falling back to redirect-based /stream for', videoId);
+  // For local backend: use the /stream endpoint which does a 302 redirect 
+  // to the YouTube CDN URL. The browser's native media element follows the 
+  // redirect and plays the audio directly. This works because:
+  // 1. The backend resolves the stream URL using yt-dlp (residential IP)
+  // 2. It returns a 302 redirect to the CDN URL
+  // 3. The browser follows the redirect and plays the audio natively
+  // NOTE: We intentionally do NOT use /stream-url (which returns a raw CDN URL)
+  // because ReactPlayer cannot play raw googlevideo.com URLs.
+  console.log('[YT] Using /stream redirect endpoint for', videoId);
   return `${getApiUrl()}/stream?videoId=${videoId}`;
 }
 

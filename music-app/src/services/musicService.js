@@ -1,7 +1,13 @@
 import { getBackendUrl } from '../utils/api';
 import { searchYoutube } from './youtubeService';
 
-const getSaavnApiUrl = () => `${getBackendUrl()}/api/music/saavn`;
+const getSaavnApiUrl = () => {
+  const customUrl = localStorage.getItem('JIOSAAVN_API_URL');
+  if (customUrl) {
+    return customUrl.replace(/\/$/, '');
+  }
+  return `${getBackendUrl()}/api/music/saavn`;
+};
 
 /**
  * Map a JioSaavn API song item to our internal track format.
@@ -54,7 +60,15 @@ function normalize(str) {
     .trim();
 }
 
+const searchCache = new Map();
+
 export const searchMusic = async (query) => {
+  const cacheKey = (query || '').toLowerCase().trim();
+  if (searchCache.has(cacheKey)) {
+    console.log(`[musicService] Query cache hit for: "${query}"`);
+    return searchCache.get(cacheKey);
+  }
+
   // Search YouTube and JioSaavn in PARALLEL
   // YouTube = streaming source, JioSaavn = metadata enrichment
   const [ytResult, saavnResult] = await Promise.allSettled([
@@ -143,15 +157,42 @@ export const searchMusic = async (query) => {
 
   // Deduplicate by normalized title + primary artist
   const seen = new Set();
-  return combined.filter(song => {
+  const finalResults = combined.filter(song => {
     const key = `${(song.title || '').toLowerCase().trim()}-${(song.artist || '').split(',')[0].toLowerCase().trim()}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+
+  // Limit cache size to 50 items
+  if (searchCache.size > 50) {
+    const firstKey = searchCache.keys().next().value;
+    searchCache.delete(firstKey);
+  }
+  searchCache.set(cacheKey, finalResults);
+
+  return finalResults;
 };
 
 export const getTrending = async () => {
+  try {
+    const cached = localStorage.getItem('aestheticore_trending_cache');
+    const cachedTime = localStorage.getItem('aestheticore_trending_time');
+    
+    if (cached && cachedTime) {
+      const age = Date.now() - parseInt(cachedTime, 10);
+      if (age < 30 * 60 * 1000) { // 30 mins cache
+        const parsed = JSON.parse(cached);
+        if (parsed && parsed.length > 0) {
+          console.log('[musicService] Returning cached trending tracks.');
+          return parsed;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('[musicService] Error reading trending cache:', e);
+  }
+
   // Use specific album/artist searches so the first result is always the original
   // Include album name to avoid instrumentals/remixes being returned first
   const hits = [
@@ -185,7 +226,18 @@ export const getTrending = async () => {
   });
 
   const results = await Promise.all(promises);
-  return results.filter(Boolean);
+  const filteredResults = results.filter(Boolean);
+
+  try {
+    if (filteredResults.length > 0) {
+      localStorage.setItem('aestheticore_trending_cache', JSON.stringify(filteredResults));
+      localStorage.setItem('aestheticore_trending_time', Date.now().toString());
+    }
+  } catch (e) {
+    console.warn('[musicService] Error writing trending cache:', e);
+  }
+
+  return filteredResults;
 };
 
 export const getRecommendations = async (song) => {

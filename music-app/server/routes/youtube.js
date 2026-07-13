@@ -259,11 +259,46 @@ async function fallbackSearchYoutube(query) {
   });
 
   const html = response.data;
-  const regex = /ytInitialData\s*=\s*({.+?});/;
-  const match = html.match(regex);
-  if (!match) throw new Error('Could not find ytInitialData in response');
+  
+  // Industrial-grade brace counter parser for ytInitialData
+  let data = null;
+  const startIdx = html.indexOf('ytInitialData = ');
+  if (startIdx !== -1) {
+    try {
+      const contentStart = html.indexOf('{', startIdx);
+      let dataStr = '';
+      let braceCount = 0;
+      let inString = false;
+      let escaped = false;
+      
+      for (let i = contentStart; i < html.length; i++) {
+        const char = html[i];
+        dataStr += char;
+        if (char === '"' && !escaped) {
+          inString = !inString;
+        }
+        if (!inString) {
+          if (char === '{') braceCount++;
+          else if (char === '}') {
+            braceCount--;
+            if (braceCount === 0) break;
+          }
+        }
+        escaped = (char === '\\' && !escaped);
+      }
+      data = JSON.parse(dataStr);
+    } catch (e) {
+      console.warn('[YouTube] Brace-counter HTML parser failed:', e.message);
+    }
+  }
 
-  const data = JSON.parse(match[1]);
+  // Fallback to regex if brace counter failed
+  if (!data) {
+    const regex = /ytInitialData\s*=\s*({.+?});/;
+    const match = html.match(regex);
+    if (!match) throw new Error('Could not find ytInitialData in response');
+    data = JSON.parse(match[1]);
+  }
   
   const videoRenderers = findVideoRenderers(data);
   if (videoRenderers.length === 0) throw new Error('No video items found in ytInitialData');
@@ -297,28 +332,71 @@ router.get('/search', async (req, res) => {
   const { q } = req.query;
   if (!q) return res.status(400).json({ error: 'Search query is required' });
 
-  try {
-    const searchResults = await ytsr(q + ' music', { limit: 15 });
-
-    const results = searchResults.items
-      .filter(item => item.type === 'video')
-      .map(item => ({
-        id: item.id,
-        title: cleanTitle(item.name || 'Unknown'),
-        artist: (item.author?.name || 'Unknown Artist').replace(' - Topic', ''),
-        thumbnail: item.bestThumbnail?.url || item.thumbnails?.[0]?.url || '',
-        source: 'youtube',
-        duration: parseDuration(item.duration)
-      }));
-
-    res.json(results);
-  } catch (error) {
-    console.error('[YouTube] ytsr search failed, using fallback scraper:', error.message);
+  // 1. Try official YouTube Data API first if a valid key is present (starts with AIzaSy and is 39 chars long)
+  const apiKey = process.env.YOUTUBE_API_KEY;
+  const isRealApiKey = apiKey && apiKey.startsWith('AIzaSy') && apiKey.length === 39;
+  if (isRealApiKey) {
     try {
-      const fallbackResults = await fallbackSearchYoutube(q);
-      res.json(fallbackResults);
+      console.log(`[YouTube] Performing official API search for: "${q}"`);
+      const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+        params: {
+          part: 'snippet',
+          q: q + ' music',
+          type: 'video',
+          maxResults: 15,
+          key: apiKey
+        }
+      });
+      const items = response.data.items || [];
+      const results = items
+        .filter(item => item.id && item.id.videoId)
+        .map(item => ({
+          id: item.id.videoId,
+          title: cleanTitle(item.snippet.title),
+          artist: cleanTitle(item.snippet.channelTitle).replace(' - Topic', ''),
+          thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || '',
+          source: 'youtube',
+          duration: 0
+        }));
+      if (results.length > 0) {
+        return res.json(results);
+      }
+    } catch (apiError) {
+      console.warn('[YouTube] Official search API failed, falling back to scrapers:', apiError.message);
+    }
+  } else {
+    console.log('[YouTube] YouTube API key is missing or dummy. Skipping official API search.');
+  }
+
+  // 2. Try the custom fast working HTML scraper first (it is highly reliable and fast)
+  try {
+    console.log(`[YouTube] Performing custom HTML scraper search for: "${q}"`);
+    const results = await fallbackSearchYoutube(q);
+    if (results && results.length > 0) {
+      return res.json(results);
+    }
+    throw new Error('Custom HTML scraper returned empty results');
+  } catch (error) {
+    console.warn('[YouTube] Custom HTML scraper failed, trying ytsr scraper:', error.message);
+    // 3. Fallback to ytsr scraper
+    try {
+      console.log(`[YouTube] Performing ytsr scraper search for: "${q}"`);
+      const searchResults = await ytsr(q + ' music', { limit: 15 });
+
+      const results = searchResults.items
+        .filter(item => item.type === 'video')
+        .map(item => ({
+          id: item.id,
+          title: cleanTitle(item.name || 'Unknown'),
+          artist: (item.author?.name || 'Unknown Artist').replace(' - Topic', ''),
+          thumbnail: item.bestThumbnail?.url || item.thumbnails?.[0]?.url || '',
+          source: 'youtube',
+          duration: parseDuration(item.duration)
+        }));
+
+      res.json(results);
     } catch (fallbackError) {
-      console.error('[YouTube] Fallback search also failed:', fallbackError.message);
+      console.error('[YouTube] All search methods failed:', fallbackError.message);
       res.status(500).json({ error: 'Failed to search YouTube' });
     }
   }

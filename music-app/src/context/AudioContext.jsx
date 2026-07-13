@@ -126,7 +126,17 @@ export const AudioProvider = ({ children }) => {
     setRepeatMode(nextMode);
   };
 
+  const unlockAudio = () => {
+    try {
+      const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+      audio.play().catch(e => console.log('[AudioContext] Audio unlock failed:', e.message));
+    } catch (e) {
+      console.warn('[AudioContext] Audio unlock error:', e);
+    }
+  };
+
   const playTrack = (track, newQueue = []) => {
+    unlockAudio();
     setCurrentTrack(track);
     setIsPlaying(true);
     if (newQueue.length > 0) {
@@ -143,6 +153,7 @@ export const AudioProvider = ({ children }) => {
   };
 
   const playNext = async () => {
+    unlockAudio();
     console.log('AudioContext: playNext called', { queueLength: queue.length, currentTrackId: currentTrack?.id });
     if (!currentTrack || queue.length === 0) return;
     
@@ -201,6 +212,7 @@ export const AudioProvider = ({ children }) => {
   };
 
   const playPrevious = () => {
+    unlockAudio();
     console.log('AudioContext: playPrevious called');
     if (!currentTrack || queue.length === 0) return;
     const currentIndex = queue.findIndex(t => t.id === currentTrack.id);
@@ -220,7 +232,10 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
-  const togglePlay = () => setIsPlaying(!isPlaying);
+  const togglePlay = () => {
+    unlockAudio();
+    setIsPlaying(!isPlaying);
+  };
 
   const addToLibrary = (track) => {
     if (!library.find(t => t.id === track.id)) {

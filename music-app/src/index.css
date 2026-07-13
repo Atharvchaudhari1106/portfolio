@@ -3287,3 +3287,267 @@ input[type="range"]::-webkit-slider-runnable-track {
     padding: 32px 24px;
   }
 }
+
+/* ============================================================
+   BLACKHOLE STYLES (DYNAMIC BLUR, VINYL, LYRICS, BADGES)
+   ============================================================ */
+
+/* Glassmorphism in Now Playing */
+.np-view {
+  position: relative !important;
+  overflow-y: auto !important;
+  background: transparent !important;
+  padding-bottom: 120px !important;
+}
+
+.np-blurred-bg {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(50px) saturate(180%) brightness(0.35);
+  z-index: 0;
+  pointer-events: none;
+  transition: background-image 0.8s ease-in-out;
+}
+
+.np-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(6, 14, 32, 0.4) 0%, rgba(6, 14, 32, 0.85) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.np-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+/* Vinyl Disc Styles */
+.np-vinyl-container {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 32px;
+}
+
+.np-vinyl-disc {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  background: #0b0c10;
+  border-radius: 50%;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), inset 0 0 12px rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: spin 20s linear infinite;
+  animation-play-state: paused;
+  border: 4px solid #1c1d22;
+}
+
+.np-vinyl-container.playing .np-vinyl-disc {
+  animation-play-state: running;
+}
+
+.np-vinyl-grooves {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(
+    circle,
+    #0d0e12,
+    #0d0e12 2px,
+    #18191e 3px,
+    #0d0e12 4px
+  );
+  opacity: 0.85;
+  pointer-events: none;
+  border: 2px solid #08090c;
+}
+
+.np-vinyl-label {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: #202020;
+  overflow: hidden;
+  border: 3px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  z-index: 2;
+}
+
+.np-vinyl-label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.np-vinyl-center-hole {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--bg-black);
+  border-radius: 50%;
+  border: 2px solid #000;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
+  z-index: 3;
+}
+
+/* Stylus Arm */
+.np-vinyl-stylus-wrapper {
+  position: absolute;
+  top: -20px;
+  right: 5px;
+  width: 90px;
+  height: 160px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.np-vinyl-stylus {
+  width: 100%;
+  height: 100%;
+  transform-origin: 75% 15%;
+  transform: rotate(-28deg);
+  transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
+  filter: drop-shadow(4px 8px 6px rgba(0,0,0,0.4));
+}
+
+.np-vinyl-container.playing .np-vinyl-stylus {
+  transform: rotate(2deg);
+}
+
+/* Lyrics Styles */
+.np-lyrics-container {
+  width: 100%;
+  max-width: 380px;
+  height: 280px;
+  overflow-y: auto;
+  margin: 16px 0 32px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Hide scrollbars */
+  -webkit-overflow-scrolling: touch;
+}
+
+.np-lyrics-container::-webkit-scrollbar {
+  display: none;
+}
+
+.np-lyrics-line {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.4;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.np-lyrics-line:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.np-lyrics-line.active {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  text-shadow: 0 0 15px var(--accent-shadow);
+  transform: scale(1.05);
+}
+
+/* Quality Badge */
+.np-quality-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-subdued);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+  text-transform: uppercase;
+}
+
+/* Accent variables shadow mapping */
+.btn-primary {
+  box-shadow: 0 4px 20px var(--accent-shadow) !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 30px var(--accent-shadow) !important;
+}
+
+.np-play-btn.neon-glow {
+  box-shadow: 0 0 20px var(--accent-shadow) !important;
+}
+
+/* Fix settings inputs and buttons */
+.auth-modal .input-group input {
+  padding-left: 48px !important;
+}
+
+.auth-modal .input-group .input-icon {
+  position: absolute !important;
+  left: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: var(--text-subdued) !important;
+  pointer-events: none;
+  z-index: 5;
+  margin: 0 !important;
+}
+
+.auth-modal-cancel-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  margin-top: 12px !important;
+}
+
+.auth-modal-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  transform: translateY(-2px);
+}
+
+/* Custom Scrollbar for Settings Modal */
+.settings-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.settings-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+.settings-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+.settings-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}

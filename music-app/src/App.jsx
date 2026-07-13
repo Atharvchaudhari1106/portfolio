@@ -15,6 +15,8 @@ import AIMixModal from './components/AIMixModal';
 import InstallModal from './components/InstallModal';
 import { useAuth } from './context/AuthContext';
 import { useAudio } from './context/AudioContext';
+import { applyTheme } from './utils/theme';
+
 
 function App() {
   const [activeView, setActiveView] = useState('home');
@@ -28,6 +30,11 @@ function App() {
   const [isStandalone, setIsStandalone] = useState(false);
   const { user } = useAuth();
   const { currentTrack } = useAudio();
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('AESTHETICORE_THEME') || 'default';
+    applyTheme(savedTheme);
+  }, []);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -50,10 +57,27 @@ function App() {
   // ─── Backend URL Health Check & Render Wakeup ─────────────────
   useEffect(() => {
     const checkLocalBackend = async () => {
+      // If the user has explicitly configured a custom remote backend, bypass local backend check
+      const customUrl = localStorage.getItem('AESTHETICORE_BACKEND_URL');
+      const isCustomRemote = customUrl && !customUrl.includes('localhost') && !customUrl.includes('127.0.0.1');
+      if (isCustomRemote) {
+        localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'false');
+        return;
+      }
+
+      // If running on localhost, always force local backend to be active
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        localStorage.setItem('LOCAL_BACKEND_ACTIVE', 'true');
+        return;
+      }
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
       try {
-        const response = await fetch('http://localhost:5000/', { signal: controller.signal });
+        const checkHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+          ? 'localhost'
+          : window.location.hostname;
+        const response = await fetch(`http://${checkHost}:5000/`, { signal: controller.signal });
         clearTimeout(timeoutId);
         if (response.ok) {
           const prev = localStorage.getItem('LOCAL_BACKEND_ACTIVE');

@@ -107,7 +107,7 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setResolvedStreamUrl(null);
+    // Keep resolvedStreamUrl to avoid unmounting ReactPlayer (which causes play AbortErrors)
     setStreamLoading(true);
     setStreamError(null);
     setResolvedVia('');
@@ -218,11 +218,57 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
     }
   }, [currentTrack]);
 
+  const endedTriggeredRef = useRef(false);
+
   // When track changes, reset progress
   useEffect(() => {
     setPlayedSeconds(0);
     setDuration(0);
+    endedTriggeredRef.current = false;
   }, [currentTrack?.id]);
+
+  // React 19 / Iframe Compatibility Polling:
+  // Since React 19 can ignore custom event handlers on forward-spread elements (like onProgress / onDuration),
+  // we poll directly from playerRef.current to update progress and duration, and as a fallback for track end.
+  useEffect(() => {
+    let interval = null;
+    if (isPlaying && resolvedStreamUrl && !streamLoading) {
+      interval = setInterval(() => {
+        if (playerRef.current) {
+          try {
+            const currentTime = playerRef.current.getCurrentTime();
+            const totalDuration = playerRef.current.getDuration();
+            
+            if (currentTime !== null && !isNaN(currentTime)) {
+              setPlayedSeconds(currentTime);
+              window.dispatchEvent(new CustomEvent('music-progress', { 
+                detail: { playedSeconds: currentTime } 
+              }));
+            }
+            
+            if (totalDuration !== null && !isNaN(totalDuration) && totalDuration > 0) {
+              setDuration(totalDuration);
+              window.dispatchEvent(new CustomEvent('music-duration', { 
+                detail: { duration: totalDuration } 
+              }));
+              
+              // Fallback track ending detection
+              if (currentTime >= totalDuration - 0.8 && !endedTriggeredRef.current) {
+                endedTriggeredRef.current = true;
+                console.log('[PlayerBar] Polling detected track end. Triggering next track.');
+                playNextRef.current();
+              }
+            }
+          } catch (e) {
+            // Player might not be ready or initialized yet
+          }
+        }
+      }, 500);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isPlaying, resolvedStreamUrl, streamLoading]);
 
   const handleVolumeChange = (e) => {
     setVolume(parseFloat(e.target.value));
@@ -481,55 +527,78 @@ const PlayerBar = ({ onOpenNowPlaying }) => {
 
       {/* Unified ReactPlayer for all sources */}
       {resolvedStreamUrl && (
-        <ReactPlayer
-          ref={playerRef}
-          url={resolvedStreamUrl}
-          playing={isPlaying}
-          volume={volume}
-          onProgress={(progress) => {
-            setPlayedSeconds(progress.playedSeconds);
-            window.dispatchEvent(new CustomEvent('music-progress', { 
-              detail: { playedSeconds: progress.playedSeconds } 
-            }));
-          }}
-          onDuration={(duration) => {
-            consecutiveErrorsRef.current = 0;
-            setDuration(duration);
-            window.dispatchEvent(new CustomEvent('music-duration', { 
-              detail: { duration } 
-            }));
-          }}
-          onEnded={() => playNextRef.current()}
-          onError={(e) => {
-            console.error('ReactPlayer error:', e);
-            consecutiveErrorsRef.current += 1;
-            if (consecutiveErrorsRef.current > 3) {
-              console.error('[PlayerBar] Too many consecutive playback errors. Stopping.');
-              setIsPlaying(false);
-              setStreamError('Playback failed. Please check your internet connection.');
+        <div style={{
+          position: 'fixed',
+          bottom: '96px',
+          right: '24px',
+          width: (resolvedVia && resolvedVia.includes('youtube')) ? '160px' : '1px',
+          height: (resolvedVia && resolvedVia.includes('youtube')) ? '90px' : '1px',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          boxShadow: (resolvedVia && resolvedVia.includes('youtube')) ? '0 10px 25px rgba(0,0,0,0.5)' : 'none',
+          border: (resolvedVia && resolvedVia.includes('youtube')) ? '1px solid rgba(255,255,255,0.1)' : 'none',
+          zIndex: 9999,
+          backgroundColor: '#000',
+          opacity: (resolvedVia && resolvedVia.includes('youtube')) ? 1 : 0.001,
+          pointerEvents: 'none',
+          transition: 'all 0.3s ease'
+        }}>
+          <ReactPlayer
+            ref={playerRef}
+            url={resolvedStreamUrl}
+            playing={isPlaying}
+            volume={volume}
+            onProgress={(progress) => {
+              setPlayedSeconds(progress.playedSeconds);
+              window.dispatchEvent(new CustomEvent('music-progress', { 
+                detail: { playedSeconds: progress.playedSeconds } 
+              }));
+            }}
+            onDuration={(duration) => {
               consecutiveErrorsRef.current = 0;
-            } else {
-              console.warn('[PlayerBar] Stream failed, auto-skipping to next track in 2 seconds...');
-              setTimeout(() => playNextRef.current(), 2000);
-            }
-          }}
-          width="0px"
-          height="0px"
-          style={{ position: 'absolute', width: '1px', height: '1px', opacity: 0 }}
-          config={{
-            youtube: {
-              playerVars: {
-                autoplay: isPlaying ? 1 : 0,
-                controls: 0,
-                disablekb: 1,
-                fs: 0,
-                modestbranding: 1,
-                rel: 0,
-                showinfo: 0
+              setDuration(duration);
+              window.dispatchEvent(new CustomEvent('music-duration', { 
+                detail: { duration } 
+              }));
+            }}
+            onEnded={() => playNextRef.current()}
+            onError={(e) => {
+              console.error('ReactPlayer error:', e);
+              consecutiveErrorsRef.current += 1;
+              if (consecutiveErrorsRef.current > 3) {
+                console.error('[PlayerBar] Too many consecutive playback errors. Stopping.');
+                setIsPlaying(false);
+                setStreamError('Playback failed. Please check your internet connection.');
+                consecutiveErrorsRef.current = 0;
+              } else {
+                console.warn('[PlayerBar] Stream failed, auto-skipping to next track in 2 seconds...');
+                setTimeout(() => playNextRef.current(), 2000);
               }
-            }
-          }}
-        />
+            }}
+            width="100%"
+            height="100%"
+            config={{
+              youtube: {
+                playerVars: {
+                  autoplay: isPlaying ? 1 : 0,
+                  controls: 0,
+                  disablekb: 1,
+                  fs: 0,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0
+                }
+              },
+              file: {
+                forceAudio: true,
+                attributes: {
+                  crossOrigin: 'anonymous',
+                  preload: 'auto'
+                }
+              }
+            }}
+          />
+        </div>
       )}
     </div>
   );
