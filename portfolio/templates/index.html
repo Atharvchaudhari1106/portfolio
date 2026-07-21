@@ -1,494 +1,578 @@
 {% extends "base.html" %}
 
-{% block title %}Atharv Chaudhari.H. | Creative Developer{% endblock %}
-{% block meta_description %}Welcome to Atharv Chaudhari.H.'s portfolio — a creative developer building stunning digital
-experiences.{% endblock %}
+{% block title %}Atharv Chaudhari.H. | Creative Developer & AI Engineer{% endblock %}
+{% block meta_description %}Portfolio of Atharv Chaudhari.H. — Full Stack Developer & AI Engineer building premium, high-performance web experiences with Apple-inspired design.{% endblock %}
 
 {% block content %}
+<!-- Preloader Loading Screen -->
+<div id="loader" class="fixed inset-0 bg-[#09090B] z-[9999] flex flex-col items-center justify-center gap-6 select-none transition-all duration-700 ease-out">
+    <div class="relative w-16 h-16 flex items-center justify-center">
+        <!-- Minimalist clean spinner -->
+        <div class="absolute inset-0 border-2 border-white/10 rounded-full"></div>
+        <div class="absolute inset-0 border-2 border-t-accent-blue border-r-accent-violet rounded-full animate-spin"></div>
+        <i data-lucide="cpu" class="w-6 h-6 text-white animate-pulse"></i>
+    </div>
+    <div class="flex flex-col items-center">
+        <h2 class="font-display text-2xl font-bold tracking-widest text-white uppercase text-reveal">Atharv</h2>
+        <p class="text-xs text-white/40 tracking-widest uppercase mt-1">Creative Developer</p>
+    </div>
+</div>
+
+<!-- Aurora Animated Background Blobs -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none -z-20 min-h-screen">
+    <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-accent-blue/15 rounded-full blur-[120px] animate-aurora-1"></div>
+    <div class="absolute bottom-[20%] right-[-10%] w-[60vw] h-[60vw] bg-accent-violet/15 rounded-full blur-[140px] animate-aurora-2"></div>
+    <div class="absolute top-[40%] left-[30%] w-[45vw] h-[45vw] bg-blue-500/10 rounded-full blur-[130px] animate-aurora-3"></div>
+</div>
+
+<!-- Grid Overlay -->
+<div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none -z-10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]"></div>
+
 <!-- Hero Section -->
-<section class="hero" id="hero">
-    <div class="hero-container">
-        <div class="hero-content">
-            <div class="hero-badge animate-fade-up">
-                <span class="badge-dot"></span>
-                Open for a chat & collaboration
-                <span class="handwritten" style="margin-left: 10px; font-size: 1rem;">Available now!</span>
-            </div>
-            <h1 class="hero-title animate-fade-up delay-1">
-                Hey there! I'm <span class="gradient-text">Atharv.</span>
-            </h1>
-            <p class="hero-subtitle animate-fade-up delay-2">
-                I build digital experiences that feel like <span class="gradient-text">home</span>.
-            </p>
-            <p class="hero-description animate-fade-up delay-3">
-                I'm a developer and designer who obsesses over the little details.
-                I believe the best websites aren't just code—they're conversations.
-                Let's make something amazing together.
-            </p>
-            <div class="hero-cta animate-fade-up delay-4">
-                <a href="#projects" class="btn btn-primary">
-                    <span>View My Work</span>
-                    <i class="fas fa-arrow-right"></i>
-                </a>
-                <a href="#contact" class="btn btn-outline">
-                    <span>Get in Touch</span>
-                </a>
-
-            </div>
-            <div class="hero-stats animate-fade-up delay-5">
-                <div class="stat-item preserve-3d">
-                    <span class="stat-number z-layer-1" id="dynamic-project-count" data-count="0">0</span><span
-                        class="stat-suffix">+</span>
-                    <span class="stat-label">Side Projects</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item preserve-3d">
-                    <span class="stat-number z-layer-1" id="dynamic-tech-count" data-count="0">0</span><span
-                        class="stat-suffix">+</span>
-                    <span class="stat-label">Skills Mastered</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="stat-item preserve-3d">
-                    <span class="stat-number z-layer-1" data-count="100">0</span><span class="stat-suffix">%</span>
-                    <span class="stat-label">Passion Level</span>
-                </div>
-            </div>
+<section class="relative min-h-screen w-full flex flex-col items-center justify-center px-6 overflow-hidden pt-20" id="hero">
+    <!-- Floating Glass Objects for Parallax Depth -->
+    <div class="absolute top-[25%] left-[15%] w-32 h-16 rounded-full border border-white/5 bg-white/5 backdrop-blur-md shadow-2xl floating-element pointer-events-none hidden lg:block -z-10" style="animation-delay: 0s;"></div>
+    <div class="absolute bottom-[25%] right-[15%] w-24 h-24 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-md shadow-2xl floating-element pointer-events-none hidden lg:block -z-10" style="animation-delay: -2s;"></div>
+    
+    <div class="max-w-5xl w-full text-center flex flex-col items-center z-10">
+        <!-- Interactive Badge -->
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg mb-8 hover:border-white/20 transition-all duration-300 translate-y-8 opacity-0 hero-reveal select-none">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-blue opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-blue"></span>
+            </span>
+            <span class="text-xs font-semibold tracking-wider uppercase text-white/80">Open for new opportunities</span>
         </div>
-        <div class="hero-visual animate-fade-up delay-2 preserve-3d">
-            <div class="avatar-container depth-lift preserve-3d">
-                <div class="code-window z-layer-1">
-                    <div class="window-header">
-                        <div class="window-controls">
-                            <span class="dot red"></span>
-                            <span class="dot yellow"></span>
-                            <span class="dot green"></span>
-                        </div>
-                        <div class="window-tabs">
-                            <div class="tab active"><i class="fab fa-js-square"></i> atharv.js</div>
-                        </div>
-                    </div>
-                    <div class="window-main">
-                        <div class="line-numbers">
-                            <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
-                        </div>
-                        <div class="code-content">
-                            <pre><code><span class="code-keyword">class</span> <span class="code-var">Developer</span> {
-  <span class="code-keyword">constructor</span>() {
-    <span class="code-var">this</span>.name = <span class="code-string">"Atharv"</span>;
-    <span class="code-var">this</span>.traits = [<span class="code-string">"Creative"</span>, <span class="code-string">"Driven"</span>];
-  }
-
-  <span class="code-var">createMagic</span>() {
-    <span class="code-keyword">return</span> <span class="code-string">"Beautiful Experiences"</span>;
-  }
-}</code></pre>
-                        </div>
-                    </div>
-                    <div class="window-footer">
-                        <div class="footer-item"><i class="fas fa-code-branch"></i> main*</div>
-                        <div class="footer-item">UTF-8</div>
-                        <div class="footer-item">JavaScript</div>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Headline -->
+        <h1 class="font-display text-5xl md:text-8xl font-black tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 mb-6 translate-y-8 opacity-0 hero-reveal select-none">
+            ATHARV CHAUDHARI
+        </h1>
+        
+        <!-- Subtitle -->
+        <p class="text-lg md:text-2xl font-light tracking-wide text-white/70 max-w-2xl mb-10 translate-y-8 opacity-0 hero-reveal">
+            Full Stack Developer <span class="text-accent-blue">•</span> AI Engineer <span class="text-accent-violet">•</span> Problem Solver
+        </p>
+        
+        <!-- CTA buttons -->
+        <div class="flex flex-col sm:flex-row items-center gap-4 translate-y-8 opacity-0 hero-reveal">
+            <a href="#projects" class="magnetic-btn inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all duration-300 group">
+                View Projects
+                <i data-lucide="arrow-right" class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"></i>
+            </a>
+            <a href="#contact" class="magnetic-btn inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-white font-semibold text-sm hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] transition-all duration-300">
+                Contact Me
+            </a>
         </div>
     </div>
-    <div class="scroll-indicator animate-fade-up delay-5">
-        <div class="mouse">
-            <div class="mouse-wheel"></div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 transition-opacity duration-500 hover:text-white/80 select-none cursor-pointer" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+        <span class="text-xs uppercase tracking-widest font-semibold">Scroll</span>
+        <div class="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-1.5">
+            <div class="w-1 h-2 bg-white/60 rounded-full animate-bounce"></div>
         </div>
-        <span>Scroll down</span>
     </div>
 </section>
 
 <!-- About Section -->
-<section class="section about-section" id="about">
-    <div class="section-container">
-        <div class="about-grid">
-            <div class="about-image-wrapper">
-                <div class="about-image-card">
-                    <div class="about-avatar">
-                        <div class="avatar-placeholder">
-                            <i class="fas fa-code"></i>
-                        </div>
+<section class="py-24 px-6 relative max-w-5xl mx-auto" id="about">
+    <div class="absolute top-[40%] right-[-10%] w-[30vw] h-[30vw] bg-accent-violet/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+    
+    <div class="flex flex-col items-center text-center mb-16 section-header">
+        <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">About Me</span>
+        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Who I Am</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch">
+        <!-- Visual Glass Card -->
+        <div class="md:col-span-5 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl group hover-glow min-h-[350px]">
+            <!-- Subtle background spotlight in card -->
+            <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            
+            <div class="relative w-full aspect-square md:aspect-auto md:h-64 rounded-2xl overflow-hidden bg-black/40 border border-white/5 flex items-center justify-center group">
+                <img src="{{ url_for('static', filename='developer_visual.png') }}" alt="Atharv Chaudhari" class="w-full h-full object-cover grayscale brightness-90 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700">
+            </div>
+            
+            <div class="mt-6 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold tracking-tight text-white">Atharv Chaudhari.H.</h3>
+                    <p class="text-xs text-white/50">Full Stack & AI Architect</p>
+                </div>
+                <a href="#contact" class="magnetic-btn w-12 h-12 rounded-full border border-white/10 hover:border-white/20 bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300">
+                    <i class="fas fa-envelope text-lg"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Info Description Glass Card -->
+        <div class="md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 md:p-10 flex flex-col justify-between shadow-2xl group hover-glow relative overflow-hidden">
+            <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            
+            <div class="space-y-6 relative z-10">
+                <h3 class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+                    Engineering intelligence and experiences.
+                </h3>
+                <p class="text-base md:text-lg text-white/70 leading-relaxed font-light">
+                    Hey! I'm Atharv. I'm 19, and I've spent the last few years teaching myself how to make the internet a more beautiful, intelligent place. I don't just write code; I solve puzzles that bridge the gap between design philosophy and computational complexity.
+                </p>
+                <p class="text-base md:text-lg text-white/70 leading-relaxed font-light">
+                    My focus lies at the intersection of high-performance frontend designs and responsive AI backend architectures. I work extensively on LLM applications, big data interfaces, and premium custom web platforms.
+                </p>
+                
+                <!-- Info Badges -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
+                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
+                        <span class="text-2xl font-extrabold font-display text-accent-blue animate-on-scroll-count" id="stat-experience" data-count="1">0</span>
+                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Year Experience</span>
                     </div>
-                    <div class="about-image-decoration"></div>
+                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
+                        <span class="text-2xl font-extrabold font-display text-accent-violet animate-on-scroll-count" id="stat-projects" data-count="12">0</span>
+                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Projects Built</span>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center col-span-2 sm:col-span-1">
+                        <span class="text-2xl font-extrabold font-display text-white">100%</span>
+                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Passion Level</span>
+                    </div>
                 </div>
             </div>
-            <div class="about-content">
-                <h2 class="about-heading">I'm a <span class="gradient-text">creative tinkerer</span> who loves building
-                    for the web</h2>
-                <p>Hey! I'm Atharv. I'm 19, and I've spent the last few years teaching myself how to make the internet a
-                    more beautiful place. I don't just write code; I try to solve puzzles that make people's lives
-                    easier.</p>
-                <p>When I'm not staring at a terminal, I'm probably listening to Lo-fi, hunting for the perfect coffee
-                    bean, or trying to explain to my cat why I can't play with him during a deployment.</p>
 
-                <div class="handwritten" style="margin: 1rem 0; font-size: 1.2rem;">"The best code is the kind that
-                    feels like magic."</div>
-                <div class="about-details">
-                    <div class="detail-item">
-                        <i class="fas fa-user"></i>
-                        <div>
-                            <span class="detail-label">Name</span>
-                            <span class="detail-value">Atharv Chaudhari.H.</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <div>
-                            <span class="detail-label">Age</span>
-                            <span class="detail-value">19 Years Old</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <span class="detail-label">Location</span>
-                            <span class="detail-value">Ahmedabad, India</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <span class="detail-label">Email</span>
-                            <span class="detail-value">atharv9727@gmail.com</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-graduation-cap"></i>
-                        <div>
-                            <span class="detail-label">Education</span>
-                            <span class="detail-value">Computer Science</span>
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-briefcase"></i>
-                        <div>
-                            <span class="detail-label">Experience</span>
-                            <span class="detail-value">1+ Years</span>
-                        </div>
-                    </div>
+            <div class="mt-8 pt-6 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 relative z-10">
+                <div class="flex items-center gap-2 text-xs text-white/50">
+                    <i class="fas fa-map-marker-alt text-accent-blue"></i>
+                    Ahmedabad, India
                 </div>
-                <a href="#contact" class="btn btn-primary">
-                    <span>Let's Work Together</span>
-                    <i class="fas fa-arrow-right"></i>
+                <a href="#contact" class="magnetic-btn inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-semibold text-xs border border-white/10 hover:border-transparent transition-all duration-300">
+                    <span>Download Resume</span>
+                    <i data-lucide="download" class="w-4 h-4"></i>
                 </a>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Skills Section (Nested in About) -->
-    <div class="section-container" style="margin-top: 6rem;">
-        <div class="section-header">
-            <span class="section-tag">Tech Stack</span>
-            <h2 class="section-title">Skills & <span class="gradient-text">Technologies</span></h2>
-            <p class="section-subtitle">Tools and technologies I work with daily</p>
-        </div>
-        <div class="skills-grid">
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-html5"></i></div>
-                <span class="skill-name">HTML5</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 95%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-css3-alt"></i></div>
-                <span class="skill-name">CSS3</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 90%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-ai"></i></div>
-                <span class="skill-name">AI technologies</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 85%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-python"></i></div>
-                <span class="skill-name">Python</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 88%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-react"></i></div>
-                <span class="skill-name">React</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 80%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fas fa-flask"></i></div>
-                <span class="skill-name">Flask</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 85%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-git-alt"></i></div>
-                <span class="skill-name">Git</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 82%;"></div>
-                </div>
-            </div>
-            <div class="skill-card">
-                <div class="skill-icon"><i class="fab fa-figma"></i></div>
-                <span class="skill-name">Figma</span>
-                <div class="skill-bar">
-                    <div class="skill-fill" style="--fill-width: 75%;"></div>
-                </div>
-            </div>
-        </div>
+<!-- Skills Section (Bento Grid) -->
+<section class="py-24 px-6 relative max-w-5xl mx-auto" id="skills">
+    <div class="absolute bottom-[-10%] left-[-10%] w-[35vw] h-[35vw] bg-accent-blue/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+    
+    <div class="flex flex-col items-center text-center mb-16 section-header">
+        <span class="text-xs font-bold uppercase tracking-widest text-accent-violet px-3 py-1 rounded-full border border-accent-violet/25 bg-accent-violet/5 mb-3">Capabilities</span>
+        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Skills & Technologies</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-accent-violet to-accent-blue mt-4 rounded-full"></div>
     </div>
 
-    <!-- Experience Timeline (Nested in About) -->
-    <div class="section-container" style="margin-top: 6rem;">
-        <div class="section-header">
-            <span class="section-tag">Journey</span>
-            <h2 class="section-title">My <span class="gradient-text">Experience</span></h2>
-        </div>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <span class="timeline-date">2024 - Present</span>
-                    <h3>web developer</h3>
-                    <p>Building custom web solutions for clients across various industries. Focused on creating
-                        performant, beautiful applications.</p>
+    <!-- Bento Grid Layout -->
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[220px]">
+        
+        <!-- Frontend Card (Large Landscape) -->
+        <div class="md:col-span-4 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+            <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="layout" class="w-6 h-6"></i>
                 </div>
+                <span class="text-xs font-mono text-white/30">Frontend</span>
             </div>
-            <div class="timeline-item">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <span class="timeline-date">2023 - 2024</span>
-                    <h3>Junior Web Developer</h3>
-                    <p>Worked on multiple full-stack projects, collaborating with design and backend teams to deliver
-                        exceptional digital products.</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <span class="timeline-date">2022 - 2023</span>
-                    <h3>Started Learning</h3>
-                    <p>Began my coding journey, learning HTML, CSS, JavaScript, and Python. Built my first portfolio and
-                        open-source projects.</p>
-                </div>
+            <div>
+                <h3 class="text-xl font-bold tracking-tight text-white mb-2">Interface Design</h3>
+                <p class="text-sm text-white/60 max-w-xl">Building semantic, modern layout systems using Tailwind, React, and GSAP that provide smooth interactions and pixel-perfect rendering.</p>
             </div>
         </div>
+
+        <!-- AI Card (Vertical Column) -->
+        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+            <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-mono text-white/30">Intelligence</span>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold tracking-tight text-white">AI & NLP Systems</h3>
+                <p class="text-sm text-white/60">Integrating local LLMs, building intelligent search agents, and mapping semantic databases like legal index systems (BNS/BSA).</p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">NLP</span>
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">LLMs</span>
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">LangChain</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backend Card (Vertical Column) -->
+        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+            <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="server" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-mono text-white/30">Backend</span>
+            </div>
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold tracking-tight text-white">APIs & Microservices</h3>
+                <p class="text-sm text-white/60">Developing secure, scalable microservices, telemetry streaming layers, and RESTful routing infrastructures.</p>
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Python</span>
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Flask</span>
+                    <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">NodeJS</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Databases Card (Landscape Half) -->
+        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+            <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
+                    <i data-lucide="database" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-mono text-white/30">Storage</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold tracking-tight text-white mb-1">Data Architectures</h3>
+                <p class="text-xs text-white/60 font-light">Structuring relational SQL databases and caching layers optimized for low latency access.</p>
+            </div>
+        </div>
+
+        <!-- DevOps & Cloud Card (Landscape Half) -->
+        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+            <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+            <div class="flex items-center justify-between">
+                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="git-branch" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-mono text-white/30">DevOps</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold tracking-tight text-white mb-1">CI/CD & Cloud Deployment</h3>
+                <p class="text-xs text-white/60 font-light">Deploying robust pipelines, utilizing containerization, git workflows, and hosting endpoints.</p>
+            </div>
+        </div>
+
     </div>
 </section>
 
-<!-- Services Section -->
-<section class="section services-section" id="services">
-    <div class="section-container">
-        <div class="section-header">
-            <span class="section-tag">What I Do</span>
-            <h2 class="section-title">Services & <span class="gradient-text">Expertise</span></h2>
-            <p class="section-subtitle">Turning complex problems into elegant solutions</p>
-            <div class="handwritten" style="margin-top: 10px;">(And having fun doing it!)</div>
+<!-- Projects Section -->
+<section class="py-24 px-6 relative max-w-5xl mx-auto" id="projects">
+    <div class="absolute top-[20%] left-[-15%] w-[40vw] h-[40vw] bg-accent-blue/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    
+    <div class="flex flex-col items-center text-center mb-20 section-header">
+        <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">Portfolio</span>
+        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Featured Projects</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
+    </div>
+
+    <!-- Project Showcase List with Alternating Layouts -->
+    <div class="space-y-24">
+        
+        <!-- Project 1: AesthetiCore Music -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
+            <div class="md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+                <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
+                    <!-- Image zoom on hover -->
+                    <img src="{{ url_for('static', filename='projects/music-hero.png') }}" alt="AesthetiCore Music" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                    <!-- Glass overlay on hover -->
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                        <a href="/portfolio/music/index.html" class="magnetic-btn w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="Live Demo">
+                            <i data-lucide="external-link" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/music-app" class="magnetic-btn w-12 h-12 rounded-full bg-black/80 text-white border border-white/10 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="GitHub Source" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="md:col-span-5 space-y-6">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-blue">Web App • Music</span>
+                <h3 class="text-3xl font-extrabold tracking-tight text-white">AesthetiCore Music</h3>
+                <p class="text-white/70 font-light leading-relaxed">
+                    A premium, zero-config music player with YouTube search capabilities, full playback sync, and a gorgeous Spotify-inspired dark mode UI. Designed with micro-animations and responsive components.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">YouTube API</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Spotify UI</span>
+                </div>
+                <div class="flex items-center gap-4 pt-2">
+                    <a href="/portfolio/music/index.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300">
+                        Live Demo
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/music-app" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 text-white font-semibold text-xs hover:bg-white/10 transition-all duration-300" target="_blank" rel="noopener noreferrer">
+                        Codebase
+                    </a>
+                </div>
+            </div>
         </div>
-        <div class="services-grid">
-            <div class="service-card" data-tilt>
-                <div class="service-icon">
-                    <i class="fas fa-code"></i>
+
+        <!-- Project 2: INTELLIGENCE-X (Alternating: Text Left, Image Right) -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
+            <div class="md:col-span-5 order-2 md:order-1 space-y-6">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-violet">AI • Big Data</span>
+                <h3 class="text-3xl font-extrabold tracking-tight text-white">INTELLIGENCE-X</h3>
+                <p class="text-white/70 font-light leading-relaxed">
+                    A real-time Big Data Search & Intelligence platform featuring AI-powered entity extraction, interactive knowledge graph visualization, and live Kafka telemetry stream analysis.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Kafka</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">GraphViz</span>
                 </div>
-                <h3>Web Development</h3>
-                <p>Building responsive, performant web applications using modern frameworks and best practices.</p>
-                <div class="service-tags">
-                    <span>React</span><span>Flask</span><span>Node.js</span>
+                <div class="flex items-center gap-4 pt-2">
+                    <a href="/portfolio/bigdata/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300">
+                        Live Demo
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/my%20works/bigdata-search" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 text-white font-semibold text-xs hover:bg-white/10 transition-all duration-300" target="_blank" rel="noopener noreferrer">
+                        Codebase
+                    </a>
                 </div>
             </div>
-            <div class="service-card" data-tilt>
-                <div class="service-icon">
-                    <i class="fas fa-palette"></i>
-                </div>
-                <h3>UI/UX Design</h3>
-                <p>Crafting intuitive, beautiful interfaces that delight users and drive engagement.</p>
-                <div class="service-tags">
-                    <span>Figma</span><span>Prototyping</span><span>Design Systems</span>
+
+            <div class="md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+                <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
+                    <img src="{{ url_for('static', filename='projects/bigdata-hero.png') }}" alt="Intelligence-X" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                        <a href="/portfolio/bigdata/" class="magnetic-btn w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="Live Demo">
+                            <i data-lucide="external-link" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/my%20works/bigdata-search" class="magnetic-btn w-12 h-12 rounded-full bg-black/80 text-white border border-white/10 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="GitHub Source" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github text-lg"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-            <div class="service-card" data-tilt>
-                <div class="service-icon">
-                    <i class="fas fa-mobile-alt"></i>
+                <!-- Project 3: CrimeGPT -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
+            <div class="md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+                <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
+                    <img src="{{ url_for('static', filename='projects/crimegpt-hero.png') }}" alt="CrimeGPT" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                        <a href="/portfolio/crimegpt/" class="magnetic-btn w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="Live Demo">
+                            <i data-lucide="external-link" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://github.com/atharv9727-debug/crimegpt" class="magnetic-btn w-12 h-12 rounded-full bg-black/80 text-white border border-white/10 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="GitHub Source" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github text-lg"></i>
+                        </a>
+                    </div>
                 </div>
-                <h3>Responsive Design</h3>
-                <p>Ensuring seamless experiences across all devices, from mobile to ultra-wide displays.</p>
-                <div class="service-tags">
-                    <span>Mobile First</span><span>CSS Grid</span><span>Flexbox</span>
+            </div>
+            
+            <div class="md:col-span-5 space-y-6">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-blue">AI • Legal-Tech</span>
+                <h3 class="text-3xl font-extrabold tracking-tight text-white">CrimeGPT</h3>
+                <p class="text-white/70 font-light leading-relaxed">
+                    A local-first, AI-assisted police documentation and case management platform. Employs NLP technologies to map legal acts (BNS/BNSS/BSA), manage cases, and generate automated summaries.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Zustand</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">BNS/BSA</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">LocalAI</span>
+                </div>
+                <div class="flex items-center gap-4 pt-2">
+                    <a href="/portfolio/crimegpt/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300">
+                        Live Demo
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <a href="https://github.com/atharv9727-debug/crimegpt" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 text-white font-semibold text-xs hover:bg-white/10 transition-all duration-300" target="_blank" rel="noopener noreferrer">
+                        Codebase
+                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Project 4: FinTrace OSINT & Financial AML -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
+            <div class="md:col-span-5 order-2 md:order-1 space-y-6">
+                <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-violet">OSINT • Financial Intelligence</span>
+                <h3 class="text-3xl font-extrabold tracking-tight text-white">FinTrace OSINT & AML</h3>
+                <p class="text-white/70 font-light leading-relaxed">
+                    A financial intelligence & anti-money laundering (AML) OSINT platform built for tracking transactions, analyzing suspicious entity networks, and generating automated investigative forensic reports.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">OSINT</span>
+                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">AML Analytics</span>
+                </div>
+                <div class="flex items-center gap-4 pt-2">
+                    <a href="https://github.com/Atharvchaudhari1106/portfolio" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300" target="_blank" rel="noopener noreferrer">
+                        Explore Project
+                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    </a>
+                    <a href="https://github.com/Atharvchaudhari1106/portfolio" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 bg-white/5 text-white font-semibold text-xs hover:bg-white/10 transition-all duration-300" target="_blank" rel="noopener noreferrer">
+                        Codebase
+                    </a>
+                </div>
+            </div>
+
+            <div class="md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+                <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
+                    <img src="{{ url_for('static', filename='projects/fintrace-hero.png') }}" alt="FinTrace OSINT & AML" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                        <a href="https://github.com/Atharvchaudhari1106/portfolio" class="magnetic-btn w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="Explore Project" target="_blank" rel="noopener noreferrer">
+                            <i data-lucide="external-link" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://github.com/Atharvchaudhari1106/portfolio" class="magnetic-btn w-12 h-12 rounded-full bg-black/80 text-white border border-white/10 flex items-center justify-center shadow-lg transition-transform duration-300 hover:scale-110" title="GitHub Source" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-github text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>      </div>
+
     </div>
 </section>
 
-<!-- Full Projects Section -->
-<section class="section projects-section" id="projects">
-    <div class="section-container">
-        <div class="section-header">
-            <span class="section-tag">Portfolio</span>
-            <h2 class="section-title">My <span class="gradient-text">Projects</span> <span id="project-count-badge"
-                    class="count-badge"></span></h2>
-            <p class="section-subtitle">A curated collection of my work</p>
-        </div>
-        <div class="projects-grid">
-            <div class="project-card" data-category="web">
-                <div class="project-image" style="background: url('{{ url_for("static",
-                    filename="projects/music-hero.png" ) }}') center/cover no-repeat;">
-                    <div class="project-overlay">
-                        <div class="project-actions">
-                            <a href="/portfolio/music/index.html" class="project-action-btn" aria-label="View Live"><i
-                                    class="fas fa-external-link-alt"></i></a>
-                            <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/music-app"
-                                class="project-action-btn" aria-label="View Code"><i class="fab fa-github"></i></a>
-                            <a href="/portfolio/music/index.html" class="project-action-btn install-btn"
-                                aria-label="Install App" title="Open to Install App"><i class="fas fa-download"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <h3>AesthetiCore Music</h3>
-                    <p>A premium, zero-config music player with YouTube search, full playback, and a Spotify-inspired
-                        UI.</p>
-                    <div class="project-tech">
-                        <span>React</span><span>YouTube API</span><span>Spotify UI</span>
-                    </div>
-                </div>
-            </div>
+<!-- Experience Timeline -->
+<section class="py-24 px-6 relative max-w-3xl mx-auto" id="experience">
+    <div class="absolute bottom-[10%] right-[-15%] w-[40vw] h-[40vw] bg-accent-violet/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    
+    <div class="flex flex-col items-center text-center mb-20">
+        <span class="text-xs font-bold uppercase tracking-widest text-accent-violet px-3 py-1 rounded-full border border-accent-violet/20 bg-accent-violet/5 mb-3">Journey</span>
+        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Experience Timeline</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-accent-violet to-accent-blue mt-4 rounded-full"></div>
+    </div>
 
-            <!-- INTELLIGENCE-X Big Data Search Tool -->
-            <div class="project-card" data-category="ai">
-                <div class="project-image" style="background: url('{{ url_for("static",
-                    filename="projects/bigdata-hero.png" ) }}') center/cover no-repeat;">
-                    <div class="project-overlay">
-                        <div class="project-actions">
-                            <a href="/portfolio/bigdata/index.html"
-                                class="project-action-btn" aria-label="View Live"><i
-                                    class="fas fa-external-link-alt"></i></a>
-                            <a href="https://github.com/Atharvchaudhari1106/portfolio/tree/main/my%20works/bigdata-search"
-                                class="project-action-btn" aria-label="View Code"><i class="fab fa-github"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <h3>INTELLIGENCE-X &mdash; Big Data Search</h3>
-                    <p>A real-time Big Data Search &amp; Intelligence platform with AI-powered entity extraction,
-                        knowledge graph visualization, and live Kafka telemetry streaming.</p>
-                    <div class="project-tech">
-                        <span>Python</span><span>Flask</span><span>React</span><span>NLP/AI</span><span>SQLite</span><span>Kafka</span>
-                    </div>
-                </div>
+    <!-- Vertical Timeline Line -->
+    <div class="relative border-l border-white/10 pl-8 ml-4 space-y-16 py-4">
+        
+        <!-- Timeline Item 1 -->
+        <div class="relative timeline-reveal">
+            <!-- Timeline dot -->
+            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-blue flex items-center justify-center shadow-lg">
+                <div class="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"></div>
             </div>
-
-            <!-- CrimeGPT AI Police Intelligence & Documentation Platform -->
-            <div class="project-card" data-category="ai">
-                <div class="project-image" style="background: url('{{ url_for("static",
-                    filename="projects/crimegpt-hero.png" ) }}') center/cover no-repeat;">
-                    <div class="project-overlay">
-                        <div class="project-actions">
-                            <a href="/portfolio/crimegpt/index.html"
-                                class="project-action-btn" aria-label="View Live"><i
-                                    class="fas fa-external-link-alt"></i></a>
-                            <a href="https://github.com/atharv9727-debug/crimegpt"
-                                class="project-action-btn" aria-label="View Code"><i class="fab fa-github"></i></a>
-                        </div>
+            
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+                <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                    <div>
+                        <h3 class="text-xl font-bold tracking-tight text-white">Freelance Web Developer</h3>
+                        <p class="text-sm text-accent-blue font-medium mt-0.5">Self-Employed</p>
                     </div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2024 - Present</span>
                 </div>
-                <div class="project-info">
-                    <h3>CrimeGPT &mdash; AI Police Intelligence</h3>
-                    <p>A local-first, AI-assisted police documentation and case management platform with NLP legal section mapping (BNS/BNSS/BSA), case diaries, and automated document generation.</p>
-                    <div class="project-tech">
-                        <span>React</span><span>Zustand</span><span>i18next</span><span>BNS/BSA</span><span>Local Storage</span><span>NLP/AI</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- FinTrace OSINT & Financial AML Platform -->
-            <div class="project-card" data-category="ai">
-                <div class="project-image" style="background: url('{{ url_for("static",
-                    filename="projects/fintrace-hero.png" ) }}') center/cover no-repeat;">
-                    <div class="project-overlay">
-                        <div class="project-actions">
-                            <a href="https://github.com/Atharvchaudhari1106/fintrace"
-                                class="project-action-btn" aria-label="View Code" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <h3>FinTrace &mdash; OSINT &amp; Financial AML</h3>
-                    <p>An end-to-end OSINT and Financial Intelligence platform for graph-based transaction analysis, money laundering detection (structuring, layering, mule rings), and AI-assisted SAR report generation.</p>
-                    <div class="project-tech">
-                        <span>FastAPI</span><span>React 19</span><span>Neo4j</span><span>SQLite/Postgres</span><span>Ollama AI</span><span>Docker</span>
-                    </div>
-                </div>
+                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                    Building robust custom web systems, optimizing databases, and deploying client-facing interactive portals. Leading architecture design and full-stack implementation.
+                </p>
             </div>
         </div>
+
+        <!-- Timeline Item 2 -->
+        <div class="relative timeline-reveal">
+            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-violet flex items-center justify-center shadow-lg">
+                <div class="w-2.5 h-2.5 rounded-full bg-accent-violet"></div>
+            </div>
+            
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+                <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                    <div>
+                        <h3 class="text-xl font-bold tracking-tight text-white">Junior Full Stack Developer</h3>
+                        <p class="text-sm text-accent-violet font-medium mt-0.5">Software Engineering Associate</p>
+                    </div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2023 - 2024</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                    Coordinated on full-stack codebases, integrated third-party REST APIs, designed responsive templates, and worked extensively with Git for source control.
+                </p>
+            </div>
+        </div>
+
+        <!-- Timeline Item 3 -->
+        <div class="relative timeline-reveal">
+            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-white/20 flex items-center justify-center shadow-lg">
+                <div class="w-2.5 h-2.5 rounded-full bg-white/25"></div>
+            </div>
+            
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+                <div class="absolute inset-0 bg-radial from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                    <div>
+                        <h3 class="text-xl font-bold tracking-tight text-white">Started Coding Journey</h3>
+                        <p class="text-sm text-white/50 font-medium mt-0.5">Autodidact Path</p>
+                    </div>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2022 - 2023</span>
+                </div>
+                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                    Began self-learning path starting with fundamental HTML, CSS, JavaScript, and Python. Developed personal terminal scripts, automation tools, and simple portfolio pages.
+                </p>
+            </div>
+        </div>
+
     </div>
 </section>
 
 <!-- Contact Section -->
-<section class="section contact-section" id="contact">
-    <div class="section-container">
-        <div class="contact-grid">
-            <div class="contact-info">
-                <h2>Let's talk about <span class="gradient-text">everything</span></h2>
-                <p>Feel free to reach out to me. I'm always open to discussing new projects, creative ideas, or
-                    opportunities.</p>
-                <div class="contact-methods">
-                    <div class="contact-method">
-                        <div class="contact-method-icon"><i class="fas fa-envelope"></i></div>
-                        <div class="contact-method-info">
-                            <span class="contact-method-label">Email</span>
-                            <a href="mailto:atharv9727@gmail.com" class="contact-method-value">atharv9727@gmail.com</a>
+<section class="py-24 px-6 relative max-w-5xl mx-auto" id="contact">
+    <div class="absolute top-[20%] right-[-15%] w-[40vw] h-[40vw] bg-accent-blue/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    
+    <div class="flex flex-col items-center text-center mb-16 section-header">
+        <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">Connection</span>
+        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Get In Touch</h2>
+        <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
+    </div>
+
+    <!-- Centered Glass Card -->
+    <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 md:p-12 shadow-2xl relative overflow-hidden group hover-glow max-w-3xl mx-auto">
+        <div class="absolute inset-0 bg-radial from-accent-blue/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative z-10">
+            <!-- Details -->
+            <div class="md:col-span-5 space-y-6">
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-2">Contact Details</h3>
+                    <p class="text-sm text-white/55">Feel free to reach out anytime. I am active and open to talk.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <a href="mailto:atharv9727@gmail.com" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-blue transition-colors group">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300">
+                            <i class="fas fa-envelope text-sm"></i>
                         </div>
-                    </div>
-                    <div class="contact-method">
-                        <div class="contact-method-icon"><i class="fab fa-linkedin-in"></i></div>
-                        <div class="contact-method-info">
-                            <span class="contact-method-label">LinkedIn</span>
-                            <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/"
-                                class="contact-method-value" target="_blank"
-                                rel="noopener noreferrer">linkedin.com/in/atharv-chaudhari-98a175306</a>
+                        atharv9727@gmail.com
+                    </a>
+                    
+                    <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-violet transition-colors group" target="_blank" rel="noopener noreferrer">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-violet group-hover:border-accent-violet/30 transition-all duration-300">
+                            <i class="fab fa-linkedin-in text-sm"></i>
                         </div>
-                    </div>
-                    <div class="contact-method">
-                        <div class="contact-method-icon"><i class="fab fa-github"></i></div>
-                        <div class="contact-method-info">
-                            <span class="contact-method-label">GitHub</span>
-                            <a href="https://github.com/Atharvchaudhari1106" class="contact-method-value"
-                                target="_blank" rel="noopener noreferrer">github.com/Atharvchaudhari1106</a>
+                        LinkedIn Profile
+                    </a>
+                    
+                    <a href="https://github.com/Atharvchaudhari1106" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-blue transition-colors group" target="_blank" rel="noopener noreferrer">
+                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300">
+                            <i class="fab fa-github text-sm"></i>
                         </div>
-                    </div>
+                        GitHub Profile
+                    </a>
                 </div>
             </div>
 
-            <div class="contact-form-wrapper">
-                <form class="contact-form" id="contactForm" action="https://formspree.io/f/xrerqgro">
-                    <div class="form-group">
-                        <label for="name" class="form-label">Your Name</label>
-                        <input type="text" id="name" name="name" class="form-input" placeholder="John Doe" required>
-                        <div class="form-line"></div>
+            <!-- Form -->
+            <div class="md:col-span-7">
+                <form id="contactForm" action="https://formspree.io/f/xrerqgro" method="POST" class="space-y-6">
+                    <div class="relative">
+                        <input type="text" id="name" name="name" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Name">
                     </div>
-                    <div class="form-group">
-                        <label for="email" class="form-label">Your Email</label>
-                        <input type="email" id="email" name="email" class="form-input" placeholder="john@example.com"
-                            required>
-                        <div class="form-line"></div>
+                    
+                    <div class="relative">
+                        <input type="email" id="email" name="email" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Email">
                     </div>
-                    <div class="form-group">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea id="message" name="message" class="form-input form-textarea"
-                            placeholder="Tell me about your project..." rows="5" required></textarea>
-                        <div class="form-line"></div>
+                    
+                    <div class="relative">
+                        <textarea id="message" name="message" required rows="5" class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300 resize-none" placeholder="Write your message..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg btn-full">
+
+                    <button type="submit" id="submitBtn" class="magnetic-btn w-full py-4 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-sm tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
                         <span>Send Message</span>
-                        <i class="fas fa-paper-plane"></i>
+                        <i data-lucide="send" class="w-4 h-4"></i>
                     </button>
                 </form>
             </div>
