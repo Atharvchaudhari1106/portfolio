@@ -233,3 +233,29 @@ html.lenis {
 .lenis-smooth iframe {
     pointer-events: none;
 }
+
+/* ==========================================================================
+   Overlap & Overflow Prevention Safeguards
+   ========================================================================== */
+section {
+    position: relative;
+    isolation: isolate;
+}
+
+h1, h2, h3, h4, p, span, a {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.skill-bento-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .skill-bento-card {
+        min-h: auto;
+    }
+}

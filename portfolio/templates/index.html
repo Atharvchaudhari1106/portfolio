@@ -163,12 +163,12 @@
     </div>
 
     <!-- Bento Grid Layout -->
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-[220px]">
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-auto md:auto-rows-[minmax(200px,auto)]">
         
         <!-- Frontend Card (Large Landscape) -->
-        <div class="md:col-span-4 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-4 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
                     <i data-lucide="layout" class="w-6 h-6"></i>
                 </div>
@@ -176,14 +176,14 @@
             </div>
             <div>
                 <h3 class="text-xl font-bold tracking-tight text-white mb-2">Interface Design</h3>
-                <p class="text-sm text-white/60 max-w-xl">Building semantic, modern layout systems using Tailwind, React, and GSAP that provide smooth interactions and pixel-perfect rendering.</p>
+                <p class="text-sm text-white/60 max-w-xl leading-relaxed">Building semantic, modern layout systems using Tailwind, React, and GSAP that provide smooth interactions and pixel-perfect rendering.</p>
             </div>
         </div>
 
         <!-- AI Card (Vertical Column) -->
-        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-2 min-h-[220px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
                     <i data-lucide="cpu" class="w-6 h-6"></i>
                 </div>
@@ -191,7 +191,7 @@
             </div>
             <div class="space-y-4">
                 <h3 class="text-xl font-bold tracking-tight text-white">AI & NLP Systems</h3>
-                <p class="text-sm text-white/60">Integrating local LLMs, building intelligent search agents, and mapping semantic databases like legal index systems (BNS/BSA).</p>
+                <p class="text-sm text-white/60 leading-relaxed">Integrating local LLMs, building intelligent search agents, and mapping semantic databases like legal index systems (BNS/BSA).</p>
                 <div class="flex flex-wrap gap-2 pt-2">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">NLP</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">LLMs</span>
@@ -201,9 +201,9 @@
         </div>
 
         <!-- Backend Card (Vertical Column) -->
-        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-2 min-h-[220px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
                     <i data-lucide="server" class="w-6 h-6"></i>
                 </div>
@@ -211,7 +211,7 @@
             </div>
             <div class="space-y-4">
                 <h3 class="text-xl font-bold tracking-tight text-white">APIs & Microservices</h3>
-                <p class="text-sm text-white/60">Developing secure, scalable microservices, telemetry streaming layers, and RESTful routing infrastructures.</p>
+                <p class="text-sm text-white/60 leading-relaxed">Developing secure, scalable microservices, telemetry streaming layers, and RESTful routing infrastructures.</p>
                 <div class="flex flex-wrap gap-2 pt-2">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Python</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Flask</span>
@@ -221,9 +221,9 @@
         </div>
 
         <!-- Databases Card (Landscape Half) -->
-        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
                     <i data-lucide="database" class="w-6 h-6"></i>
                 </div>
@@ -231,14 +231,14 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold tracking-tight text-white mb-1">Data Architectures</h3>
-                <p class="text-xs text-white/60 font-light">Structuring relational SQL databases and caching layers optimized for low latency access.</p>
+                <p class="text-xs text-white/60 font-light leading-relaxed">Structuring relational SQL databases and caching layers optimized for low latency access.</p>
             </div>
         </div>
 
         <!-- DevOps & Cloud Card (Landscape Half) -->
-        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between mb-4">
                 <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
                     <i data-lucide="git-branch" class="w-6 h-6"></i>
                 </div>
@@ -246,7 +246,7 @@
             </div>
             <div>
                 <h3 class="text-lg font-bold tracking-tight text-white mb-1">CI/CD & Cloud Deployment</h3>
-                <p class="text-xs text-white/60 font-light">Deploying robust pipelines, utilizing containerization, git workflows, and hosting endpoints.</p>
+                <p class="text-xs text-white/60 font-light leading-relaxed">Deploying robust pipelines, utilizing containerization, git workflows, and hosting endpoints.</p>
             </div>
         </div>
 
