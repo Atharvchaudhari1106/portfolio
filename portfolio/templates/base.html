@@ -1,139 +1,113 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="{% block meta_description %}Atharv Chaudhari.H. | Premium Apple-Inspired Developer Portfolio{% endblock %}">
-    <meta property="og:title" content="Atharv Chaudhari.H. | Creative Developer & AI Engineer">
+        content="{% block meta_description %}Professional portfolio showcasing creative development work{% endblock %}">
+    <meta property="og:title" content="Atharv Chaudhari.H. | Creative Developer & Designer">
     <meta property="og:description"
-        content="Immersive developer portfolio showcasing luxury, minimal, and high-performance digital experiences.">
+        content="Immersive portfolio showcasing high-performance web experiences and creative digital designs.">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Atharv Chaudhari.H. | Creative Developer">
     <meta name="twitter:description" content="Building the future of the web, one pixel at a time.">
 
     <title>{% block title %}Atharv Chaudhari.H. | Portfolio{% endblock %}</title>
-    
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS v4 CDN -->
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <style type="text/tailwindcss">
-        @theme {
-            --font-display: 'Outfit', 'Inter', sans-serif;
-            --font-sans: 'Inter', sans-serif;
-            --color-bg-dark: #09090B;
-            --color-bg-gray: #111827;
-            --color-accent-blue: #3B82F6;
-            --color-accent-violet: #8B5CF6;
-        }
-    </style>
-
-    <!-- FontAwesome & Lucide Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Caveat:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- GSAP & Lenis CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.13/dist/lenis.css">
-    
-    <!-- Custom Style Sheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        // Set scroll restoration to manual and disable smooth scroll as early as possible
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        document.documentElement.style.scrollBehavior = 'auto';
+        window.scrollTo(0, 0);
+    </script>
 </head>
 
-<body class="bg-bg-dark text-white font-sans antialiased overflow-x-hidden selection:bg-accent-violet/30 selection:text-white">
-    <!-- Scroll Progress Indicator -->
-    <div id="scrollProgress" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-accent-blue via-accent-violet to-accent-blue z-[9999] w-0 transition-all duration-100 ease-out"></div>
 
-    <!-- Custom Cursor -->
-    <div id="customCursorDot" class="fixed w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 hidden md:block mix-blend-difference"></div>
-    <div id="customCursorRing" class="fixed w-10 h-10 border border-white/30 rounded-full pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 ease-out hidden md:block"></div>
+<body style="visibility: hidden; opacity: 0; transition: opacity 0.5s ease-in;">
+    <script>
+        // High-priority immediate scroll reset
+        window.scrollTo(0, 0);
+    </script>
+    <!-- Animated background particles -->
 
-    <!-- Floating Navigation Bar -->
-    <header class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-5xl transition-all duration-500" id="navbar">
-        <div class="flex items-center justify-between px-6 py-4 rounded-full border border-white/5 bg-black/30 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-            <a href="/" class="text-xl font-bold font-display tracking-tight text-white flex items-center gap-1 group">
-                <span class="text-accent-blue transition-transform duration-300 group-hover:-translate-x-1">&lt;</span>
-                Atharv.
-                <span class="text-accent-violet transition-transform duration-300 group-hover:translate-x-1">/&gt;</span>
+
+
+
+    <!-- Navigation -->
+    <header class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-bracket">&lt;</span>Atharv Chaudhari.H.<span class="logo-bracket">/&gt;</span>
             </a>
-            
-            <nav class="hidden md:block" id="navMenu">
-                <ul class="flex items-center gap-2">
-                    <li><a href="#hero" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300 active-nav">Home</a></li>
-                    <li><a href="#about" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">About</a></li>
-                    <li><a href="#skills" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Skills</a></li>
-                    <li><a href="#projects" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Projects</a></li>
-                    <li><a href="#experience" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Experience</a></li>
-                    <li><a href="#contact" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Contact</a></li>
+            <nav class="nav-menu" id="navMenu">
+                <ul class="nav-list">
+                    <li><a href="#hero" class="nav-link">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>
             </nav>
-
-            <!-- Mobile nav trigger -->
-            <button class="md:hidden flex flex-col justify-center gap-1.5 w-6 h-6 bg-transparent border-none cursor-pointer focus:outline-none z-[1001]" id="navToggle" aria-label="Toggle navigation">
-                <span class="w-full h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine1"></span>
-                <span class="w-full h-[2px] bg-white rounded transition-opacity duration-300" id="navToggleLine2"></span>
-                <span class="w-full h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine3"></span>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                <span class="hamburger"></span>
             </button>
-        </div>
-
-        <!-- Mobile Navigation Menu Overlay -->
-        <div class="fixed top-20 left-0 right-0 hidden bg-black/90 backdrop-blur-2xl border border-white/5 p-8 rounded-3xl mx-4 mt-2 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[999] md:hidden transition-all duration-300 origin-top scale-95 opacity-0" id="mobileMenu">
-            <ul class="flex flex-col gap-6 text-center">
-                <li><a href="#hero" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Home</a></li>
-                <li><a href="#about" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">About</a></li>
-                <li><a href="#skills" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Skills</a></li>
-                <li><a href="#projects" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Projects</a></li>
-                <li><a href="#experience" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Experience</a></li>
-                <li><a href="#contact" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Contact</a></li>
-            </ul>
         </div>
     </header>
 
-    <!-- Page Content -->
-    <main class="w-full min-h-screen">
+    <!-- Page content -->
+    <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="relative w-full py-12 px-6 border-t border-white/5 bg-bg-dark overflow-hidden">
-        <div class="absolute inset-0 bg-radial from-accent-violet/5 via-transparent to-transparent opacity-50 -z-10 pointer-events-none"></div>
-        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="flex flex-col items-center md:items-start gap-2">
-                <a href="/" class="text-xl font-bold font-display text-white">
-                    Atharv Chaudhari.H.
-                </a>
-                <p class="text-xs text-white/40 tracking-wider">Designed & Developed with ❤️</p>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="/" class="footer-logo">
+                        <span class="logo-bracket">&lt;</span>Atharv Chaudhari.H.<span class="logo-bracket">/&gt;</span>
+                    </a>
+                    <p class="footer-tagline">Crafting digital experiences with passion and precision.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#projects">Projects</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="https://github.com/Atharvchaudhari1106" class="social-icon" aria-label="GitHub"
+                            target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/" class="social-icon"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><i
+                                class="fab fa-linkedin-in"></i></a>
+                        <a href="mailto:atharv9727@gmail.com" class="social-icon" aria-label="Email"><i
+                                class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
             </div>
-            
-            <div class="flex items-center gap-6">
-                <a href="https://github.com/Atharvchaudhari1106" class="w-10 h-10 rounded-full border border-white/10 hover:border-accent-blue/50 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-github text-lg"></i>
-                </a>
-                <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/" class="w-10 h-10 rounded-full border border-white/10 hover:border-accent-violet/50 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
-                    <i class="fab fa-linkedin-in text-lg"></i>
-                </a>
-                <a href="mailto:atharv9727@gmail.com" class="w-10 h-10 rounded-full border border-white/10 hover:border-accent-blue/50 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300" aria-label="Email">
-                    <i class="fas fa-envelope text-lg"></i>
-                </a>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Atharv Chaudhari.H. All rights reserved.</p>
             </div>
-            
-            <p class="text-xs text-white/40">&copy; 2026 Atharv Chaudhari.H. All rights reserved.</p>
         </div>
     </footer>
 
-    <!-- Init Lucide Icons -->
-    <script>
-        lucide.createIcons();
-    </script>
-    <script src="{{ url_for('static', filename='script.js') }}?v=2.0"></script>
+    <script src="{{ url_for('static', filename='script.js') }}?v=1.1"></script>
 </body>
 
 </html>

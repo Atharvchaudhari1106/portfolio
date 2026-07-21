@@ -11,24 +11,6 @@ def home():
 @app.route('/portfolio/music/<path:path>')
 def serve_music(path='index.html'):
     dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'music-app', 'dist'))
-    if not os.path.exists(dist_dir) or not os.path.exists(os.path.join(dist_dir, path)):
-        return "Music App Live Demo placeholder (building...)", 200
-    return send_from_directory(dist_dir, path)
-
-@app.route('/portfolio/bigdata/')
-@app.route('/portfolio/bigdata/<path:path>')
-def serve_bigdata(path='index.html'):
-    dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'my works', 'bigdata-search', 'frontend', 'dist'))
-    if not os.path.exists(dist_dir) or not os.path.exists(os.path.join(dist_dir, path)):
-        return "Intelligence-X Live Demo placeholder (building...)", 200
-    return send_from_directory(dist_dir, path)
-
-@app.route('/portfolio/crimegpt/')
-@app.route('/portfolio/crimegpt/<path:path>')
-def serve_crimegpt(path='index.html'):
-    dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'crimegpt', 'crimegpt-frontend', 'dist'))
-    if not os.path.exists(dist_dir) or not os.path.exists(os.path.join(dist_dir, path)):
-        return "CrimeGPT Live Demo placeholder (building...)", 200
     return send_from_directory(dist_dir, path)
 
 if __name__ == '__main__':
