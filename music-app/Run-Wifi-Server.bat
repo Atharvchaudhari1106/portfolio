@@ -15,5 +15,6 @@ if %errorlevel% neq 0 (
     exit
 )
 
-echo 📦 Building frontend & launching Wi-Fi Server...
+echo 📦 Building frontend and launching Wi-Fi Server...
 call npm run wifi
+
