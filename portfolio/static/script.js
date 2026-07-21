@@ -234,37 +234,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // Project Cards Reveal
     const projectReveals = document.querySelectorAll('.project-reveal');
     projectReveals.forEach((project) => {
-        const visual = project.querySelector('div:first-child');
-        const text = project.querySelector('div:nth-child(2)');
+        const visual = project.querySelector('.project-visual') || project.querySelector('div:first-child');
+        const text = project.querySelector('.project-text') || project.querySelector('div:nth-child(2)');
 
-        // Visual side fade
-        gsap.from(visual, {
-            x: visual.classList.contains('order-2') ? 50 : -50,
-            opacity: 0,
-            filter: 'blur(10px)',
-            duration: 1.2,
-            ease: 'power3.out',
-            scrollTrigger: {
-                trigger: project,
-                start: 'top 80%',
-                toggleActions: 'play none none none'
-            }
-        });
+        if (visual) {
+            gsap.from(visual, {
+                y: 40,
+                opacity: 0,
+                filter: 'blur(10px)',
+                duration: 1,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                clearProps: 'all'
+            });
+        }
 
-        // Text side slide up
-        gsap.from(text.children, {
-            y: 30,
-            opacity: 0,
-            filter: 'blur(5px)',
-            duration: 1,
-            stagger: 0.1,
-            ease: 'power3.out',
-            scrollTrigger: {
-                trigger: project,
-                start: 'top 80%',
-                toggleActions: 'play none none none'
-            }
-        });
+        if (text) {
+            gsap.from(text, {
+                y: 40,
+                opacity: 0,
+                filter: 'blur(10px)',
+                duration: 1,
+                delay: 0.15,
+                ease: 'power3.out',
+                scrollTrigger: {
+                    trigger: project,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                },
+                clearProps: 'all'
+            });
+        }
     });
 
     // Experience Timeline Reveals
