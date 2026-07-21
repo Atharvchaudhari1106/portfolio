@@ -218,18 +218,16 @@ async function tryDirectStream(track) {
       return null;
     }
 
-    // Bypass backend YouTube stream redirects on deployed environment
+    // ReactPlayer cannot play raw /api/youtube/stream endpoint URLs directly.
+    // If track has a YouTube video ID, convert to YouTube watch URL for ReactPlayer.
     if (url.includes('/api/youtube/stream')) {
-      const backendUrl = getBackendUrl();
-      const isRemote = !backendUrl.includes('localhost') && 
-                       !backendUrl.includes('127.0.0.1') && 
-                       !backendUrl.includes('192.168.') && 
-                       !backendUrl.includes('10.') && 
-                       !backendUrl.includes('172.');
-      if (isRemote) {
-        console.log('[StreamResolver] Deployed environment: bypassing backend YouTube stream redirect');
-        return null;
+      if (track.id) {
+        return {
+          streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
+          resolvedVia: 'youtube-direct'
+        };
       }
+      return null;
     }
 
     // Rewrite stale Render-backend URLs to use the current local backend
@@ -251,22 +249,11 @@ async function tryJioSaavnMatch(track) {
 
 // ─── Tier 3: YouTube Direct Stream ──────────────────────────────
 async function tryYoutubeDirectStream(track) {
-  if (track.source === 'youtube' && track.id) {
-    try {
-      const streamUrl = await getYoutubeAudioStream(track.id);
-      if (streamUrl) {
-        return {
-          streamUrl,
-          resolvedVia: 'youtube-direct'
-        };
-      }
-    } catch (err) {
-      console.warn('[StreamResolver] YouTube direct audio resolution failed:', err.message);
-      return {
-        streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
-        resolvedVia: 'youtube-direct-fallback'
-      };
-    }
+  if (track.id) {
+    return {
+      streamUrl: `https://www.youtube.com/watch?v=${track.id}`,
+      resolvedVia: 'youtube-direct'
+    };
   }
   return null;
 }
@@ -291,21 +278,9 @@ async function tryYoutubeSearchStream(track) {
     if (scored.length > 0) {
       const bestMatch = scored[0];
       console.log(`[StreamResolver] YouTube search match: "${bestMatch.title}" (score: ${bestMatch.matchScore.toFixed(2)})`);
-      try {
-        const streamUrl = await getYoutubeAudioStream(bestMatch.id);
-        if (streamUrl) {
-          return {
-            streamUrl,
-            resolvedVia: 'youtube-search',
-            matchScore: bestMatch.matchScore
-          };
-        }
-      } catch (err) {
-        console.warn('[StreamResolver] YouTube search audio resolution failed:', err.message);
-      }
       return {
         streamUrl: `https://www.youtube.com/watch?v=${bestMatch.id}`,
-        resolvedVia: 'youtube-search-fallback',
+        resolvedVia: 'youtube-search',
         matchScore: bestMatch.matchScore
       };
     }
