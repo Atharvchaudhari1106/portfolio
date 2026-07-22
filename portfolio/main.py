@@ -7,14 +7,6 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route('/portfolio/music/')
-@app.route('/portfolio/music/<path:path>')
-def serve_music(path='index.html'):
-    dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'music-app', 'dist'))
-    if not os.path.exists(dist_dir) or not os.path.exists(os.path.join(dist_dir, path)):
-        return "Music App Live Demo placeholder (building...)", 200
-    return send_from_directory(dist_dir, path)
-
 @app.route('/portfolio/bigdata/')
 @app.route('/portfolio/bigdata/<path:path>')
 def serve_bigdata(path='index.html'):
