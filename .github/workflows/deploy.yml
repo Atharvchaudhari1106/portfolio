@@ -21,20 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ── Music App (Vite/React) ────────────────────────
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install music app dependencies
-        run: npm install --legacy-peer-deps
-        working-directory: music-app
-
-      - name: Build music app
-        run: npm run build
-        working-directory: music-app
-
       # ── Portfolio (Flask-Frozen) ──────────────────────
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -50,11 +36,6 @@ jobs:
       - name: Build portfolio with Flask-Frozen
         working-directory: portfolio
         run: python freeze.py
-
-      - name: Copy music app into portfolio build
-        run: |
-          mkdir -p portfolio/build/music
-          cp -r music-app/dist/* portfolio/build/music/
 
       # ── Big Data Search App (Vite/React) ──────────────────
       - name: Install big data search dependencies
