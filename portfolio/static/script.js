@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const magneticButtons = document.querySelectorAll('.magnetic-btn');
     magneticButtons.forEach((btn) => {
         btn.addEventListener('mousemove', (e) => {
+            if (window.innerWidth < 768) return;
             const rect = btn.getBoundingClientRect();
             const x = e.clientX - rect.left - rect.width / 2;
             const y = e.clientY - rect.top - rect.height / 2;
@@ -153,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         btn.addEventListener('mouseleave', () => {
+            if (window.innerWidth < 768) return;
             // Elastic rebound snap back
             gsap.to(btn, {
                 x: 0,

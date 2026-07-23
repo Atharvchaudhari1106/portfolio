@@ -237,9 +237,17 @@ html.lenis {
 /* ==========================================================================
    Overlap & Overflow Prevention Safeguards
    ========================================================================== */
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 section {
     position: relative;
     isolation: isolate;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 h1, h2, h3, h4, p, span, a {
@@ -254,8 +262,28 @@ h1, h2, h3, h4, p, span, a {
     height: 100%;
 }
 
+/* Mobile Specific Responsive Tweaks */
 @media (max-width: 768px) {
+    body {
+        cursor: default !important;
+    }
+    
+    #customCursorDot, #customCursorRing {
+        display: none !important;
+    }
+    
     .skill-bento-card {
-        min-h: auto;
+        min-height: auto !important;
+    }
+
+    .magnetic-btn {
+        transform: none !important;
+    }
+
+    /* Prevent mobile input auto-zoom on iOS */
+    input[type="text"],
+    input[type="email"],
+    textarea {
+        font-size: 16px !important;
     }
 }

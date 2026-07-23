@@ -29,65 +29,65 @@
 <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none -z-10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]"></div>
 
 <!-- Hero Section -->
-<section class="relative min-h-screen w-full flex flex-col items-center justify-center px-6 overflow-hidden pt-20" id="hero">
-    <!-- Floating Glass Objects for Parallax Depth -->
+<section class="relative min-h-screen w-full flex flex-col items-center justify-center px-4 sm:px-6 overflow-hidden pt-24 pb-16" id="hero">
+    <!-- Floating Glass Objects for Parallax Depth (Desktop only) -->
     <div class="absolute top-[25%] left-[15%] w-32 h-16 rounded-full border border-white/5 bg-white/5 backdrop-blur-md shadow-2xl floating-element pointer-events-none hidden lg:block -z-10" style="animation-delay: 0s;"></div>
     <div class="absolute bottom-[25%] right-[15%] w-24 h-24 rounded-3xl border border-white/5 bg-white/5 backdrop-blur-md shadow-2xl floating-element pointer-events-none hidden lg:block -z-10" style="animation-delay: -2s;"></div>
     
-    <div class="max-w-5xl w-full text-center flex flex-col items-center z-10">
+    <div class="max-w-5xl w-full text-center flex flex-col items-center z-10 px-2">
         <!-- Interactive Badge -->
-        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg mb-8 hover:border-white/20 transition-all duration-300 translate-y-8 opacity-0 hero-reveal select-none">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg mb-6 sm:mb-8 hover:border-white/20 transition-all duration-300 translate-y-8 opacity-0 hero-reveal select-none">
             <span class="relative flex h-2 w-2">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-blue opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-accent-blue"></span>
             </span>
-            <span class="text-xs font-semibold tracking-wider uppercase text-white/80">Open for new opportunities</span>
+            <span class="text-[11px] sm:text-xs font-semibold tracking-wider uppercase text-white/80">Open for new opportunities</span>
         </div>
         
         <!-- Headline -->
-        <h1 class="font-display text-5xl md:text-8xl font-black tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 mb-6 translate-y-8 opacity-0 hero-reveal select-none">
+        <h1 class="font-display text-3xl sm:text-6xl md:text-8xl font-black tracking-tight leading-none bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40 mb-4 sm:mb-6 translate-y-8 opacity-0 hero-reveal select-none">
             ATHARV CHAUDHARI
         </h1>
         
         <!-- Subtitle -->
-        <p class="text-lg md:text-2xl font-light tracking-wide text-white/70 max-w-2xl mb-10 translate-y-8 opacity-0 hero-reveal">
+        <p class="text-sm sm:text-xl md:text-2xl font-light tracking-wide text-white/70 max-w-2xl mb-8 sm:mb-10 translate-y-8 opacity-0 hero-reveal px-2">
             Full Stack Developer <span class="text-accent-blue">•</span> AI Engineer <span class="text-accent-violet">•</span> Problem Solver
         </p>
         
         <!-- CTA buttons -->
-        <div class="flex flex-col sm:flex-row items-center gap-4 translate-y-8 opacity-0 hero-reveal">
-            <a href="#projects" class="magnetic-btn inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all duration-300 group">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto max-w-xs sm:max-w-none translate-y-8 opacity-0 hero-reveal">
+            <a href="#projects" class="magnetic-btn inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 rounded-full bg-white text-black font-semibold text-sm hover:bg-white/90 hover:scale-[1.02] shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all duration-300 group">
                 View Projects
                 <i data-lucide="arrow-right" class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"></i>
             </a>
-            <a href="#contact" class="magnetic-btn inline-flex items-center gap-2 px-8 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-white font-semibold text-sm hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] transition-all duration-300">
+            <a href="#contact" class="magnetic-btn inline-flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-white font-semibold text-sm hover:bg-white/10 hover:border-white/20 hover:scale-[1.02] transition-all duration-300">
                 Contact Me
             </a>
         </div>
     </div>
 
     <!-- Scroll indicator -->
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 transition-opacity duration-500 hover:text-white/80 select-none cursor-pointer" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
-        <span class="text-xs uppercase tracking-widest font-semibold">Scroll</span>
-        <div class="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center p-1.5">
+    <div class="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40 transition-opacity duration-500 hover:text-white/80 select-none cursor-pointer" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+        <span class="text-[10px] sm:text-xs uppercase tracking-widest font-semibold">Scroll</span>
+        <div class="w-5 h-9 sm:w-6 sm:h-10 border-2 border-white/20 rounded-full flex justify-center p-1 sm:p-1.5">
             <div class="w-1 h-2 bg-white/60 rounded-full animate-bounce"></div>
         </div>
     </div>
 </section>
 
 <!-- About Section -->
-<section class="py-24 px-6 relative max-w-5xl mx-auto" id="about">
+<section class="py-16 sm:py-24 px-4 sm:px-6 relative max-w-5xl mx-auto" id="about">
     <div class="absolute top-[40%] right-[-10%] w-[30vw] h-[30vw] bg-accent-violet/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
     
-    <div class="flex flex-col items-center text-center mb-16 section-header">
+    <div class="flex flex-col items-center text-center mb-12 sm:mb-16 section-header">
         <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">About Me</span>
-        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Who I Am</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">Who I Am</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-stretch">
         <!-- Visual Glass Card -->
-        <div class="md:col-span-5 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl group hover-glow min-h-[350px]">
+        <div class="md:col-span-5 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden shadow-2xl group hover-glow min-h-[300px] sm:min-h-[350px]">
             <!-- Subtle background spotlight in card -->
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             
@@ -95,55 +95,55 @@
                 <img src="{{ url_for('static', filename='developer_visual.png') }}" alt="Atharv Chaudhari" class="w-full h-full object-cover grayscale brightness-90 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700">
             </div>
             
-            <div class="mt-6 flex items-center justify-between">
+            <div class="mt-4 sm:mt-6 flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-bold tracking-tight text-white">Atharv Chaudhari.H.</h3>
+                    <h3 class="text-base sm:text-lg font-bold tracking-tight text-white">Atharv Chaudhari.H.</h3>
                     <p class="text-xs text-white/50">Full Stack & AI Architect</p>
                 </div>
-                <a href="#contact" class="magnetic-btn w-12 h-12 rounded-full border border-white/10 hover:border-white/20 bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300">
-                    <i class="fas fa-envelope text-lg"></i>
+                <a href="#contact" class="magnetic-btn w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/10 hover:border-white/20 bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition-all duration-300">
+                    <i class="fas fa-envelope text-base sm:text-lg"></i>
                 </a>
             </div>
         </div>
 
         <!-- Info Description Glass Card -->
-        <div class="md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 md:p-10 flex flex-col justify-between shadow-2xl group hover-glow relative overflow-hidden">
+        <div class="md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 md:p-10 flex flex-col justify-between shadow-2xl group hover-glow relative overflow-hidden">
             <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             
-            <div class="space-y-6 relative z-10">
-                <h3 class="text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+            <div class="space-y-4 sm:space-y-6 relative z-10">
+                <h3 class="text-xl sm:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
                     Engineering intelligence and experiences.
                 </h3>
-                <p class="text-base md:text-lg text-white/70 leading-relaxed font-light">
+                <p class="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed font-light">
                     Hey! I'm Atharv. I'm 19, and I've spent the last few years teaching myself how to make the internet a more beautiful, intelligent place. I don't just write code; I solve puzzles that bridge the gap between design philosophy and computational complexity.
                 </p>
-                <p class="text-base md:text-lg text-white/70 leading-relaxed font-light">
+                <p class="text-sm sm:text-base md:text-lg text-white/70 leading-relaxed font-light">
                     My focus lies at the intersection of high-performance frontend designs and responsive AI backend architectures. I work extensively on LLM applications, big data interfaces, and premium custom web platforms.
                 </p>
                 
                 <!-- Info Badges -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
-                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
-                        <span class="text-2xl font-extrabold font-display text-accent-blue animate-on-scroll-count" id="stat-experience" data-count="1">0</span>
-                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Year Experience</span>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 pt-2 sm:pt-4">
+                    <div class="p-3.5 sm:p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
+                        <span class="text-xl sm:text-2xl font-extrabold font-display text-accent-blue animate-on-scroll-count" id="stat-experience" data-count="1">0</span>
+                        <span class="text-[10px] sm:text-xs text-white/40 uppercase tracking-widest mt-1">Year Experience</span>
                     </div>
-                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
-                        <span class="text-2xl font-extrabold font-display text-accent-violet animate-on-scroll-count" id="stat-projects" data-count="12">0</span>
-                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Projects Built</span>
+                    <div class="p-3.5 sm:p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center">
+                        <span class="text-xl sm:text-2xl font-extrabold font-display text-accent-violet animate-on-scroll-count" id="stat-projects" data-count="12">0</span>
+                        <span class="text-[10px] sm:text-xs text-white/40 uppercase tracking-widest mt-1">Projects Built</span>
                     </div>
-                    <div class="p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center col-span-2 sm:col-span-1">
-                        <span class="text-2xl font-extrabold font-display text-white">100%</span>
-                        <span class="text-xs text-white/40 uppercase tracking-widest mt-1">Passion Level</span>
+                    <div class="p-3.5 sm:p-4 rounded-2xl border border-white/5 bg-black/20 flex flex-col justify-center col-span-2 sm:col-span-1">
+                        <span class="text-xl sm:text-2xl font-extrabold font-display text-white">100%</span>
+                        <span class="text-[10px] sm:text-xs text-white/40 uppercase tracking-widest mt-1">Passion Level</span>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-8 pt-6 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 relative z-10">
+            <div class="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/5 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 relative z-10">
                 <div class="flex items-center gap-2 text-xs text-white/50">
                     <i class="fas fa-map-marker-alt text-accent-blue"></i>
                     Ahmedabad, India
                 </div>
-                <a href="#contact" class="magnetic-btn inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-semibold text-xs border border-white/10 hover:border-transparent transition-all duration-300">
+                <a href="#contact" class="magnetic-btn inline-flex items-center justify-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-white/10 hover:bg-white text-white hover:text-black font-semibold text-xs border border-white/10 hover:border-transparent transition-all duration-300">
                     <span>Download Resume</span>
                     <i data-lucide="download" class="w-4 h-4"></i>
                 </a>
@@ -153,46 +153,46 @@
 </section>
 
 <!-- Skills Section (Bento Grid) -->
-<section class="py-24 px-6 relative max-w-5xl mx-auto" id="skills">
+<section class="py-16 sm:py-24 px-4 sm:px-6 relative max-w-5xl mx-auto" id="skills">
     <div class="absolute bottom-[-10%] left-[-10%] w-[35vw] h-[35vw] bg-accent-blue/5 rounded-full blur-[100px] pointer-events-none -z-10"></div>
     
-    <div class="flex flex-col items-center text-center mb-16 section-header">
+    <div class="flex flex-col items-center text-center mb-12 sm:mb-16 section-header">
         <span class="text-xs font-bold uppercase tracking-widest text-accent-violet px-3 py-1 rounded-full border border-accent-violet/25 bg-accent-violet/5 mb-3">Capabilities</span>
-        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Skills & Technologies</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">Skills & Technologies</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-accent-violet to-accent-blue mt-4 rounded-full"></div>
     </div>
 
     <!-- Bento Grid Layout -->
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-6 auto-rows-auto md:auto-rows-[minmax(200px,auto)]">
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-4 sm:gap-6 auto-rows-auto md:auto-rows-[minmax(200px,auto)]">
         
         <!-- Frontend Card (Large Landscape) -->
-        <div class="md:col-span-4 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-4 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
-                    <i data-lucide="layout" class="w-6 h-6"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="layout" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <span class="text-xs font-mono text-white/30">Frontend</span>
             </div>
             <div>
-                <h3 class="text-xl font-bold tracking-tight text-white mb-2">Interface Design</h3>
-                <p class="text-sm text-white/60 max-w-xl leading-relaxed">Building semantic, modern layout systems using Tailwind, React, and GSAP that provide smooth interactions and pixel-perfect rendering.</p>
+                <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white mb-2">Interface Design</h3>
+                <p class="text-xs sm:text-sm text-white/60 max-w-xl leading-relaxed">Building semantic, modern layout systems using Tailwind, React, and GSAP that provide smooth interactions and pixel-perfect rendering.</p>
             </div>
         </div>
 
         <!-- AI Card (Vertical Column) -->
-        <div class="md:col-span-2 md:row-span-2 min-h-[220px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
-                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
+                    <i data-lucide="cpu" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <span class="text-xs font-mono text-white/30">Intelligence</span>
             </div>
-            <div class="space-y-4">
-                <h3 class="text-xl font-bold tracking-tight text-white">AI & NLP Systems</h3>
-                <p class="text-sm text-white/60 leading-relaxed">Integrating local LLMs, building intelligent search agents, and mapping semantic databases like legal index systems (BNS/BSA).</p>
-                <div class="flex flex-wrap gap-2 pt-2">
+            <div class="space-y-3 sm:space-y-4">
+                <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white">AI & NLP Systems</h3>
+                <p class="text-xs sm:text-sm text-white/60 leading-relaxed">Integrating local LLMs, building intelligent search agents, and mapping semantic databases like legal index systems (BNS/BSA).</p>
+                <div class="flex flex-wrap gap-1.5 sm:gap-2 pt-2">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">NLP</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">LLMs</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">LangChain</span>
@@ -201,18 +201,18 @@
         </div>
 
         <!-- Backend Card (Vertical Column) -->
-        <div class="md:col-span-2 md:row-span-2 min-h-[220px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
-                    <i data-lucide="server" class="w-6 h-6"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="server" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <span class="text-xs font-mono text-white/30">Backend</span>
             </div>
-            <div class="space-y-4">
-                <h3 class="text-xl font-bold tracking-tight text-white">APIs & Microservices</h3>
-                <p class="text-sm text-white/60 leading-relaxed">Developing secure, scalable microservices, telemetry streaming layers, and RESTful routing infrastructures.</p>
-                <div class="flex flex-wrap gap-2 pt-2">
+            <div class="space-y-3 sm:space-y-4">
+                <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white">APIs & Microservices</h3>
+                <p class="text-xs sm:text-sm text-white/60 leading-relaxed">Developing secure, scalable microservices, telemetry streaming layers, and RESTful routing infrastructures.</p>
+                <div class="flex flex-wrap gap-1.5 sm:gap-2 pt-2">
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Python</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">Flask</span>
                     <span class="px-2.5 py-1 rounded-md text-[10px] font-mono bg-white/5 border border-white/5 text-white/70">NodeJS</span>
@@ -221,31 +221,31 @@
         </div>
 
         <!-- Databases Card (Landscape Half) -->
-        <div class="md:col-span-2 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
-                    <i data-lucide="database" class="w-6 h-6"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-accent-violet/10 flex items-center justify-center text-accent-violet border border-accent-violet/20">
+                    <i data-lucide="database" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <span class="text-xs font-mono text-white/30">Storage</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold tracking-tight text-white mb-1">Data Architectures</h3>
+                <h3 class="text-base sm:text-lg font-bold tracking-tight text-white mb-1">Data Architectures</h3>
                 <p class="text-xs text-white/60 font-light leading-relaxed">Structuring relational SQL databases and caching layers optimized for low latency access.</p>
             </div>
         </div>
 
         <!-- DevOps & Cloud Card (Landscape Half) -->
-        <div class="md:col-span-2 md:row-span-1 min-h-[200px] rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
+        <div class="md:col-span-2 md:row-span-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 flex flex-col justify-between shadow-xl relative overflow-hidden group hover-glow transform-lift skill-bento-card">
             <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
             <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
-                    <i data-lucide="git-branch" class="w-6 h-6"></i>
+                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-accent-blue/10 flex items-center justify-center text-accent-blue border border-accent-blue/20">
+                    <i data-lucide="git-branch" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                 </div>
                 <span class="text-xs font-mono text-white/30">DevOps</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold tracking-tight text-white mb-1">CI/CD & Cloud Deployment</h3>
+                <h3 class="text-base sm:text-lg font-bold tracking-tight text-white mb-1">CI/CD & Cloud Deployment</h3>
                 <p class="text-xs text-white/60 font-light leading-relaxed">Deploying robust pipelines, utilizing containerization, git workflows, and hosting endpoints.</p>
             </div>
         </div>
@@ -254,34 +254,34 @@
 </section>
 
 <!-- Projects Section -->
-<section class="py-24 px-6 relative max-w-5xl mx-auto" id="projects">
+<section class="py-16 sm:py-24 px-4 sm:px-6 relative max-w-5xl mx-auto" id="projects">
     <div class="absolute top-[20%] left-[-15%] w-[40vw] h-[40vw] bg-accent-blue/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
     
-    <div class="flex flex-col items-center text-center mb-20 section-header">
+    <div class="flex flex-col items-center text-center mb-12 sm:mb-20 section-header">
         <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">Portfolio</span>
-        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Featured Projects</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">Featured Projects</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
     </div>
 
     <!-- Project Showcase List with Alternating Layouts -->
-    <div class="space-y-24">
+    <div class="space-y-16 sm:space-y-24">
         
-        <!-- Project 1: INTELLIGENCE-X (Alternating: Text Left, Image Right) -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
-            <div class="project-text md:col-span-5 order-2 md:order-1 space-y-6">
+        <!-- Project 1: INTELLIGENCE-X -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-12 items-center project-reveal">
+            <div class="project-text md:col-span-5 order-2 md:order-1 space-y-4 sm:space-y-6">
                 <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-violet">AI • Big Data</span>
-                <h3 class="text-3xl font-extrabold tracking-tight text-white">INTELLIGENCE-X</h3>
-                <p class="text-white/70 font-light leading-relaxed">
+                <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">INTELLIGENCE-X</h3>
+                <p class="text-sm sm:text-base text-white/70 font-light leading-relaxed">
                     A real-time Big Data Search & Intelligence platform featuring AI-powered entity extraction, interactive knowledge graph visualization, and live Kafka telemetry stream analysis.
                 </p>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Kafka</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">GraphViz</span>
+                <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Kafka</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">GraphViz</span>
                 </div>
-                <div class="flex items-center gap-4 pt-2">
+                <div class="flex flex-wrap items-center gap-3 pt-2">
                     <a href="/portfolio/bigdata/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300">
                         Live Demo
                         <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
@@ -292,7 +292,7 @@
                 </div>
             </div>
 
-            <div class="project-visual md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+            <div class="project-visual md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-3 sm:p-4 shadow-2xl relative overflow-hidden group hover-glow">
                 <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
                     <img src="{{ url_for('static', filename='projects/bigdata-hero.png') }}" alt="Intelligence-X" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
@@ -308,8 +308,8 @@
         </div>
 
         <!-- Project 2: CrimeGPT -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
-            <div class="project-visual md:col-span-7 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-12 items-center project-reveal">
+            <div class="project-visual md:col-span-7 order-1 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-3 sm:p-4 shadow-2xl relative overflow-hidden group hover-glow">
                 <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
                     <img src="{{ url_for('static', filename='projects/crimegpt-hero.png') }}" alt="CrimeGPT" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
@@ -323,19 +323,19 @@
                 </div>
             </div>
             
-            <div class="project-text md:col-span-5 space-y-6">
+            <div class="project-text md:col-span-5 order-2 space-y-4 sm:space-y-6">
                 <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-blue">AI • Legal-Tech</span>
-                <h3 class="text-3xl font-extrabold tracking-tight text-white">CrimeGPT</h3>
-                <p class="text-white/70 font-light leading-relaxed">
+                <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">CrimeGPT</h3>
+                <p class="text-sm sm:text-base text-white/70 font-light leading-relaxed">
                     A local-first, AI-assisted police documentation and case management platform. Employs NLP technologies to map legal acts (BNS/BNSS/BSA), manage cases, and generate automated summaries.
                 </p>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Zustand</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">BNS/BSA</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">LocalAI</span>
+                <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">React</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Zustand</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">BNS/BSA</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">LocalAI</span>
                 </div>
-                <div class="flex items-center gap-4 pt-2">
+                <div class="flex flex-wrap items-center gap-3 pt-2">
                     <a href="/portfolio/crimegpt/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300">
                         Live Demo
                         <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
@@ -348,20 +348,20 @@
         </div>
 
         <!-- Project 3: FinTrace OSINT & Financial AML -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center project-reveal">
-            <div class="project-text md:col-span-5 order-2 md:order-1 space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-12 items-center project-reveal">
+            <div class="project-text md:col-span-5 order-2 md:order-1 space-y-4 sm:space-y-6">
                 <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent-violet">OSINT • Financial Intelligence</span>
-                <h3 class="text-3xl font-extrabold tracking-tight text-white">FinTrace OSINT & AML</h3>
-                <p class="text-white/70 font-light leading-relaxed">
+                <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">FinTrace OSINT & AML</h3>
+                <p class="text-sm sm:text-base text-white/70 font-light leading-relaxed">
                     A financial intelligence & anti-money laundering (AML) OSINT platform built for tracking transactions, analyzing suspicious entity networks, and generating automated investigative forensic reports.
                 </p>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">OSINT</span>
-                    <span class="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">AML Analytics</span>
+                <div class="flex flex-wrap gap-1.5 sm:gap-2">
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Python</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">Flask</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">OSINT</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs bg-white/5 border border-white/5 text-white/80">AML Analytics</span>
                 </div>
-                <div class="flex items-center gap-4 pt-2">
+                <div class="flex flex-wrap items-center gap-3 pt-2">
                     <a href="https://github.com/Atharvchaudhari1106/portfolio" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-xs hover:bg-white/90 hover:scale-[1.02] shadow-lg transition-all duration-300" target="_blank" rel="noopener noreferrer">
                         Explore Project
                         <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
@@ -372,7 +372,7 @@
                 </div>
             </div>
 
-            <div class="project-visual md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-4 shadow-2xl relative overflow-hidden group hover-glow">
+            <div class="project-visual md:col-span-7 order-1 md:order-2 rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-3 sm:p-4 shadow-2xl relative overflow-hidden group hover-glow">
                 <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden border border-white/5 bg-black">
                     <img src="{{ url_for('static', filename='projects/fintrace-hero.png') }}" alt="FinTrace OSINT & AML" class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
@@ -391,35 +391,35 @@
 </section>
 
 <!-- Experience Timeline -->
-<section class="py-24 px-6 relative max-w-3xl mx-auto" id="experience">
+<section class="py-16 sm:py-24 px-4 sm:px-6 relative max-w-3xl mx-auto" id="experience">
     <div class="absolute bottom-[10%] right-[-15%] w-[40vw] h-[40vw] bg-accent-violet/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
     
-    <div class="flex flex-col items-center text-center mb-20">
+    <div class="flex flex-col items-center text-center mb-12 sm:mb-20">
         <span class="text-xs font-bold uppercase tracking-widest text-accent-violet px-3 py-1 rounded-full border border-accent-violet/20 bg-accent-violet/5 mb-3">Journey</span>
-        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Experience Timeline</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">Experience Timeline</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-accent-violet to-accent-blue mt-4 rounded-full"></div>
     </div>
 
     <!-- Vertical Timeline Line -->
-    <div class="relative border-l border-white/10 pl-8 ml-4 space-y-16 py-4">
+    <div class="relative border-l border-white/10 pl-6 sm:pl-8 ml-3 sm:ml-4 space-y-10 sm:space-y-16 py-4">
         
         <!-- Timeline Item 1 -->
         <div class="relative timeline-reveal">
             <!-- Timeline dot -->
-            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-blue flex items-center justify-center shadow-lg">
+            <div class="absolute -left-[37px] sm:-left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-blue flex items-center justify-center shadow-lg">
                 <div class="w-2.5 h-2.5 rounded-full bg-accent-blue animate-pulse"></div>
             </div>
             
-            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-5 sm:p-6 shadow-xl relative overflow-hidden group hover-glow">
                 <div class="absolute inset-0 bg-radial from-accent-blue/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4 relative z-10">
                     <div>
-                        <h3 class="text-xl font-bold tracking-tight text-white">Freelance Web Developer</h3>
-                        <p class="text-sm text-accent-blue font-medium mt-0.5">Self-Employed</p>
+                        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white">Freelance Web Developer</h3>
+                        <p class="text-xs sm:text-sm text-accent-blue font-medium mt-0.5">Self-Employed</p>
                     </div>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2024 - Present</span>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55 w-max">2024 - Present</span>
                 </div>
-                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light relative z-10">
                     Building robust custom web systems, optimizing databases, and deploying client-facing interactive portals. Leading architecture design and full-stack implementation.
                 </p>
             </div>
@@ -427,20 +427,20 @@
 
         <!-- Timeline Item 2 -->
         <div class="relative timeline-reveal">
-            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-violet flex items-center justify-center shadow-lg">
+            <div class="absolute -left-[37px] sm:-left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-accent-violet flex items-center justify-center shadow-lg">
                 <div class="w-2.5 h-2.5 rounded-full bg-accent-violet"></div>
             </div>
             
-            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-5 sm:p-6 shadow-xl relative overflow-hidden group hover-glow">
                 <div class="absolute inset-0 bg-radial from-accent-violet/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4 relative z-10">
                     <div>
-                        <h3 class="text-xl font-bold tracking-tight text-white">Junior Full Stack Developer</h3>
-                        <p class="text-sm text-accent-violet font-medium mt-0.5">Software Engineering Associate</p>
+                        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white">Junior Full Stack Developer</h3>
+                        <p class="text-xs sm:text-sm text-accent-violet font-medium mt-0.5">Software Engineering Associate</p>
                     </div>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2023 - 2024</span>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55 w-max">2023 - 2024</span>
                 </div>
-                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light relative z-10">
                     Coordinated on full-stack codebases, integrated third-party REST APIs, designed responsive templates, and worked extensively with Git for source control.
                 </p>
             </div>
@@ -448,20 +448,20 @@
 
         <!-- Timeline Item 3 -->
         <div class="relative timeline-reveal">
-            <div class="absolute -left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-white/20 flex items-center justify-center shadow-lg">
+            <div class="absolute -left-[37px] sm:-left-[41px] top-1.5 w-6 h-6 rounded-full bg-[#09090B] border-2 border-white/20 flex items-center justify-center shadow-lg">
                 <div class="w-2.5 h-2.5 rounded-full bg-white/25"></div>
             </div>
             
-            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 shadow-xl relative overflow-hidden group hover-glow">
+            <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-5 sm:p-6 shadow-xl relative overflow-hidden group hover-glow">
                 <div class="absolute inset-0 bg-radial from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 relative z-10">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 sm:mb-4 relative z-10">
                     <div>
-                        <h3 class="text-xl font-bold tracking-tight text-white">Started Coding Journey</h3>
-                        <p class="text-sm text-white/50 font-medium mt-0.5">Autodidact Path</p>
+                        <h3 class="text-lg sm:text-xl font-bold tracking-tight text-white">Started Coding Journey</h3>
+                        <p class="text-xs sm:text-sm text-white/50 font-medium mt-0.5">Autodidact Path</p>
                     </div>
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55">2022 - 2023</span>
+                    <span class="inline-block px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/5 text-white/55 w-max">2022 - 2023</span>
                 </div>
-                <p class="text-sm text-white/60 leading-relaxed font-light relative z-10">
+                <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-light relative z-10">
                     Began self-learning path starting with fundamental HTML, CSS, JavaScript, and Python. Developed personal terminal scripts, automation tools, and simple portfolio pages.
                 </p>
             </div>
@@ -471,67 +471,67 @@
 </section>
 
 <!-- Contact Section -->
-<section class="py-24 px-6 relative max-w-5xl mx-auto" id="contact">
+<section class="py-16 sm:py-24 px-4 sm:px-6 relative max-w-5xl mx-auto" id="contact">
     <div class="absolute top-[20%] right-[-15%] w-[40vw] h-[40vw] bg-accent-blue/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>
     
-    <div class="flex flex-col items-center text-center mb-16 section-header">
+    <div class="flex flex-col items-center text-center mb-12 sm:mb-16 section-header">
         <span class="text-xs font-bold uppercase tracking-widest text-accent-blue px-3 py-1 rounded-full border border-accent-blue/20 bg-accent-blue/5 mb-3">Connection</span>
-        <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-white">Get In Touch</h2>
+        <h2 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">Get In Touch</h2>
         <div class="w-12 h-1 bg-gradient-to-r from-accent-blue to-accent-violet mt-4 rounded-full"></div>
     </div>
 
     <!-- Centered Glass Card -->
-    <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-8 md:p-12 shadow-2xl relative overflow-hidden group hover-glow max-w-3xl mx-auto">
+    <div class="rounded-3xl border border-white/5 bg-white/2 backdrop-blur-md p-6 sm:p-8 md:p-12 shadow-2xl relative overflow-hidden group hover-glow max-w-3xl mx-auto">
         <div class="absolute inset-0 bg-radial from-accent-blue/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
         
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start relative z-10">
             <!-- Details -->
             <div class="md:col-span-5 space-y-6">
                 <div>
-                    <h3 class="text-lg font-bold text-white mb-2">Contact Details</h3>
-                    <p class="text-sm text-white/55">Feel free to reach out anytime. I am active and open to talk.</p>
+                    <h3 class="text-base sm:text-lg font-bold text-white mb-2">Contact Details</h3>
+                    <p class="text-xs sm:text-sm text-white/55">Feel free to reach out anytime. I am active and open to talk.</p>
                 </div>
                 
                 <div class="space-y-4">
-                    <a href="mailto:atharv9727@gmail.com" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-blue transition-colors group">
-                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300">
-                            <i class="fas fa-envelope text-sm"></i>
+                    <a href="mailto:atharv9727@gmail.com" class="flex items-center gap-3 text-xs sm:text-sm text-white/70 hover:text-accent-blue transition-colors group">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300 shrink-0">
+                            <i class="fas fa-envelope text-xs sm:text-sm"></i>
                         </div>
-                        atharv9727@gmail.com
+                        <span class="truncate">atharv9727@gmail.com</span>
                     </a>
                     
-                    <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-violet transition-colors group" target="_blank" rel="noopener noreferrer">
-                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-violet group-hover:border-accent-violet/30 transition-all duration-300">
-                            <i class="fab fa-linkedin-in text-sm"></i>
+                    <a href="https://www.linkedin.com/in/atharv-chaudhari-98a175306/" class="flex items-center gap-3 text-xs sm:text-sm text-white/70 hover:text-accent-violet transition-colors group" target="_blank" rel="noopener noreferrer">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-violet group-hover:border-accent-violet/30 transition-all duration-300 shrink-0">
+                            <i class="fab fa-linkedin-in text-xs sm:text-sm"></i>
                         </div>
-                        LinkedIn Profile
+                        <span>LinkedIn Profile</span>
                     </a>
                     
-                    <a href="https://github.com/Atharvchaudhari1106" class="flex items-center gap-3 text-sm text-white/70 hover:text-accent-blue transition-colors group" target="_blank" rel="noopener noreferrer">
-                        <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300">
-                            <i class="fab fa-github text-sm"></i>
+                    <a href="https://github.com/Atharvchaudhari1106" class="flex items-center gap-3 text-xs sm:text-sm text-white/70 hover:text-accent-blue transition-colors group" target="_blank" rel="noopener noreferrer">
+                        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 group-hover:text-accent-blue group-hover:border-accent-blue/30 transition-all duration-300 shrink-0">
+                            <i class="fab fa-github text-xs sm:text-sm"></i>
                         </div>
-                        GitHub Profile
+                        <span>GitHub Profile</span>
                     </a>
                 </div>
             </div>
 
             <!-- Form -->
             <div class="md:col-span-7">
-                <form id="contactForm" action="https://formspree.io/f/xrerqgro" method="POST" class="space-y-6">
+                <form id="contactForm" action="https://formspree.io/f/xrerqgro" method="POST" class="space-y-4 sm:space-y-6">
                     <div class="relative">
-                        <input type="text" id="name" name="name" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Name">
+                        <input type="text" id="name" name="name" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Name">
                     </div>
                     
                     <div class="relative">
-                        <input type="email" id="email" name="email" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Email">
+                        <input type="email" id="email" name="email" required class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none transition-all duration-300" placeholder="Your Email">
                     </div>
                     
                     <div class="relative">
-                        <textarea id="message" name="message" required rows="5" class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all duration-300 resize-none" placeholder="Write your message..."></textarea>
+                        <textarea id="message" name="message" required rows="4" class="w-full bg-white/5 border border-white/10 focus:border-accent-blue/50 rounded-xl px-4 py-3.5 text-sm sm:text-base text-white placeholder-white/30 focus:outline-none transition-all duration-300 resize-none" placeholder="Write your message..."></textarea>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="magnetic-btn w-full py-4 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-sm tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+                    <button type="submit" id="submitBtn" class="magnetic-btn w-full py-3.5 sm:py-4 rounded-xl bg-white text-black hover:bg-white/90 font-bold text-sm tracking-wide shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
                         <span>Send Message</span>
                         <i data-lucide="send" class="w-4 h-4"></i>
                     </button>

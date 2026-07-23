@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="description"
         content="{% block meta_description %}Atharv Chaudhari.H. | Premium Apple-Inspired Developer Portfolio{% endblock %}">
     <meta property="og:title" content="Atharv Chaudhari.H. | Creative Developer & AI Engineer">
@@ -48,51 +48,51 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body class="bg-bg-dark text-white font-sans antialiased overflow-x-hidden selection:bg-accent-violet/30 selection:text-white">
+<body class="bg-bg-dark text-white font-sans antialiased overflow-x-hidden w-full selection:bg-accent-violet/30 selection:text-white">
     <!-- Scroll Progress Indicator -->
     <div id="scrollProgress" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-accent-blue via-accent-violet to-accent-blue z-[9999] w-0 transition-all duration-100 ease-out"></div>
 
-    <!-- Custom Cursor -->
+    <!-- Custom Cursor (Desktop Only) -->
     <div id="customCursorDot" class="fixed w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 hidden md:block mix-blend-difference"></div>
     <div id="customCursorRing" class="fixed w-10 h-10 border border-white/30 rounded-full pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 transition-transform duration-300 ease-out hidden md:block"></div>
 
     <!-- Floating Navigation Bar -->
-    <header class="fixed top-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-5xl transition-all duration-500" id="navbar">
-        <div class="flex items-center justify-between px-6 py-4 rounded-full border border-white/5 bg-black/30 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-            <a href="/" class="text-xl font-bold font-display tracking-tight text-white flex items-center gap-1 group">
+    <header class="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-[1000] w-[92%] max-w-5xl transition-all duration-500" id="navbar">
+        <div class="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 rounded-full border border-white/10 bg-black/50 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+            <a href="/" class="text-lg sm:text-xl font-bold font-display tracking-tight text-white flex items-center gap-1 group">
                 <span class="text-accent-blue transition-transform duration-300 group-hover:-translate-x-1">&lt;</span>
                 Atharv.
                 <span class="text-accent-violet transition-transform duration-300 group-hover:translate-x-1">/&gt;</span>
             </a>
             
             <nav class="hidden md:block" id="navMenu">
-                <ul class="flex items-center gap-2">
-                    <li><a href="#hero" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300 active-nav">Home</a></li>
-                    <li><a href="#about" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">About</a></li>
-                    <li><a href="#skills" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Skills</a></li>
-                    <li><a href="#projects" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Projects</a></li>
-                    <li><a href="#experience" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Experience</a></li>
-                    <li><a href="#contact" class="nav-link text-sm font-medium px-4 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all duration-300">Contact</a></li>
+                <ul class="flex items-center gap-1 lg:gap-2">
+                    <li><a href="#hero" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300 active-nav">Home</a></li>
+                    <li><a href="#about" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">About</a></li>
+                    <li><a href="#skills" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">Skills</a></li>
+                    <li><a href="#projects" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">Projects</a></li>
+                    <li><a href="#experience" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">Experience</a></li>
+                    <li><a href="#contact" class="nav-link text-xs lg:text-sm font-medium px-3.5 py-1.5 lg:px-4 lg:py-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all duration-300">Contact</a></li>
                 </ul>
             </nav>
 
             <!-- Mobile nav trigger -->
-            <button class="md:hidden flex flex-col justify-center gap-1.5 w-6 h-6 bg-transparent border-none cursor-pointer focus:outline-none z-[1001]" id="navToggle" aria-label="Toggle navigation">
-                <span class="w-full h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine1"></span>
-                <span class="w-full h-[2px] bg-white rounded transition-opacity duration-300" id="navToggleLine2"></span>
-                <span class="w-full h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine3"></span>
+            <button class="md:hidden flex flex-col justify-center items-center gap-1.5 w-9 h-9 p-2 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 cursor-pointer focus:outline-none z-[1001] transition-all duration-300" id="navToggle" aria-label="Toggle navigation">
+                <span class="w-4 h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine1"></span>
+                <span class="w-4 h-[2px] bg-white rounded transition-opacity duration-300" id="navToggleLine2"></span>
+                <span class="w-4 h-[2px] bg-white rounded transition-transform duration-300 origin-center" id="navToggleLine3"></span>
             </button>
         </div>
 
         <!-- Mobile Navigation Menu Overlay -->
-        <div class="fixed top-20 left-0 right-0 hidden bg-black/90 backdrop-blur-2xl border border-white/5 p-8 rounded-3xl mx-4 mt-2 shadow-[0_20px_50px_rgba(0,0,0,0.8)] z-[999] md:hidden transition-all duration-300 origin-top scale-95 opacity-0" id="mobileMenu">
-            <ul class="flex flex-col gap-6 text-center">
-                <li><a href="#hero" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Home</a></li>
-                <li><a href="#about" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">About</a></li>
-                <li><a href="#skills" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Skills</a></li>
-                <li><a href="#projects" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Projects</a></li>
-                <li><a href="#experience" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Experience</a></li>
-                <li><a href="#contact" class="mobile-nav-link text-lg font-medium text-white/80 hover:text-white transition-colors">Contact</a></li>
+        <div class="fixed top-16 sm:top-20 left-0 right-0 hidden bg-black/95 backdrop-blur-2xl border border-white/10 p-6 sm:p-8 rounded-3xl mx-3 sm:mx-4 mt-2 shadow-[0_20px_50px_rgba(0,0,0,0.9)] z-[999] md:hidden transition-all duration-300 origin-top scale-95 opacity-0" id="mobileMenu">
+            <ul class="flex flex-col gap-4 text-center">
+                <li><a href="#hero" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block border-b border-white/5 transition-colors">Home</a></li>
+                <li><a href="#about" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block border-b border-white/5 transition-colors">About</a></li>
+                <li><a href="#skills" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block border-b border-white/5 transition-colors">Skills</a></li>
+                <li><a href="#projects" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block border-b border-white/5 transition-colors">Projects</a></li>
+                <li><a href="#experience" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block border-b border-white/5 transition-colors">Experience</a></li>
+                <li><a href="#contact" class="mobile-nav-link text-base font-semibold text-white/80 hover:text-white py-2 block transition-colors">Contact</a></li>
             </ul>
         </div>
     </header>
