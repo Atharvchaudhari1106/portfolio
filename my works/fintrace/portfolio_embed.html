@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrace — OSINT & Financial AML Detection Portfolio Feature Card</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* ── Portfolio Project Card ────────────────────────── */
+    .portfolio-card {
+      background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+      border: 1px solid #1e293b;
+      border-radius: 16px;
+      max-width: 800px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .portfolio-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .card-header {
+      padding: 2rem 2rem 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .card-title-group h2 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-title-group h2 i {
+      color: var(--accent);
+    }
+
+    .badge-live {
+      background: rgba(52, 211, 153, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .description {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 1.75rem;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .feature-item {
+      background: #1e293b;
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .feature-item i {
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
+
+    .feature-text strong {
+      display: block;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+    }
+
+    .feature-text span {
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
+    /* Tech Stack Tags */
+    .tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .tag {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #e2e8f0;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: monospace;
+    }
+
+    /* Action Buttons */
+    .card-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #0284c7;
+      color: white;
+      border: none;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: #0369a1;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: #38bdf8;
+      border: 1px solid #38bdf8;
+    }
+
+    .btn-outline:hover {
+      background: rgba(56, 189, 248, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Copy this card HTML into your Portfolio Website -->
+  <div class="portfolio-card">
+    <div class="card-header">
+      <div class="card-title-group">
+        <h2><i class="fa-solid fa-shield-halved"></i> FinTrace OSINT & Finance AML</h2>
+        <span style="color: #94a3b8; font-size: 0.9rem;">Graph-Based Anti-Money Laundering & Intelligence Platform</span>
+      </div>
+      <span class="badge-live"><span class="dot"></span> Live Project</span>
+    </div>
+
+    <div class="card-body">
+      <p class="description">
+        An end-to-end OSINT and Financial Intelligence platform engineered for graph-based transaction analysis, money laundering detection (structuring, smurfing, layering, mule rings), and AI-assisted Suspicious Activity Report (SAR) generation.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <i class="fa-solid fa-diagram-project"></i>
+          <div class="feature-text">
+            <strong>Graph Analytics</strong>
+            <span>Neo4j topology & circular money traces</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <i class="fa-solid fa-file-shield"></i>
+          <div class="feature-text">
+            <strong>Automated AML Engine</strong>
+            <span>8+ rule detection heuristics & risk scoring</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <i class="fa-solid fa-robot"></i>
+          <div class="feature-text">
+            <strong>AI SAR Generator</strong>
+            <span>LLM-powered compliance reporting</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <i class="fa-solid fa-wifi"></i>
+          <div class="feature-text">
+            <strong>LAN / Multi-Device</strong>
+            <span>Cross-device real-time sync on Wi-Fi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tech-stack">
+        <span class="tag">FastAPI</span>
+        <span class="tag">React 19</span>
+        <span class="tag">TypeScript</span>
+        <span class="tag">SQLite / Postgres</span>
+        <span class="tag">Neo4j Graph DB</span>
+        <span class="tag">Ollama LLM</span>
+        <span class="tag">Node.js Server</span>
+      </div>
+
+      <div class="card-actions">
+        <a href="http://localhost:3000" target="_blank" class="btn btn-primary">
+          <i class="fa-solid fa-rocket"></i> Launch Live Application
+        </a>
+        <a href="https://github.com/yourusername/fintrace" target="_blank" class="btn btn-outline">
+          <i class="fa-brands fa-github"></i> View Source Code
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

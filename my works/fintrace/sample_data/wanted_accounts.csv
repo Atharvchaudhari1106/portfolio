@@ -1,0 +1,7 @@
+account_id,name,reason,source
+Blacklisted Entity A,Blacklisted Entity Alpha,Suspected money laundering - FIU investigation 2024,FIU-IND
+Blacklisted Entity B,Blacklisted Entity Beta,PMLA case - account freeze order,Enforcement Directorate
+WANTED001,Wanted Person Account 1,Interpol Red Notice subject,Interpol
+WANTED002,Wanted Person Account 2,FATF watchlist entity,FATF
+SHELL_CORP_99,Suspicious Shell Corp,No legitimate business activity identified,Internal Investigation
+HAWALA_AGENT_01,Known Hawala Operator,Unlicensed money transfer operations,RBI Intelligence

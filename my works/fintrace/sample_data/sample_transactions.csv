@@ -1,0 +1,60 @@
+sender,receiver,amount,timestamp,reference_number,bank,mode,description
+Rajesh Kumar,Amit Shah,49000,2025-03-01 10:15:00,TXN001,HDFC,UPI,Payment for services
+Rajesh Kumar,Amit Shah,48500,2025-03-01 11:30:00,TXN002,HDFC,UPI,Payment for services
+Rajesh Kumar,Amit Shah,49500,2025-03-01 14:00:00,TXN003,HDFC,UPI,Payment for services
+Rajesh Kumar,Amit Shah,48900,2025-03-01 16:45:00,TXN004,HDFC,UPI,Payment for services
+Amit Shah,Priya Patel,500000,2025-03-01 17:00:00,TXN005,ICICI,NEFT,Consolidated transfer
+Priya Patel,Vikram Singh,700000,2025-03-02 09:00:00,TXN006,SBI,RTGS,Business payment
+Vikram Singh,Rajesh Kumar,500000,2025-03-02 09:30:00,TXN007,SBI,NEFT,Return payment
+Deepika Reddy,Mule Account A,999,2025-03-03 08:00:00,TXN008,AXIS,UPI,Small payment
+Suresh Iyer,Mule Account A,875,2025-03-03 08:05:00,TXN009,AXIS,UPI,Small payment
+Kavita Sharma,Mule Account A,950,2025-03-03 08:10:00,TXN010,AXIS,UPI,Small payment
+Anand Verma,Mule Account A,980,2025-03-03 08:15:00,TXN011,AXIS,UPI,Small payment
+Meera Nair,Mule Account A,890,2025-03-03 08:20:00,TXN012,AXIS,UPI,Small payment
+Ravi Gupta,Mule Account A,925,2025-03-03 08:25:00,TXN013,AXIS,UPI,Small payment
+Sunita Das,Mule Account A,960,2025-03-03 08:30:00,TXN014,AXIS,UPI,Small payment
+Mohit Jain,Mule Account A,845,2025-03-03 08:35:00,TXN015,AXIS,UPI,Small payment
+Neha Kapoor,Mule Account A,915,2025-03-03 08:40:00,TXN016,AXIS,UPI,Small payment
+Arun Mehta,Mule Account A,935,2025-03-03 08:45:00,TXN017,AXIS,UPI,Small payment
+Pooja Sinha,Mule Account A,870,2025-03-03 08:50:00,TXN018,AXIS,UPI,Small payment
+Harish Rao,Mule Account A,995,2025-03-03 08:55:00,TXN019,AXIS,UPI,Small payment
+Divya Mishra,Mule Account A,905,2025-03-03 09:00:00,TXN020,AXIS,UPI,Small payment
+Sanjay Pandey,Mule Account A,940,2025-03-03 09:05:00,TXN021,AXIS,UPI,Small payment
+Rekha Bhatt,Mule Account A,860,2025-03-03 09:10:00,TXN022,AXIS,UPI,Small payment
+Vivek Chopra,Mule Account A,975,2025-03-03 09:15:00,TXN023,AXIS,UPI,Small payment
+Geeta Saxena,Mule Account A,920,2025-03-03 09:20:00,TXN024,AXIS,UPI,Small payment
+Manoj Tiwari,Mule Account A,855,2025-03-03 09:25:00,TXN025,AXIS,UPI,Small payment
+Rashmi Kulkarni,Mule Account A,990,2025-03-03 09:30:00,TXN026,AXIS,UPI,Small payment
+Ashok Yadav,Mule Account A,930,2025-03-03 09:35:00,TXN027,AXIS,UPI,Small payment
+Mule Account A,Shell Company X,18500,2025-03-03 09:40:00,TXN028,AXIS,NEFT,Consolidated transfer
+Shell Company X,Layer B1,6000,2025-03-04 10:00:00,TXN029,PNB,NEFT,Layering hop 1
+Shell Company X,Layer B2,6500,2025-03-04 10:05:00,TXN030,PNB,NEFT,Layering hop 1
+Shell Company X,Layer B3,6000,2025-03-04 10:10:00,TXN031,PNB,NEFT,Layering hop 1
+Layer B1,Final Destination,5800,2025-03-04 10:30:00,TXN032,BOB,RTGS,Layering hop 2
+Layer B2,Final Destination,6300,2025-03-04 10:35:00,TXN033,BOB,RTGS,Layering hop 2
+Layer B3,Final Destination,5800,2025-03-04 10:40:00,TXN034,BOB,RTGS,Layering hop 2
+Speed Account A,Speed Account B,250000,2025-03-05 14:00:00,TXN035,HDFC,IMPS,Velocity chain
+Speed Account B,Speed Account C,248000,2025-03-05 14:05:00,TXN036,ICICI,IMPS,Velocity chain
+Speed Account C,Speed Account D,246000,2025-03-05 14:10:00,TXN037,SBI,IMPS,Velocity chain
+Speed Account D,Speed Account E,244000,2025-03-05 14:15:00,TXN038,AXIS,IMPS,Velocity chain
+Speed Account E,Speed Account F,242000,2025-03-05 14:20:00,TXN039,PNB,IMPS,Velocity chain
+Dormant Account Z,Active User 1,4000000,2025-03-06 09:00:00,TXN040,SBI,RTGS,Large reactivation
+Normal User 1,Normal User 2,15000,2025-03-07 11:00:00,TXN041,HDFC,UPI,Rent payment
+Normal User 2,Normal User 3,8500,2025-03-07 12:00:00,TXN042,ICICI,UPI,Dinner split
+Normal User 3,Normal User 1,5000,2025-03-08 09:00:00,TXN043,SBI,UPI,Loan repayment
+Normal User 4,Normal User 5,25000,2025-03-08 14:00:00,TXN044,HDFC,NEFT,Salary advance
+Normal User 5,Normal User 6,12000,2025-03-09 10:00:00,TXN045,AXIS,UPI,Purchase payment
+Normal User 6,Normal User 4,3000,2025-03-09 15:00:00,TXN046,PNB,UPI,Cab fare
+Blacklisted Entity A,Clean Account 1,75000,2025-03-10 08:00:00,TXN047,BOB,NEFT,Suspicious transfer
+Clean Account 2,Blacklisted Entity B,45000,2025-03-10 09:00:00,TXN048,SBI,NEFT,Outgoing to blacklist
+Rajesh Kumar,Priya Patel,49800,2025-03-11 08:00:00,TXN049,HDFC,UPI,Additional structuring
+Rajesh Kumar,Priya Patel,48700,2025-03-11 10:00:00,TXN050,HDFC,UPI,Additional structuring
+Rajesh Kumar,Priya Patel,49200,2025-03-11 12:00:00,TXN051,HDFC,UPI,Additional structuring
+Rajesh Kumar,Priya Patel,49600,2025-03-11 14:00:00,TXN052,HDFC,UPI,Additional structuring
+Corporate Account A,Corporate Account B,1500000,2025-03-12 09:00:00,TXN053,HDFC,RTGS,Legitimate business
+Corporate Account B,Corporate Account C,750000,2025-03-12 11:00:00,TXN054,ICICI,RTGS,Vendor payment
+Employee 1,Employee 2,2000,2025-03-13 13:00:00,TXN055,SBI,UPI,Lunch money
+Employee 2,Employee 3,1500,2025-03-13 13:30:00,TXN056,SBI,UPI,Coffee
+Employee 3,Employee 1,3500,2025-03-13 14:00:00,TXN057,SBI,UPI,Team outing share
+Suspicious Vendor,Mule Account A,500,2025-03-14 08:00:00,TXN058,AXIS,UPI,Another deposit
+Suspicious Vendor,Shell Company X,150000,2025-03-14 08:30:00,TXN059,PNB,NEFT,Large vendor payment

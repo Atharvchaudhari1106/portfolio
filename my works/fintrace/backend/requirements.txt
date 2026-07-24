@@ -1,0 +1,39 @@
+# ── Web Framework ─────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+python-multipart==0.0.12
+
+# ── Database ──────────────────────────────────────
+sqlalchemy==2.0.35
+aiosqlite==0.20.0
+asyncpg==0.30.0
+alembic==1.13.3
+neo4j==5.25.0
+
+# ── Data Processing ──────────────────────────────
+pandas==2.2.3
+openpyxl==3.1.5
+pdfplumber==0.11.4
+pytesseract==0.3.13
+
+# ── Graph Algorithms ─────────────────────────────
+networkx==3.4.2
+
+# ── Authentication ───────────────────────────────
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.0
+
+# ── HTTP Client (Ollama) ─────────────────────────
+httpx==0.28.1
+
+# ── Validation & Config ──────────────────────────
+pydantic==2.9.2
+pydantic-settings==2.5.2
+email-validator==2.2.0
+
+# ── Utilities ────────────────────────────────────
+python-dateutil==2.9.0
+aiofiles==24.1.0
+reportlab==4.2.5
+

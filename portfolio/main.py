@@ -37,6 +37,23 @@ def serve_crimegpt(path='index.html'):
         return "CrimeGPT Live Demo placeholder (building...)", 200
     return send_from_directory(dist_dir, path)
 
+@app.route('/portfolio/fintrace/')
+@app.route('/portfolio/fintrace/<path:path>')
+def serve_fintrace(path='index.html'):
+    possible_paths = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'my works', 'fintrace', 'frontend', 'dist')),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'OSINT & Finance', 'fintrace', 'frontend', 'dist')),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'portfolio', 'my works', 'fintrace', 'frontend', 'dist'))
+    ]
+    dist_dir = next((p for p in possible_paths if os.path.exists(p)), possible_paths[0])
+    target_file = os.path.join(dist_dir, path)
+    if not os.path.exists(dist_dir) or not os.path.exists(target_file):
+        if os.path.exists(os.path.join(dist_dir, 'index.html')):
+            return send_from_directory(dist_dir, 'index.html')
+        return "FinTrace Live Demo placeholder (building...)", 200
+    return send_from_directory(dist_dir, path)
+
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5002)
+
 
