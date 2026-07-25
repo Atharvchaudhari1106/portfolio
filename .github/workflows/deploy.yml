@@ -54,18 +54,12 @@ jobs:
           cp -r "my works/bigdata-search/frontend/dist"/* portfolio/build/portfolio/bigdata/
 
       # ── FinTrace OSINT & Finance App (Vite/React) ──────────────────
-      - name: Install and Build FinTrace app
-        run: |
-          cd "my works/fintrace/frontend"
-          npm install --legacy-peer-deps || true
-          npm run build || true
-
       - name: Copy FinTrace into portfolio build
         run: |
           mkdir -p portfolio/build/fintrace
           mkdir -p portfolio/build/portfolio/fintrace
-          cp -rf "my works/fintrace/frontend/dist"/* portfolio/build/fintrace/
-          cp -rf "my works/fintrace/frontend/dist"/* portfolio/build/portfolio/fintrace/
+          cp -rf "my works/fintrace/frontend/dist"/. portfolio/build/fintrace/
+          cp -rf "my works/fintrace/frontend/dist"/. portfolio/build/portfolio/fintrace/
 
       # ── CrimeGPT App (Vite/React) ──────────────────
       - name: Checkout CrimeGPT
