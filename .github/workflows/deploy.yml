@@ -49,7 +49,25 @@ jobs:
       - name: Copy big data search app into portfolio build
         run: |
           mkdir -p portfolio/build/bigdata
+          mkdir -p portfolio/build/portfolio/bigdata
           cp -r "my works/bigdata-search/frontend/dist"/* portfolio/build/bigdata/
+          cp -r "my works/bigdata-search/frontend/dist"/* portfolio/build/portfolio/bigdata/
+
+      # ── FinTrace OSINT & Finance App (Vite/React) ──────────────────
+      - name: Install FinTrace dependencies
+        run: npm install
+        working-directory: "my works/fintrace/frontend"
+
+      - name: Build FinTrace app
+        run: npm run build
+        working-directory: "my works/fintrace/frontend"
+
+      - name: Copy FinTrace into portfolio build
+        run: |
+          mkdir -p portfolio/build/fintrace
+          mkdir -p portfolio/build/portfolio/fintrace
+          cp -r "my works/fintrace/frontend/dist"/* portfolio/build/fintrace/
+          cp -r "my works/fintrace/frontend/dist"/* portfolio/build/portfolio/fintrace/
 
       # ── CrimeGPT App (Vite/React) ──────────────────
       - name: Checkout CrimeGPT
@@ -73,7 +91,9 @@ jobs:
       - name: Copy CrimeGPT into portfolio build
         run: |
           mkdir -p portfolio/build/crimegpt
+          mkdir -p portfolio/build/portfolio/crimegpt
           cp -r crimegpt/crimegpt-frontend/dist/* portfolio/build/crimegpt/
+          cp -r crimegpt/crimegpt-frontend/dist/* portfolio/build/portfolio/crimegpt/
 
       # ── Upload artifact ──────────────────────────────
       - name: Upload artifact
