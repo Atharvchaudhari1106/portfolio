@@ -7,6 +7,7 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
+@app.route('/portfolio/bigdata')
 @app.route('/portfolio/bigdata/')
 @app.route('/portfolio/bigdata/<path:path>')
 def serve_bigdata(path='index.html'):
@@ -22,6 +23,7 @@ def serve_bigdata(path='index.html'):
         return "Intelligence-X Live Demo placeholder (building...)", 200
     return send_from_directory(dist_dir, path)
 
+@app.route('/portfolio/crimegpt')
 @app.route('/portfolio/crimegpt/')
 @app.route('/portfolio/crimegpt/<path:path>')
 def serve_crimegpt(path='index.html'):
@@ -37,6 +39,7 @@ def serve_crimegpt(path='index.html'):
         return "CrimeGPT Live Demo placeholder (building...)", 200
     return send_from_directory(dist_dir, path)
 
+@app.route('/portfolio/fintrace')
 @app.route('/portfolio/fintrace/')
 @app.route('/portfolio/fintrace/<path:path>')
 def serve_fintrace(path='index.html'):
