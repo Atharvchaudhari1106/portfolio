@@ -59,7 +59,7 @@ jobs:
         working-directory: "my works/fintrace/frontend"
 
       - name: Build FinTrace app
-        run: npm run build
+        run: npx vite build
         working-directory: "my works/fintrace/frontend"
 
       - name: Copy FinTrace into portfolio build
